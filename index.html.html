@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Facebook Group Auto Poster & Seeding Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.85); opacity: 0.8; }
+            70% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        .animate-pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 9999px;
+            border: 2px solid #22c55e;
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- CỔNG ĐĂNG KÝ & ĐĂNG NHẬP BẢO MẬT SHA-256 (NHẤT QUÁN XUYÊN SUỐT MỌI BẢN CẬP NHẬT) -->
+    <div id="authGateOverlay" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-900">AI FB Group Studio</h2>
+                <p class="text-xs text-slate-500">Hệ thống bảo mật mã hóa SHA-256 • Đăng ký 1 lần dùng xuyên suốt mọi phiên bản cập nhật</p>
+            </div>
+
+            <!-- Tabs Đăng Nhập / Đăng Ký -->
+            <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl text-xs font-bold">
+                <button type="button" id="tabLoginBtn" onclick="switchAuthTab('login')" class="py-2 rounded-lg bg-white text-blue-600 shadow-sm transition">
+                    Đăng Nhập
+                </button>
+                <button type="button" id="tabRegisterBtn" onclick="switchAuthTab('register')" class="py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
+                    Tạo Tài Khoản Mới
+                </button>
+            </div>
+
+            <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-600"></div>
+
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Gmail hoặc Số điện thoại</label>
+                    <input type="text" id="authIdentifierInput" required placeholder="vd: tenban@gmail.com hoặc 0912345678"
+                        class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mật khẩu bảo mật (tối thiểu 6 ký tự)</label>
+                    <input type="password" id="authPasswordInput" required minlength="6" placeholder="••••••••"
+                        class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+
+                <div id="confirmPasswordWrapper" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Xác nhận lại mật khẩu</label>
+                    <input type="password" id="authConfirmPasswordInput" placeholder="••••••••"
+                        class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition">
+                    Đăng Nhập & Mở Khóa Tool
+                </button>
+            </form>
+
+            <div class="pt-3 border-t border-slate-100 flex flex-col items-center gap-2 text-center">
+                <label class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer transition">
+                    <svg class="w-3.5 h-3.5 mr-1.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    Khôi phục từ file Sao lưu Tài khoản (.json)
+                    <input type="file" accept=".json" onchange="importAccountVault(event)" class="hidden">
+                </label>
+                <p class="text-[11px] text-slate-400">
+                    Tài khoản đăng ký 1 lần được đồng bộ xuyên suốt cho mọi bản cập nhật tiếp theo của hệ thống.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HƯỚNG DẪN SỬ DỤNG TOOL -->
+    <div id="guideModalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl max-h-[88vh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">?</span>
+                    <h3 class="font-bold text-slate-900 text-base">Hướng Dẫn Vận Hành Chi Tiết</h3>
+                </div>
+                <button type="button" onclick="toggleGuideModal(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-5 text-sm text-slate-600 leading-relaxed">
+                <div class="p-4 rounded-2xl bg-blue-50 border border-blue-100 text-blue-900">
+                    <p class="font-bold mb-1">1. Chuẩn bị Gemini API Key (Miễn phí)</p>
+                    <p class="text-xs">Truy cập <a href="https://aistudio.google.com/apikey" target="_blank" class="underline font-bold text-blue-700">Google AI Studio</a>, tạo một API Key và dán vào ô cấu hình số 1. Hệ thống dùng model <b>Gemini 2.5 Flash</b> để đọc hình ảnh sản phẩm và viết bài chuẩn chuyên gia.</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="font-bold text-slate-800">2. Thiết lập Tài khoản nguồn & Nhóm mục tiêu</p>
+                    <ul class="list-disc pl-5 space-y-1 text-xs">
+                        <li>Dán <b>Link Facebook cá nhân / Fanpage nguồn</b> dùng để đi đăng bài và seeding.</li>
+                        <li>Dán <b>Link Hội Nhóm Facebook</b> cần đăng. Copy 3–5 bài viết đang có nhiều tương tác trong nhóm đó dán vào mục <b>Dữ liệu bài đăng Hot</b> để AI học văn phong tự nhiên của nhóm.</li>
+                    </ul>
+                </div>
+                <div class="space-y-2">
+                    <p class="font-bold text-slate-800">3. Cơ chế Vòng lặp Thông minh & Seeding 5 Bình luận</p>
+                    <ul class="list-disc pl-5 space-y-1 text-xs">
+                        <li><b>Chu kỳ đăng bài (Mặc định 3 phút):</b> Mỗi khi hết đếm ngược, AI tự động viết lại một phiên bản bài đăng hoàn toàn mới dựa trên ảnh sản phẩm & ngữ cảnh nhóm để tránh bị Facebook đánh dấu spam trùng lặp.</li>
+                        <li><b>Chu kỳ bình luận Seeding (Mặc định 5 phút/lần - Tối đa 5 comment):</b> AI tự sinh 5 câu hỏi/bình luận kích thích sự tò mò của khách hàng dựa trên chi tiết ảnh sản phẩm và lần lượt mở khóa từng câu theo đúng thời gian bạn cài đặt.</li>
+                    </ul>
+                </div>
+                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs">
+                    <b>Lưu ý bảo toàn tài khoản:</b> Hãy bấm nút <b>"Sao lưu Tài khoản"</b> trên thanh công cụ để tải về file <code>.json</code> đã mã hóa SHA-256. Khi bạn cập nhật tool lên phiên bản mới hoặc chuyển sang hosting khác, chỉ cần khôi phục file này là giữ nguyên toàn bộ tài khoản và cấu hình!
+                </div>
+            </div>
+            <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button type="button" onclick="toggleGuideModal(false)" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition">
+                    Đã Hiểu, Bắt Đầu Làm Việc
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- THANH ĐIỀU HƯỚNG (HEADER) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold shadow-sm">
+                    AI
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">FB Group AI Auto Poster & Seeding</h1>
+                    <p class="text-[11px] text-slate-500 hidden sm:block">Phân tích hình ảnh sản phẩm • Tự động xoay vòng content • Seeding 5 bình luận tò mò</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button type="button" onclick="toggleGuideModal(true)" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Hướng dẫn sử dụng</span>
+                    <span class="sm:hidden">Hướng dẫn</span>
+                </button>
+
+                <button type="button" onclick="exportAccountVault()" title="Xuất file hồ sơ tài khoản đã mã hóa để dùng xuyên suốt các bản cập nhật / tên miền mới" class="hidden md:inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Sao lưu Tài khoản
+                </button>
+
+                <span id="statusBadge" class="hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-slate-400 mr-2"></span> Sẵn sàng
+                </span>
+
+                <div class="flex items-center bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs">
+                    <span id="currentUserLabel" class="font-semibold text-slate-700 mr-2 max-w-[110px] truncate">Chưa đăng nhập</span>
+                    <button type="button" onclick="logoutUser()" class="text-rose-600 hover:text-rose-800 font-bold" title="Đăng xuất">Thoát</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- CỘT TRÁI: CẤU HÌNH & DỮ LIỆU ĐẦU VÀO (5 CỘT) -->
+            <div class="lg:col-span-5 space-y-5">
+
+                <!-- THẺ 1: API KEY, TÀI KHOẢN NGUỒN & CÀI ĐẶT THỜI GIAN -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-bold text-slate-900 flex items-center">
+                            <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-extrabold mr-2">1</span>
+                            Cấu hình Hệ thống & Thời gian
+                        </h2>
+                        <a href="https://aistudio.google.com/apikey" target="_blank" class="text-xs text-blue-600 hover:underline font-medium">Lấy API Key →</a>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Google Gemini API Key <span class="text-rose-500">*</span></label>
+                        <input type="password" id="apiKeyInput" oninput="autoSaveDraftInputs()" placeholder="AIzaSy..."
+                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Link Tài khoản Nguồn (Nick/Page đăng bài)</label>
+                        <div class="flex gap-2">
+                            <input type="url" id="sourceAccountUrlInput" oninput="autoSaveDraftInputs()" placeholder="https://www.facebook.com/profile.php?id=..."
+                                class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <button type="button" onclick="openExternalLink('sourceAccountUrlInput')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition whitespace-nowrap">
+                                Mở Nick
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Link Hội Nhóm Facebook Mục Tiêu</label>
+                        <div class="flex gap-2">
+                            <input type="url" id="groupUrlInput" oninput="autoSaveDraftInputs()" placeholder="https://www.facebook.com/groups/..."
+                                class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <button type="button" onclick="openExternalLink('groupUrlInput')" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-xl transition whitespace-nowrap">
+                                Mở Group
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TÙY CHỈNH THỜI GIAN ĐĂNG BÀI & COMMENT -->
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Chu kỳ đăng lại (Phút)</label>
+                            <input type="number" id="postIntervalInput" min="1" max="1440" value="3" oninput="syncCustomTimersUI(); autoSaveDraftInputs();"
+                                class="w-full px-2.5 py-1.5 text-sm font-bold text-blue-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Giãn cách Comment (Phút)</label>
+                            <input type="number" id="commentIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI(); autoSaveDraftInputs();"
+                                class="w-full px-2.5 py-1.5 text-sm font-bold text-indigo-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THẺ 2: THÔNG TIN & HÌNH ẢNH SẢN PHẨM -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-extrabold mr-2">2</span>
+                        Dữ liệu Sản phẩm & Hình ảnh (AI Vision)
+                    </h2>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Mô tả sản phẩm / Ưu đãi gốc <span class="text-rose-500">*</span></label>
+                        <textarea id="productInfoInput" rows="3" oninput="autoSaveDraftInputs()" placeholder="Nhập tên sản phẩm, công dụng, giá bán, khuyến mãi..."
+                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition custom-scrollbar"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ảnh sản phẩm (Để AI phân tích chi tiết như chuyên gia)</label>
+                        <div class="flex items-center gap-3">
+                            <label class="flex-1 flex flex-col items-center justify-center px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/40 transition">
+                                <svg class="w-6 h-6 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span id="imageFileNameLabel" class="text-xs font-medium text-slate-600 text-center">Bấm để chọn ảnh sản phẩm (JPG, PNG, WEBP)</span>
+                                <input type="file" id="productImageInput" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                            </label>
+                            <div id="imagePreviewWrapper" class="hidden relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 shrink-0 shadow-sm">
+                                <img id="imagePreviewImg" src="" alt="Preview" class="w-full h-full object-cover">
+                                <button type="button" onclick="clearUploadedImage()" class="absolute top-1 right-1 w-5 h-5 bg-slate-900/70 text-white rounded-full text-xs flex items-center justify-center hover:bg-rose-600">×</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Dữ liệu các bài đăng Hot trong Group (Để AI học văn phong)</label>
+                        <textarea id="hotPostsInput" rows="3" oninput="autoSaveDraftInputs()" placeholder="Copy 2-4 bài viết đang nhiều tương tác trong nhóm dán vào đây để AI bắt trend..."
+                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition custom-scrollbar"></textarea>
+                    </div>
+
+                    <!-- NÚT ĐIỀU KHIỂN CHIẾN DỊCH -->
+                    <div class="pt-2 flex gap-2.5">
+                        <button type="button" id="startCampaignBtn" onclick="startCampaign()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 transition flex items-center justify-center space-x-2 text-sm">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            <span>Chạy Chiến Dịch Tự Động</span>
+                        </button>
+                        <button type="button" id="stopCampaignBtn" onclick="stopCampaign()" disabled class="bg-slate-200 text-slate-400 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-1 text-sm cursor-not-allowed">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"></path></svg>
+                            <span>Dừng</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: BẢNG ĐIỀU KHIỂN THỜI GIAN THỰC & KẾT QUẢ AI (7 CỘT) -->
+            <div class="lg:col-span-7 space-y-5">
+
+                <!-- BỘ ĐẾM THỜI GIAN THỰC -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-semibold text-slate-500">Đổi bài mới sau</span>
+                            <span id="postTimerTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">Chu kỳ 3 phút</span>
+                        </div>
+                        <div id="postCountdownDisplay" class="text-2xl font-extrabold text-slate-900 tracking-tight">03:00</div>
+                        <p class="text-[11px] text-slate-400 mt-1">Phiên bản bài đăng: <b id="postCycleCountDisplay" class="text-slate-700">0</b></p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-semibold text-slate-500">Bình luận kế tiếp</span>
+                            <span id="commentTimerTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">Mỗi 5 phút</span>
+                        </div>
+                        <div id="commentCountdownDisplay" class="text-2xl font-extrabold text-indigo-600 tracking-tight">05:00</div>
+                        <p class="text-[11px] text-slate-400 mt-1">Tiến độ Seeding: <b id="commentProgressDisplay" class="text-slate-700">0 / 5</b></p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm flex flex-col justify-between">
+                        <span class="text-xs font-semibold text-slate-300">Tạo bài mới ngay lập tức</span>
+                        <button type="button" id="forceGenerateBtn" onclick="triggerImmediateGeneration()" class="mt-2 w-full py-2 px-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/15 transition flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Làm Mới Nội Dung AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PHÂN TÍCH CHUYÊN GIA & BÀI VIẾT MỚI -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span>
+                            Bài Đăng Đã Tối Ưu Bởi Chuyên Gia AI
+                        </h3>
+                        <button type="button" onclick="copyTextFromElement('generatedPostOutput', 'Đã sao chép nội dung bài viết!')" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition">
+                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            Copy Bài Đăng
+                        </button>
+                    </div>
+
+                    <div id="aiExpertInsightBox" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                        <span class="font-bold">Góc nhìn chuyên gia AI:</span> <span id="aiExpertInsightText"></span>
+                    </div>
+
+                    <textarea id="generatedPostOutput" rows="6" readonly placeholder="Nhấn 'Chạy Chiến Dịch Tự Động' hoặc 'Làm Mới Nội Dung AI' để chuyên gia AI phân tích hình ảnh sản phẩm và tạo bài đăng thu hút..."
+                        class="w-full p-3.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none custom-scrollbar leading-relaxed"></textarea>
+                </div>
+
+                <!-- DANH SÁCH 5 BÌNH LUẬN SEEDING GÂY TÒ MÒ -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">Kịch Bản Seeding Bình Luận Tò Mò (Tối đa 5 Comment)</h3>
+                            <p class="text-[11px] text-slate-500">Tự động mở khóa lần lượt theo đúng thời gian giãn cách đã cài đặt</p>
+                        </div>
+                        <span id="unlockedBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">0 / 5 Đã mở</span>
+                    </div>
+
+                    <div id="commentsListContainer" class="space-y-2.5">
+                        <div class="p-4 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400">
+                            Chưa có dữ liệu bình luận seeding. Hãy khởi chạy chiến dịch để AI tạo 5 câu hỏi kích thích khách hàng!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NHẬT KÝ HOẠT ĐỘNG THỜI GIAN THỰC -->
+                <div class="bg-slate-900 rounded-2xl p-4 text-slate-300 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-100 uppercase tracking-wider">Nhật ký hệ thống (Live Logs)</span>
+                        <button type="button" onclick="clearLogs()" class="text-[11px] text-slate-400 hover:text-white">Xóa log</button>
+                    </div>
+                    <div id="systemLogsBox" class="h-32 overflow-y-auto custom-scrollbar space-y-1.5 font-mono text-[11px]">
+                        <div class="text-slate-400">[SYSTEM] Sẵn sàng vận hành. Vui lòng kiểm tra API Key và bấm Chạy Chiến Dịch.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- THÔNG BÁO NỔI (TOAST) -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div id="toastInner" class="px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold text-white bg-slate-900 flex items-center space-x-2">
+            <span id="toastMessage">Thông báo</span>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. KIẾN TRÚC LƯU TRỮ NHẤT QUÁN XUYÊN SUỐT MỌI PHIÊN BẢN (CORE VAULT)
+        // =========================================================================
+        const VAULT_STORAGE_KEY = 'FB_AI_STUDIO_CORE_VAULT_V1';
+        const PERSISTENT_SESSION_KEY = 'FB_AI_STUDIO_ACTIVE_SESSION_V1';
+        const CORE_CRYPTO_SALT = 'FB_AI_STUDIO_CORE_SALT_2025_PERSISTENT';
+
+        let authMode = 'login';
+
+        // Trạng thái chiến dịch thời gian thực
+        const state = {
+            isRunning: false,
+            isGenerating: false,
+            timerIntervalId: null,
+            postIntervalSec: 180,
+            commentIntervalSec: 300,
+            postCountdownSec: 180,
+            commentCountdownSec: 300,
+            postCycleCount: 0,
+            unlockedCommentCount: 0,
+            maxComments: 5,
+            commentsPool: [],
+            imageBase64: null,
+            imageMimeType: null
+        };
+
+        // Hàm làm sạch và parse JSON an toàn từ phản hồi AI
+        function safeParseAIJson(rawText) {
+            let cleaned = String(rawText || '').trim();
+            cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+            const firstBrace = cleaned.indexOf('{');
+            const lastBrace = cleaned.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+            }
+            cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
+            return JSON.parse(cleaned);
+        }
+
+        function getCoreVault() {
+            const defaultVault = {
+                schemaVersion: 1,
+                users: {},
+                userConfigs: {}
+            };
+            try {
+                const raw = localStorage.getItem(VAULT_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    return {
+                        schemaVersion: 1,
+                        users: parsed.users || {},
+                        userConfigs: parsed.userConfigs || {}
+                    };
+                }
+                const legacyUsers = JSON.parse(localStorage.getItem('fb_ai_encrypted_users') || '{}');
+                if (Object.keys(legacyUsers).length > 0) {
+                    defaultVault.users = legacyUsers;
+                    saveCoreVault(defaultVault);
+                }
+            } catch (e) {
+                console.error('Vault read error:', e);
+            }
+            return defaultVault;
+        }
+
+        function saveCoreVault(vaultData) {
+            try {
+                localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vaultData));
+            } catch (e) {
+                console.error('Vault write error:', e);
+            }
+        }
+
+        async function hashStringSHA256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function validateIdentifier(value) {
+            const cleanVal = value.replace(/\s+/g, '');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^(0|\+84)[0-9]{8,10}$/;
+            return emailRegex.test(cleanVal) || phoneRegex.test(cleanVal);
+        }
+
+        function switchAuthTab(mode) {
+            authMode = mode;
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const regBtn = document.getElementById('tabRegisterBtn');
+            const confirmWrap = document.getElementById('confirmPasswordWrapper');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const errorBox = document.getElementById('authErrorBox');
+
+            errorBox.classList.add('hidden');
+            if (mode === 'login') {
+                loginBtn.className = 'py-2 rounded-lg bg-white text-blue-600 shadow-sm transition';
+                regBtn.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition';
+                confirmWrap.classList.add('hidden');
+                submitBtn.textContent = 'Đăng Nhập & Mở Khóa Tool';
+            } else {
+                regBtn.className = 'py-2 rounded-lg bg-white text-blue-600 shadow-sm transition';
+                loginBtn.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition';
+                confirmWrap.classList.remove('hidden');
+                submitBtn.textContent = 'Mã Hóa & Tạo Tài Khoản Mới';
+            }
+        }
+
+        function showAuthError(msg) {
+            const errorBox = document.getElementById('authErrorBox');
+            errorBox.textContent = msg;
+            errorBox.classList.remove('hidden');
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('authIdentifierInput').value.trim().toLowerCase().replace(/\s+/g, '');
+            const password = document.getElementById('authPasswordInput').value;
+            const confirmPassword = document.getElementById('authConfirmPasswordInput').value;
+
+            if (!validateIdentifier(identifier)) {
+                showAuthError('Vui lòng nhập đúng định dạng Email (Gmail) hoặc Số điện thoại!');
+                return;
+            }
+
+            const idHash = await hashStringSHA256(CORE_CRYPTO_SALT + identifier);
+            const passHash = await hashStringSHA256(CORE_CRYPTO_SALT + identifier + ':' + password);
+            const vault = getCoreVault();
+
+            if (authMode === 'register') {
+                if (password !== confirmPassword) {
+                    showAuthError('Mật khẩu xác nhận không trùng khớp!');
+                    return;
+                }
+                if (vault.users[idHash]) {
+                    showAuthError('Gmail hoặc Số điện thoại này đã được đăng ký. Vui lòng chuyển sang tab Đăng Nhập!');
+                    return;
+                }
+
+                vault.users[idHash] = {
+                    passHash: passHash,
+                    maskedId: identifier.includes('@')
+                        ? identifier.replace(/(.{2})(.*)(@.*)/, '$1***$3')
+                        : identifier.replace(/(\d{3})\d+(\d{3})/, '$1****$2'),
+                    createdAt: Date.now()
+                };
+                saveCoreVault(vault);
+                unlockAppSession(idHash, vault.users[idHash].maskedId);
+                showToast('Tạo tài khoản nhất quán thành công! Dùng xuyên suốt mọi bản cập nhật.', 'success');
+            } else {
+                const record = vault.users[idHash];
+                if (!record || record.passHash !== passHash) {
+                    showAuthError('Thông tin Gmail/SĐT hoặc mật khẩu không chính xác!');
+                    return;
+                }
+                unlockAppSession(idHash, record.maskedId);
+                showToast('Đăng nhập thành công! Đã tải cấu hình của bạn.', 'success');
+            }
+        }
+
+        function unlockAppSession(sessionToken, maskedLabel) {
+            localStorage.setItem(PERSISTENT_SESSION_KEY, JSON.stringify({
+                token: sessionToken,
+                label: maskedLabel
+            }));
+            document.getElementById('authGateOverlay').classList.add('hidden');
+            document.getElementById('currentUserLabel').textContent = maskedLabel;
+            loadUserConfigFromVault(sessionToken);
+            addLog(`Đã mở khóa phiên làm việc nhất quán cho tài khoản: ${maskedLabel}`, 'success');
+        }
+
+        function logoutUser() {
+            if (state.isRunning) stopCampaign();
+            localStorage.removeItem(PERSISTENT_SESSION_KEY);
+            document.getElementById('authPasswordInput').value = '';
+            document.getElementById('authConfirmPasswordInput').value = '';
+            document.getElementById('authGateOverlay').classList.remove('hidden');
+            showToast('Đã khóa phiên làm việc và đăng xuất.', 'info');
+        }
+
+        function saveUserConfigToVault(configObj) {
+            const session = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
+            if (!session || !session.token) return;
+            const vault = getCoreVault();
+            vault.userConfigs[session.token] = {
+                ...(vault.userConfigs[session.token] || {}),
+                ...configObj,
+                updatedAt: Date.now()
+            };
+            saveCoreVault(vault);
+        }
+
+        function autoSaveDraftInputs() {
+            saveUserConfigToVault({
+                apiKey: document.getElementById('apiKeyInput').value.trim(),
+                sourceAccount: document.getElementById('sourceAccountUrlInput').value.trim(),
+                groupUrl: document.getElementById('groupUrlInput').value.trim(),
+                productInfo: document.getElementById('productInfoInput').value,
+                hotPosts: document.getElementById('hotPostsInput').value,
+                postMins: parseInt(document.getElementById('postIntervalInput').value, 10) || 3,
+                cmtMins: parseInt(document.getElementById('commentIntervalInput').value, 10) || 5
+            });
+        }
+
+        function loadUserConfigFromVault(userToken) {
+            const vault = getCoreVault();
+            const cfg = vault.userConfigs[userToken] || {
+                apiKey: localStorage.getItem('fb_ai_gemini_key') || '',
+                sourceAccount: localStorage.getItem('fb_ai_source_account') || '',
+                groupUrl: localStorage.getItem('fb_ai_group_url') || '',
+                productInfo: localStorage.getItem('fb_ai_product_info') || '',
+                hotPosts: localStorage.getItem('fb_ai_hot_posts') || '',
+                postMins: localStorage.getItem('fb_ai_post_mins') || 3,
+                cmtMins: localStorage.getItem('fb_ai_cmt_mins') || 5
+            };
+
+            if (cfg.apiKey) document.getElementById('apiKeyInput').value = cfg.apiKey;
+            if (cfg.sourceAccount) document.getElementById('sourceAccountUrlInput').value = cfg.sourceAccount;
+            if (cfg.groupUrl) document.getElementById('groupUrlInput').value = cfg.groupUrl;
+            if (cfg.productInfo) document.getElementById('productInfoInput').value = cfg.productInfo;
+            if (cfg.hotPosts) document.getElementById('hotPostsInput').value = cfg.hotPosts;
+            if (cfg.postMins) document.getElementById('postIntervalInput').value = cfg.postMins;
+            if (cfg.cmtMins) document.getElementById('commentIntervalInput').value = cfg.cmtMins;
+
+            syncCustomTimersUI();
+        }
+
+        function exportAccountVault() {
+            const vault = getCoreVault();
+            const blob = new Blob([JSON.stringify(vault, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FB_AI_Studio_Account_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Đã xuất file Sao lưu Tài khoản mã hóa!', 'success');
+        }
+
+        function importAccountVault(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!imported.users || typeof imported.users !== 'object') {
+                        throw new Error('Định dạng file sao lưu không hợp lệ.');
+                    }
+                    const currentVault = getCoreVault();
+                    currentVault.users = { ...currentVault.users, ...imported.users };
+                    currentVault.userConfigs = { ...currentVault.userConfigs, ...(imported.userConfigs || {}) };
+                    saveCoreVault(currentVault);
+                    showToast('Khôi phục tài khoản & cấu hình thành công! Hãy đăng nhập ngay.', 'success');
+                } catch (err) {
+                    showAuthError('File sao lưu không hợp lệ hoặc bị hỏng!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // =========================================================================
+        // 2. XỬ LÝ GIAO DIỆN, HÌNH ẢNH & TIỆN ÍCH
+        // =========================================================================
+        function toggleGuideModal(show) {
+            const modal = document.getElementById('guideModalOverlay');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openExternalLink(inputId) {
+            const val = document.getElementById(inputId).value.trim();
+            if (!val) {
+                showToast('Vui lòng nhập đường dẫn URL trước khi mở!', 'warning');
+                return;
+            }
+            const formattedUrl = val.startsWith('http') ? val : 'https://' + val;
+            window.open(formattedUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        function formatSecondsToMMSS(totalSeconds) {
+            const mins = Math.floor(Math.max(0, totalSeconds) / 60);
+            const secs = Math.max(0, totalSeconds) % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function syncCustomTimersUI() {
+            const postInput = document.getElementById('postIntervalInput');
+            const cmtInput = document.getElementById('commentIntervalInput');
+
+            const postMins = Math.min(1440, Math.max(1, parseInt(postInput.value, 10) || 3));
+            const cmtMins = Math.min(1440, Math.max(1, parseInt(cmtInput.value, 10) || 5));
+
+            state.postIntervalSec = postMins * 60;
+            state.commentIntervalSec = cmtMins * 60;
+
+            document.getElementById('postTimerTag').textContent = `Chu kỳ ${postMins} phút`;
+            document.getElementById('commentTimerTag').textContent = `Mỗi ${cmtMins} phút`;
+
+            if (!state.isRunning) {
+                state.postCountdownSec = state.postIntervalSec;
+                state.commentCountdownSec = state.commentIntervalSec;
+                updateCountersUI();
+            }
+        }
+
+        function updateCountersUI() {
+            document.getElementById('postCountdownDisplay').textContent = formatSecondsToMMSS(state.postCountdownSec);
+            document.getElementById('commentCountdownDisplay').textContent =
+                state.unlockedCommentCount >= state.maxComments ? 'HOÀN TẤT' : formatSecondsToMMSS(state.commentCountdownSec);
+            document.getElementById('postCycleCountDisplay').textContent = state.postCycleCount;
+            document.getElementById('commentProgressDisplay').textContent = `${state.unlockedCommentCount} / ${state.maxComments}`;
+            document.getElementById('unlockedBadge').textContent = `${state.unlockedCommentCount} / ${state.maxComments} Đã mở`;
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('Vui lòng chọn ảnh có dung lượng dưới 10MB!', 'warning');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const commaIndex = dataUrl.indexOf(',');
+                state.imageBase64 = dataUrl.slice(commaIndex + 1);
+                state.imageMimeType = file.type || 'image/jpeg';
+
+                document.getElementById('imagePreviewImg').src = dataUrl;
+                document.getElementById('imagePreviewWrapper').classList.remove('hidden');
+                document.getElementById('imageFileNameLabel').textContent = file.name;
+                addLog(`Đã nạp hình ảnh sản phẩm (${file.name}) cho AI Vision phân tích.`, 'info');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearUploadedImage() {
+            state.imageBase64 = null;
+            state.imageMimeType = null;
+            document.getElementById('productImageInput').value = '';
+            document.getElementById('imagePreviewWrapper').classList.add('hidden');
+            document.getElementById('imageFileNameLabel').textContent = 'Bấm để chọn ảnh sản phẩm (JPG, PNG, WEBP)';
+        }
+
+        function copyTextFromElement(elementId, successMsg) {
+            const el = document.getElementById(elementId);
+            const text = el ? (el.value || el.textContent || '').trim() : '';
+            if (!text) {
+                showToast('Chưa có nội dung để sao chép!', 'warning');
+                return;
+            }
+            copyRawText(text, successMsg);
+        }
+
+        function copyRawText(text, successMsg) {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = text;
+            tempTextArea.style.position = 'fixed';
+            tempTextArea.style.left = '-9999px';
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg || 'Đã sao chép vào bộ nhớ tạm!', 'success');
+            } catch (err) {
+                showToast('Không thể tự động copy, vui lòng bôi đen thủ công.', 'warning');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        function addLog(message, type = 'info') {
+            const logBox = document.getElementById('systemLogsBox');
+            const timeStr = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+            let colorClass = 'text-slate-300';
+            if (type === 'success') colorClass = 'text-emerald-400';
+            if (type === 'warning') colorClass = 'text-amber-400';
+            if (type === 'error') colorClass = 'text-rose-400';
+
+            const line = document.createElement('div');
+            line.className = colorClass;
+            line.textContent = `[${timeStr}] ${message}`;
+            logBox.appendChild(line);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('systemLogsBox').innerHTML = '';
+        }
+
+        let toastTimeoutId = null;
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toastNotification');
+            const inner = document.getElementById('toastInner');
+            const msgEl = document.getElementById('toastMessage');
+
+            msgEl.textContent = message;
+            inner.className = 'px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold text-white flex items-center space-x-2 ' +
+                (type === 'success' ? 'bg-emerald-600' : type === 'warning' ? 'bg-amber-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-900');
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            if (toastTimeoutId) clearTimeout(toastTimeoutId);
+            toastTimeoutId = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3200);
+        }
+
+        // =========================================================================
+        // 3. GỌI GOOGLE GEMINI AI PHÂN TÍCH HÌNH ẢNH & TẠO CONTENT + 5 SEEDING CMT
+        // =========================================================================
+        async function callGeminiMarketingAI() {
+            if (state.isGenerating) return;
+
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const productInfo = document.getElementById('productInfoInput').value.trim();
+            const hotPosts = document.getElementById('hotPostsInput').value.trim();
+            const sourceAccount = document.getElementById('sourceAccountUrlInput').value.trim();
+
+            if (!apiKey) {
+                showToast('Vui lòng nhập Google Gemini API Key ở mục 1!', 'error');
+                addLog('Lỗi: Thiếu Gemini API Key.', 'error');
+                return;
+            }
+            if (!productInfo && !state.imageBase64) {
+                showToast('Vui lòng nhập mô tả sản phẩm hoặc tải ảnh sản phẩm lên!', 'warning');
+                return;
+            }
+
+            state.isGenerating = true;
+            const forceBtn = document.getElementById('forceGenerateBtn');
+            forceBtn.disabled = true;
+            forceBtn.classList.add('opacity-60');
+
+            addLog(`AI đang phân tích hình ảnh sản phẩm & văn phong nhóm (Chu kỳ #${state.postCycleCount + 1})...`, 'info');
+
+            const promptText = `Bạn là một chuyên gia Marketing thực chiến và bậc thầy tâm lý khách hàng trên Facebook Group.
+Hãy thực hiện các nhiệm vụ sau:
+1. Phân tích kỹ thông tin sản phẩm được cung cấp (và xem trực tiếp hình ảnh đính kèm nếu có) để nhận diện điểm nổi bật về thiết kế, màu sắc, công dụng, giá trị thực tế.
+2. Dựa trên ngữ cảnh các bài viết đang hot trong hội nhóm (và góc nhìn của tài khoản nguồn: ${sourceAccount || 'Người dùng chia sẻ thực tế'}), hãy viết một bài đăng mới hoàn toàn tự nhiên, thu hút, không trùng lặp với các lần đăng trước (Lần lặp thứ ${state.postCycleCount + 1}), tránh từ ngữ quảng cáo thô cứng dễ bị Facebook bóp tương tác.
+3. Tạo đúng 5 bình luận seeding ngắn gọn, đóng vai khách hàng tò mò đặt câu hỏi về chi tiết trên hình ảnh sản phẩm, trải nghiệm thực tế, cách dùng hoặc ưu đãi để kích thích người đọc tương tác.
+
+THÔNG TIN SẢN PHẨM:
+${productInfo || 'Phân tích trực tiếp từ hình ảnh sản phẩm đính kèm.'}
+
+DỮ LIỆU CÁC BÀI VIẾT HOT TRONG NHÓM:
+${hotPosts || 'Cộng đồng thảo luận cởi mở, thích chia sẻ trải nghiệm thật và hỏi đáp ngắn gọn.'}
+
+Trả về kết quả JSON theo đúng cấu trúc:
+{
+  "expert_analysis": "Tóm tắt ngắn gọn 1-2 câu điểm đắt giá nhất AI nhìn thấy từ sản phẩm/hình ảnh",
+  "post_content": "Nội dung bài viết hoàn chỉnh sẵn sàng đăng lên Facebook Group",
+  "curious_comments": [
+    "Câu bình luận tò mò 1",
+    "Câu bình luận tò mò 2",
+    "Câu bình luận tò mò 3",
+    "Câu bình luận tò mò 4",
+    "Câu bình luận tò mò 5"
+  ]
+}`;
+
+            const parts = [{ text: promptText }];
+            if (state.imageBase64) {
+                parts.push({
+                    inline_data: {
+                        mime_type: state.imageMimeType || 'image/jpeg',
+                        data: state.imageBase64
+                    }
+                });
+            }
+
+            try {
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: parts }],
+                        generationConfig: {
+                            temperature: 0.85,
+                            responseMimeType: 'application/json'
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data?.error?.message || `HTTP Error ${response.status}`);
+                }
+
+                const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const parsed = safeParseAIJson(rawText);
+
+                state.postCycleCount += 1;
+                document.getElementById('generatedPostOutput').value = parsed.post_content || '';
+
+                if (parsed.expert_analysis) {
+                    document.getElementById('aiExpertInsightText').textContent = parsed.expert_analysis;
+                    document.getElementById('aiExpertInsightBox').classList.remove('hidden');
+                }
+
+                const newComments = Array.isArray(parsed.curious_comments) ? parsed.curious_comments.slice(0, 5) : [];
+                while (newComments.length < 5) {
+                    newComments.push(`Sản phẩm này nhìn thực tế đẹp quá, cho mình xin thêm thông tin chi tiết với ạ! (#${newComments.length + 1})`);
+                }
+
+                state.commentsPool = newComments;
+                // Khi tạo bài mới, mở sẵn bình luận đầu tiên (1/5), 4 bình luận còn lại mở dần mỗi 5 phút
+                state.unlockedCommentCount = 1;
+                state.commentCountdownSec = state.commentIntervalSec;
+
+                renderSeedingCommentsList();
+                updateCountersUI();
+
+                addLog(`AI đã biên soạn xong bài đăng phiên bản #${state.postCycleCount} và bộ 5 bình luận seeding!`, 'success');
+                showToast(`Đã tạo xong bài đăng mới (#${state.postCycleCount}) & mở khóa comment 1/5!`, 'success');
+            } catch (error) {
+                console.error('Gemini API Error:', error);
+                addLog(`Lỗi gọi Gemini AI: ${error.message}`, 'error');
+                showToast(`Lỗi AI: ${error.message}`, 'error');
+            } finally {
+                state.isGenerating = false;
+                forceBtn.disabled = false;
+                forceBtn.classList.remove('opacity-60');
+            }
+        }
+
+        function renderSeedingCommentsList() {
+            const container = document.getElementById('commentsListContainer');
+            if (!state.commentsPool.length) return;
+
+            container.innerHTML = '';
+            state.commentsPool.forEach((cmtText, idx) => {
+                const isUnlocked = idx < state.unlockedCommentCount;
+                const card = document.createElement('div');
+                card.className = isUnlocked
+                    ? 'p-3 rounded-xl bg-indigo-50/70 border border-indigo-200 flex items-start justify-between gap-3 transition'
+                    : 'p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 opacity-65';
+
+                if (isUnlocked) {
+                    const leftDiv = document.createElement('div');
+                    leftDiv.className = 'space-y-1 flex-1';
+
+                    const badge = document.createElement('span');
+                    badge.className = 'inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-600 text-white';
+                    badge.textContent = `Comment #${idx + 1} • Sẵn sàng`;
+
+                    const p = document.createElement('p');
+                    p.className = 'text-xs text-slate-800 font-medium leading-relaxed';
+                    p.textContent = cmtText;
+
+                    leftDiv.appendChild(badge);
+                    leftDiv.appendChild(p);
+
+                    const copyBtn = document.createElement('button');
+                    copyBtn.type = 'button';
+                    copyBtn.className = 'shrink-0 px-3 py-1.5 rounded-lg bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 text-xs font-bold transition';
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.onclick = () => copyRawText(cmtText, `Đã copy bình luận seeding #${idx + 1}!`);
+
+                    card.appendChild(leftDiv);
+                    card.appendChild(copyBtn);
+                } else {
+                    const lockText = document.createElement('div');
+                    lockText.className = 'text-xs text-slate-500 flex items-center gap-2';
+                    lockText.innerHTML = `<span class="font-bold text-slate-700">#${idx + 1}</span> <span>Đang khóa • Tự động mở sau khi đến lượt hẹn giờ</span>`;
+                    card.appendChild(lockText);
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        // =========================================================================
+        // 4. ĐIỀU PHỐI BỘ ĐẾM THỜI GIAN THỰC (CHẠY CHIẾN DỊCH / DỪNG)
+        // =========================================================================
+        async function triggerImmediateGeneration() {
+            autoSaveDraftInputs();
+            await callGeminiMarketingAI();
+            if (state.isRunning) {
+                state.postCountdownSec = state.postIntervalSec;
+                updateCountersUI();
+            }
+        }
+
+        async function startCampaign() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const productInfo = document.getElementById('productInfoInput').value.trim();
+
+            if (!apiKey) {
+                showToast('Vui lòng nhập Google Gemini API Key trước khi chạy!', 'error');
+                document.getElementById('apiKeyInput').focus();
+                return;
+            }
+            if (!productInfo && !state.imageBase64) {
+                showToast('Vui lòng nhập mô tả sản phẩm hoặc chọn ảnh sản phẩm!', 'warning');
+                document.getElementById('productInfoInput').focus();
+                return;
+            }
+
+            syncCustomTimersUI();
+            autoSaveDraftInputs();
+
+            state.isRunning = true;
+            state.postCountdownSec = state.postIntervalSec;
+            state.commentCountdownSec = state.commentIntervalSec;
+
+            // Khóa ô chỉnh thời gian khi đang chạy để đảm bảo đồng bộ
+            document.getElementById('postIntervalInput').disabled = true;
+            document.getElementById('commentIntervalInput').disabled = true;
+
+            const startBtn = document.getElementById('startCampaignBtn');
+            const stopBtn = document.getElementById('stopCampaignBtn');
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-60', 'cursor-not-allowed');
+            stopBtn.disabled = false;
+            stopBtn.className = 'bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-rose-500/20 transition flex items-center justify-center space-x-1 text-sm cursor-pointer';
+
+            const badge = document.getElementById('statusBadge');
+            badge.innerHTML = `<span class="relative w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse-ring"></span> Đang chạy tự động`;
+            badge.className = 'hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+
+            addLog(`Khởi chạy chiến dịch: Đổi bài mỗi ${Math.round(state.postIntervalSec / 60)} phút • Seeding comment mỗi ${Math.round(state.commentIntervalSec / 60)} phút (tối đa 5 cmt).`, 'success');
+
+            // Gọi AI tạo bài đăng đầu tiên ngay lập tức
+            await callGeminiMarketingAI();
+
+            if (state.timerIntervalId) clearInterval(state.timerIntervalId);
+            state.timerIntervalId = setInterval(async () => {
+                if (!state.isRunning) return;
+
+                // 1. Đếm ngược chu kỳ làm mới bài đăng
+                if (state.postCountdownSec > 0) {
+                    state.postCountdownSec -= 1;
+                } else if (!state.isGenerating) {
+                    state.postCountdownSec = state.postIntervalSec;
+                    addLog('Đã đến chu kỳ đăng bài mới! AI đang tự động xoay vòng nội dung...', 'info');
+                    await callGeminiMarketingAI();
+                }
+
+                // 2. Đếm ngược chu kỳ mở khóa bình luận seeding (tối đa 5 bình luận)
+                if (state.commentsPool.length > 0 && state.unlockedCommentCount < state.maxComments) {
+                    if (state.commentCountdownSec > 0) {
+                        state.commentCountdownSec -= 1;
+                    } else {
+                        state.unlockedCommentCount += 1;
+                        state.commentCountdownSec = state.commentIntervalSec;
+                        renderSeedingCommentsList();
+                        addLog(`Đã mở khóa bình luận seeding #${state.unlockedCommentCount}/${state.maxComments}!`, 'success');
+                        showToast(`Đã mở khóa bình luận seeding #${state.unlockedCommentCount}/${state.maxComments}!`, 'info');
+                    }
+                }
+
+                updateCountersUI();
+            }, 1000);
+        }
+
+        function stopCampaign() {
+            state.isRunning = false;
+            if (state.timerIntervalId) {
+                clearInterval(state.timerIntervalId);
+                state.timerIntervalId = null;
+            }
+
+            document.getElementById('postIntervalInput').disabled = false;
+            document.getElementById('commentIntervalInput').disabled = false;
+
+            const startBtn = document.getElementById('startCampaignBtn');
+            const stopBtn = document.getElementById('stopCampaignBtn');
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            stopBtn.disabled = true;
+            stopBtn.className = 'bg-slate-200 text-slate-400 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-1 text-sm cursor-not-allowed';
+
+            const badge = document.getElementById('statusBadge');
+            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400 mr-2"></span> Đã tạm dừng`;
+            badge.className = 'hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600';
+
+            addLog('Đã dừng chiến dịch theo yêu cầu.', 'warning');
+            showToast('Đã dừng bộ đếm chiến dịch.', 'info');
+        }
+
+        // Khôi phục phiên đăng nhập nhất quán khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
+            const vault = getCoreVault();
+
+            if (activeSession && activeSession.token && vault.users[activeSession.token]) {
+                document.getElementById('authGateOverlay').classList.add('hidden');
+                document.getElementById('currentUserLabel').textContent = activeSession.label;
+                loadUserConfigFromVault(activeSession.token);
+            } else {
+                syncCustomTimersUI();
+            }
+        });
+    </script>
+</body>
+</html>
