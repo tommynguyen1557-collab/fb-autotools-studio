@@ -355,10 +355,11 @@
                         <div class="flex gap-2">
                             <input type="url" id="sourceAccountUrlInput" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/profile.php?id=..."
                                 class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
-                            <button type="button" onclick="openSourceAccountUrl()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition shrink-0">
-                                Mở Nick
+                            <button type="button" onclick="openSourceAccountUrl()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                                🔗 Kết Nối Nick
                             </button>
                         </div>
+                        <p class="text-[10px] text-slate-400 mt-1">Bấm <b>Kết Nối Nick</b> để Robot mở thẳng tài khoản/Fanpage nguồn này và dùng chính phiên đó để đăng bài.</p>
                     </div>
 
                     <div>
@@ -1223,14 +1224,36 @@
             syncCustomTimersUI();
         }
 
-        function openSourceAccountUrl() {
+        async function openSourceAccountUrl() {
             const url = (document.getElementById('sourceAccountUrlInput')?.value || '').trim();
             if (!url) {
                 showToast('Vui lòng nhập link tài khoản nguồn trước!', 'warning');
+                document.getElementById('sourceAccountUrlInput')?.focus();
                 return;
             }
             const fullUrl = url.startsWith('http') ? url : 'https://' + url;
+            saveUserConfigToVault();
+
+            // Ưu tiên gửi lệnh trực tiếp cho Robot mở thẳng link tài khoản nguồn trên trình duyệt điều khiển
+            const connected = state.robotConnected || await checkDesktopRobotBridge(false);
+            if (connected) {
+                try {
+                    const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/connect-source`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sourceUrl: fullUrl })
+                    }, 5000);
+                    if (res.ok) {
+                        addLog(`Đã gửi lệnh cho Robot kết nối trực tiếp tới tài khoản nguồn: ${fullUrl}`, 'success');
+                        showToast('Robot đã mở thẳng link tài khoản nguồn trên trình duyệt điều khiển!', 'success');
+                        return;
+                    }
+                } catch (_) {}
+            }
+
+            // Dự phòng nếu chưa bật Robot: mở trực tiếp trên trình duyệt hiện tại
             window.open(fullUrl, '_blank', 'noopener,noreferrer');
+            showToast('Đang mở link tài khoản nguồn trên trình duyệt của bạn (Bật Robot để kết nối tự động).', 'info');
         }
 
         function parseCleanGroupUrls(rawText) {
@@ -1506,9 +1529,11 @@
             }
 
             try {
+                const sourceAccountUrl = (document.getElementById('sourceAccountUrlInput')?.value || '').trim();
                 const formData = new FormData();
                 formData.append('groupUrls', JSON.stringify(groupUrls));
                 formData.append('postContent', postContent);
+                formData.append('sourceUrl', sourceAccountUrl);
 
                 state.images.forEach((imgObj, idx) => {
                     const imgBlob = base64ToBlob(imgObj.base64, imgObj.mimeType);
@@ -1626,7 +1651,7 @@
                 'def parse_multipart_payload(content_type, raw_body):',
                 '    header_bytes = f"Content-Type: {content_type}\\r\\nMIME-Version: 1.0\\r\\n\\r\\n".encode("utf-8")',
                 '    msg = message_from_bytes(header_bytes + raw_body)',
-                '    group_urls, post_content, saved_files = [], "", []',
+                '    group_urls, post_content, source_url, saved_files = [], "", "", []',
                 '    if msg.is_multipart():',
                 '        for idx, part in enumerate(msg.get_payload()):',
                 '            name = part.get_param("name", header="Content-Disposition")',
@@ -1642,7 +1667,9 @@
                 '                group_urls = json.loads(payload_bytes.decode("utf-8", errors="ignore") or "[]")',
                 '            elif name == "postContent":',
                 '                post_content = payload_bytes.decode("utf-8", errors="ignore")',
-                '    return group_urls, post_content, saved_files',
+                '            elif name == "sourceUrl":',
+                '                source_url = payload_bytes.decode("utf-8", errors="ignore").strip()',
+                '    return group_urls, post_content, source_url, saved_files',
                 '',
                 'class BridgeHandler(BaseHTTPRequestHandler):',
                 '    def _cors(self):',
@@ -1658,13 +1685,18 @@
                 '    def do_POST(self):',
                 '        length = int(self.headers.get("Content-Length", 0))',
                 '        raw_body = self.rfile.read(length) if length > 0 else b""',
-                '        if self.path == "/auto-post-media":',
+                '        if self.path == "/connect-source":',
+                '            data = json.loads(raw_body.decode("utf-8") or "{}")',
+                '            TASK_QUEUE.append(("connect_source", data))',
+                '            self.send_response(200); self._cors(); self.end_headers()',
+                '            self.wfile.write(b\'{"connected":true}\')',
+                '        elif self.path == "/auto-post-media":',
                 '            for old_f in os.listdir(MEDIA_TMP_DIR):',
                 '                try: os.remove(os.path.join(MEDIA_TMP_DIR, old_f))',
                 '                except Exception: pass',
                 '            ctype = self.headers.get("Content-Type", "")',
-                '            group_urls, post_content, saved_files = parse_multipart_payload(ctype, raw_body)',
-                '            TASK_QUEUE.append(("post", {"groupUrls": group_urls, "postContent": post_content, "mediaPaths": saved_files}))',
+                '            group_urls, post_content, source_url, saved_files = parse_multipart_payload(ctype, raw_body)',
+                '            TASK_QUEUE.append(("post", {"groupUrls": group_urls, "postContent": post_content, "sourceUrl": source_url, "mediaPaths": saved_files}))',
                 '            self.send_response(200); self._cors(); self.end_headers()',
                 '            self.wfile.write(b\'{"queued":true}\')',
                 '        elif self.path == "/auto-comment":',
@@ -1675,6 +1707,28 @@
                 '    def log_message(self, *args): pass',
                 '',
                 'def human_sleep(a=1.5, b=3.0): time.sleep(random.uniform(a, b))',
+                '',
+                'def connect_to_source_account(page, source_url):',
+                '    if not source_url:',
+                '        return',
+                '    print(f"[ROBOT] Dang ket noi truc tiep toi tai khoan nguon: {source_url}")',
+                '    page.bring_to_front()',
+                '    page.goto(source_url, wait_until="domcontentloaded", timeout=60000)',
+                '    human_sleep(2.5, 4.0)',
+                '    if "two_step_verification" in page.url:',
+                '        print("[ROBOT] Phat hien man hinh xac thuc 2FA -> Tu dong chuyen sang giao dien nhe mbasic...")',
+                '        page.goto("https://mbasic.facebook.com", wait_until="domcontentloaded")',
+                '        return',
+                '    for switch_txt in ["Chuyển ngay", "Switch Now", "Chuyển sang Trang", "Switch"]:',
+                '        try:',
+                '            sw_btn = page.locator(f\'div[aria-label="{switch_txt}"][role="button"]\').first',
+                '            if sw_btn.is_visible(timeout=2000):',
+                '                sw_btn.click()',
+                '                print(f"[ROBOT] Da tu dong chuyen quyen thao tac sang tai khoan nguon ({switch_txt})!")',
+                '                human_sleep(3, 5)',
+                '                break',
+                '        except Exception:',
+                '            pass',
                 '',
                 'def run_robot():',
                 '    global LAST_POST_URL',
@@ -1703,14 +1757,24 @@
                 '        ctx = browser.contexts[0]',
                 '        page = ctx.pages[0] if ctx.pages else ctx.new_page()',
                 '        print("==========================================================")',
-                '        print("  DA DONG BO PHIEN DANG NHAP FACEBOOK SANG TRINH DUYET ROBOT!")',
-                '        print("  NEU CHUA VAO TRANG CHU, BAN CO THE DANG NHAP TRUC TIEP NGAY!")',
+                '        print("  DA SAN SANG KET NOI TRUC TIEP LINK TAI KHOAN NGUON!")',
                 '        print("==========================================================")',
                 '        while True:',
+                '            if "two_step_verification" in page.url:',
+                '                try: page.goto("https://mbasic.facebook.com", wait_until="domcontentloaded")',
+                '                except Exception: pass',
                 '            if not TASK_QUEUE:',
                 '                time.sleep(1); continue',
                 '            kind, payload = TASK_QUEUE.pop(0)',
-                '            if kind == "post":',
+                '            if kind == "connect_source":',
+                '                try:',
+                '                    connect_to_source_account(page, payload.get("sourceUrl", ""))',
+                '                except Exception as e:',
+                '                    print(f"[ROBOT LOI KET NOI NICK] {e}")',
+                '            elif kind == "post":',
+                '                try:',
+                '                    connect_to_source_account(page, payload.get("sourceUrl", ""))',
+                '                except Exception: pass',
                 '                media_paths = [m for m in payload.get("mediaPaths", []) if os.path.exists(m)]',
                 '                for g_url in payload.get("groupUrls", []):',
                 '                    try:',
