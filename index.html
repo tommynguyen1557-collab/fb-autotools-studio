@@ -233,40 +233,160 @@
         </div>
     </div>
 
-    <!-- MODAL HƯỚNG DẪN SỬ DỤNG TOOL -->
-    <div id="guideModalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-2xl max-h-[88vh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center space-x-2.5">
-                    <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm">?</span>
-                    <h3 class="font-bold text-slate-900 text-base">Hướng Dẫn Sử Dụng AI FB Group Studio</h3>
+    <!-- MODAL HƯỚNG DẪN SỬ DỤNG TOOL CHI TIẾT TỪ A-Z -->
+    <div id="guideModalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            <!-- Header Modal -->
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+                <div class="flex items-center space-x-3">
+                    <span class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs text-white flex items-center justify-center font-extrabold text-base">📘</span>
+                    <div>
+                        <h3 class="font-extrabold text-base sm:text-lg">Cẩm Nang Cài Đặt & Vận Hành AI FB Group Studio (A–Z)</h3>
+                        <p class="text-[11px] text-blue-100">Hướng dẫn từng bước trực quan • Ai cũng có thể tự cài và chạy tự động chỉ sau 3 phút</p>
+                    </div>
                 </div>
-                <button type="button" onclick="toggleGuideModal(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition">
+                <button type="button" onclick="toggleGuideModal(false)" class="p-2 rounded-xl text-blue-100 hover:text-white hover:bg-white/10 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-6 overflow-y-auto custom-scrollbar space-y-4 text-sm text-slate-600 leading-relaxed">
-                <div class="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 text-blue-900 text-xs">
-                    <strong>Kiến trúc đồng nhất:</strong> Tài khoản & cài đặt của bạn được mã hóa SHA-256 và tự động giữ nguyên xuyên suốt mọi bản cập nhật sau này.
-                </div>
-                <div class="space-y-3">
-                    <div>
-                        <h4 class="font-bold text-slate-900">Bước 1: Kết nối AI & Tài khoản nguồn</h4>
-                        <p class="text-xs mt-1">Dán <strong>Google Gemini API Key</strong> (miễn phí tại Google AI Studio), nhập link trang cá nhân/Fanpage nguồn dùng để đi đăng bài, danh sách link các Group mục tiêu và tùy chỉnh số phút nghỉ giữa các lần đăng/bình luận.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-slate-900">Bước 2: Nạp hình ảnh & dữ liệu bài hot trong nhóm</h4>
-                        <p class="text-xs mt-1">Tải lên ảnh sản phẩm rõ nét để AI Vision phân tích chi tiết màu sắc, kiểu dáng. Dán thêm 2–3 đoạn nội dung bài viết đang nổi bật trong nhóm để AI học văn phong tự nhiên.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-slate-900">Bước 3: Vận hành chu kỳ đăng bài & Seeding 5 bình luận</h4>
-                        <p class="text-xs mt-1">Bấm <strong>Chạy Chiến Dịch Tự Động</strong>. AI sẽ tự động viết bài mới sau mỗi chu kỳ (mặc định 3 phút) để tránh trùng lặp, đồng thời lần lượt mở khóa từng câu bình luận seeding gây tò mò sau mỗi chu kỳ bình luận (mặc định 5 phút, tối đa 5 bình luận).</p>
-                    </div>
-                </div>
+
+            <!-- Thanh điều hướng nhanh các phần -->
+            <div class="px-6 py-2.5 bg-slate-100 border-b border-slate-200 flex flex-wrap gap-1.5 text-[11px] font-bold">
+                <a href="#guide-sec-1" class="px-2.5 py-1 rounded-lg bg-white text-blue-700 border border-slate-200 hover:bg-blue-50 transition">1. Kích Hoạt Bản Quyền</a>
+                <a href="#guide-sec-2" class="px-2.5 py-1 rounded-lg bg-white text-indigo-700 border border-slate-200 hover:bg-indigo-50 transition">2. Lấy Google Gemini API Key</a>
+                <a href="#guide-sec-3" class="px-2.5 py-1 rounded-lg bg-white text-amber-800 border border-slate-200 hover:bg-amber-50 transition">3. Cài Robot Tự Động Chuột/Phím</a>
+                <a href="#guide-sec-4" class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 border border-slate-200 hover:bg-emerald-50 transition">4. Chạy Chiến Dịch & Seeding</a>
+                <a href="#guide-sec-5" class="px-2.5 py-1 rounded-lg bg-white text-rose-700 border border-slate-200 hover:bg-rose-50 transition">5. Mẹo An Toàn & Khắc Phục Lỗi</a>
             </div>
-            <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50 flex justify-end">
-                <button type="button" onclick="toggleGuideModal(false)" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
-                    Đã Hiểu & Bắt Đầu
+
+            <!-- Nội dung chi tiết -->
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 text-sm text-slate-700 leading-relaxed">
+
+                <!-- TỔNG QUAN 2 CHẾ ĐỘ HOẠT ĐỘNG -->
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 space-y-2">
+                    <h4 class="font-extrabold text-blue-950 text-xs uppercase tracking-wider">⚡ Công cụ hoạt động theo 2 chế độ thông minh:</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 rounded-xl bg-white border border-blue-100 shadow-2xs">
+                            <p class="font-bold text-blue-700">🌐 Chế độ Web (Không cần cài đặt gì)</p>
+                            <p class="text-slate-600 mt-1">AI tự động phân tích ảnh sản phẩm, viết mới nội dung bài đăng & 5 bình luận seeding theo chu kỳ phút. Bạn chỉ cần bấm nút <b>Mở Nhóm</b> rồi nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">Ctrl + V</kbd> là đăng ngay.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 shadow-2xs">
+                            <p class="font-bold text-amber-400">🤖 Chế độ Robot Ngầm (100% Không đụng tay)</p>
+                            <p class="text-slate-300 mt-1">Kết nối thêm file Robot chạy nền trên Windows để máy tính <b>tự điều khiển chuột & bàn phím</b> mở từng Group, gõ phím đăng bài, tải ảnh lên và tự thả 5 bình luận seeding hoàn toàn tự động.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHẦN 1: KÍCH HOẠT TÀI KHOẢN -->
+                <div id="guide-sec-1" class="space-y-2.5 scroll-mt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-blue-600 text-white text-xs font-extrabold flex items-center justify-center">1</span>
+                        <h4 class="font-extrabold text-slate-900 text-base">Đăng Ký & Kích Hoạt Giấy Phép Sử Dụng</h4>
+                    </div>
+                    <ul class="space-y-1.5 text-xs text-slate-600 pl-8 list-disc">
+                        <li><strong>Bước 1:</strong> Liên hệ Chủ sở hữu công cụ, cung cấp địa chỉ <b>Gmail</b> hoặc <b>Số điện thoại</b> của bạn để nhận <b>Mã Cấp Quyền (License Key)</b> có dạng <code class="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-mono">FBA-20261231-XXXXXXXXXXXX</code>.</li>
+                        <li><strong>Bước 2:</strong> Tại màn hình mở khóa ban đầu, chọn tab <b>Tạo Tài Khoản</b> (nếu dùng lần đầu) → nhập đúng Gmail/SĐT đã đăng ký, đặt mật khẩu bảo mật (từ 6 ký tự) và dán <b>Mã Cấp Quyền</b> vào ô màu vàng.</li>
+                        <li><strong>Bước 3:</strong> Sau khi vào bên trong, bạn nên bấm nút <b>Sao lưu Tài khoản</b> (màu xanh lá trên thanh tiêu đề) để tải về file <code class="bg-slate-100 px-1 rounded">.json</code> lưu trữ cấu hình. Nếu sau này đổi trình duyệt hoặc sang máy tính khác, chỉ cần khôi phục file này là giữ nguyên toàn bộ cài đặt.</li>
+                    </ul>
+                </div>
+
+                <!-- PHẦN 2: LẤY GOOGLE GEMINI API KEY -->
+                <div id="guide-sec-2" class="space-y-2.5 scroll-mt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center">2</span>
+                        <h4 class="font-extrabold text-slate-900 text-base">Cách Lấy Mã Google Gemini API Key (Miễn Phí Trong 30 Giây)</h4>
+                    </div>
+                    <div class="pl-8 space-y-2 text-xs text-slate-600">
+                        <p>API Key là "bộ não" giúp AI đọc hiểu hình ảnh sản phẩm và tự sáng tạo bài viết mới không trùng lặp:</p>
+                        <ol class="list-decimal pl-4 space-y-1.5">
+                            <li>Bấm vào chữ <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline">Lấy API Key →</a> ở góc trên bên phải Mục 1 (hoặc truy cập <b>aistudio.google.com/apikey</b>) và đăng nhập bằng tài khoản Google (Gmail).</li>
+                            <li>Bấm nút màu xanh <b>Create API key</b> (Tạo khóa API) → chọn dự án có sẵn hoặc tạo mới.</li>
+                            <li>Copy dãy ký tự bắt đầu bằng <code class="px-1.5 py-0.5 bg-slate-100 border rounded font-mono font-bold text-slate-800">AIzaSy...</code> và dán vào ô <b>Google Gemini API Key *</b> trên công cụ. Hệ thống sẽ tự động lưu lại cho các lần sau.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- PHẦN 3: CÀI ĐẶT ROBOT TỰ ĐỘNG CHUỘT/BÀN PHÍM -->
+                <div id="guide-sec-3" class="space-y-3 scroll-mt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 text-xs font-extrabold flex items-center justify-center">3</span>
+                        <h4 class="font-extrabold text-slate-900 text-base">Cài Đặt Robot Tự Động Điều Khiển Chuột & Bàn Phím (Chỉ Làm 1 Lần)</h4>
+                    </div>
+                    <div class="pl-8 space-y-2.5 text-xs text-slate-600">
+                        <p>Nếu bạn muốn máy tính Windows tự động mở Facebook, tự gõ phím nhập bài, tự tải ảnh sản phẩm lên và tự thả bình luận ngầm mà <b>không cần đụng tay</b>, hãy làm đúng 3 bước sau:</p>
+
+                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                            <div>
+                                <span class="font-extrabold text-slate-900">Bước 3.1 — Cài đặt Python trên máy tính (Nếu máy chưa có):</span>
+                                <p class="mt-0.5">Tải Python miễn phí tại <a href="https://www.python.org/downloads/" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline">python.org/downloads</a>. Khi mở bộ cài, <strong class="text-rose-600">bắt buộc tích chọn ô vuông "Add python.exe to PATH"</strong> ở góc dưới cùng rồi bấm <b>Install Now</b>.</p>
+                            </div>
+                            <div>
+                                <span class="font-extrabold text-slate-900">Bước 3.2 — Tải & Khởi động Robot 1-Click:</span>
+                                <p class="mt-0.5">Tại khung màu đen <b>Robot Tự Động Chuột/Phím</b> ở cột bên trái giao diện Web, bấm nút màu vàng <b>⬇ Tải Robot 1-Click (.bat)</b>. Sau đó vào thư mục <b>Downloads</b> (Tải xuống) bấm đúp mở file <code class="px-1.5 py-0.5 bg-amber-100 text-amber-950 font-mono font-bold rounded">KHOI_DONG_ROBOT.bat</code>.</p>
+                                <p class="text-[11px] text-slate-500 mt-1 italic">* Ở lần chạy đầu tiên, cửa sổ đen sẽ tự động tải bộ điều khiển trình duyệt (mất khoảng 1–2 phút). Các lần sau chỉ mất 2 giây là mở ngay!</p>
+                            </div>
+                            <div>
+                                <span class="font-extrabold text-slate-900">Bước 3.3 — Đăng nhập Facebook 1 lần duy nhất & Kết nối:</span>
+                                <p class="mt-0.5">Khi cửa sổ trình duyệt của Robot tự động bật lên trang Facebook, bạn hãy <b>đăng nhập tài khoản Facebook dùng để đi đăng bài</b> trên cửa sổ đó (Robot sẽ tự lưu phiên đăng nhập cho mọi lần sau). Quay lại trang Web bấm <b>Kiểm tra kết nối Robot</b> → đèn chuyển sang <span class="text-emerald-600 font-bold">màu xanh lá (Đã kết nối Robot)</span> là hoàn tất!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHẦN 4: THIẾT LẬP & CHẠY CHIẾN DỊCH -->
+                <div id="guide-sec-4" class="space-y-2.5 scroll-mt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white text-xs font-extrabold flex items-center justify-center">4</span>
+                        <h4 class="font-extrabold text-slate-900 text-base">Thiết Lập Nội Dung & Vận Hành Chiến Dịch Tự Động</h4>
+                    </div>
+                    <div class="pl-8 space-y-2 text-xs text-slate-600">
+                        <ol class="list-decimal pl-4 space-y-1.5">
+                            <li><strong>Nhập danh sách Group mục tiêu:</strong> Dán đường link các nhóm Facebook muốn đăng vào ô <b>Danh sách Link Group Mục Tiêu</b> (mỗi nhóm 1 dòng). Hệ thống tự động làm sạch các tham số thừa như <code class="bg-slate-100 px-1 rounded">?locale=vi_VN</code>.</li>
+                            <li><strong>Cài đặt nhịp độ thời gian an toàn:</strong>
+                                <ul class="list-disc pl-4 mt-1 space-y-0.5 text-slate-500">
+                                    <li><b>Chu kỳ đăng lại (Phút):</b> Khoảng thời gian nghỉ giữa mỗi lần AI viết bài mới và đăng bài (khuyến nghị đặt từ <b>5 – 15 phút</b> để giống người dùng thật).</li>
+                                    <li><b>Chu kỳ comment (Phút):</b> Thời gian nghỉ giữa mỗi lượt thả 1 bình luận seeding gây tò mò (tối đa 5 bình luận/bài viết).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Nạp hình ảnh & dữ liệu sản phẩm:</strong> Chọn ảnh sản phẩm rõ nét (hệ thống tự động nén tối ưu để AI đọc siêu tốc trong 2 giây). Nhập mô tả ngắn gọn về sản phẩm + 2–3 câu văn phong đang hot trong nhóm để AI bắt chước giọng điệu tự nhiên nhất.</li>
+                            <li><strong>Bấm "Chạy Chiến Dịch Tự Động":</strong> Hệ thống sẽ lập tức phân tích ảnh, xuất bài đăng #1, tự động truyền sang Robot đăng lên các nhóm và đếm ngược đồng hồ thả lần lượt 5 bình luận seeding!</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- PHẦN 5: MẸO AN TOÀN & KHẮC PHỤC LỖI THƯỜNG GẶP -->
+                <div id="guide-sec-5" class="space-y-2.5 scroll-mt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-rose-600 text-white text-xs font-extrabold flex items-center justify-center">5</span>
+                        <h4 class="font-extrabold text-slate-900 text-base">Bí Quyết Chống Khóa Nick & Xử Lý Nhanh Sự Cố</h4>
+                    </div>
+                    <div class="pl-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-1">
+                            <p class="font-bold text-emerald-900">🛡️ Nguyên tắc nuôi nick an toàn:</p>
+                            <ul class="list-disc pl-4 text-emerald-800 space-y-1 text-[11px]">
+                                <li>Không nên cài chu kỳ đăng quá dày (1–2 phút/lần) trên nick Facebook mới lập.</li>
+                                <li>Nên dùng nick phụ hoặc nick đã tham gia nhóm ổn định để chạy seeding.</li>
+                                <li>Không tắt cửa sổ đen của Robot khi chiến dịch đang chạy tự động.</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 space-y-1">
+                            <p class="font-bold text-amber-900">🔧 Xử lý nhanh nếu gặp thông báo:</p>
+                            <ul class="list-disc pl-4 text-amber-800 space-y-1 text-[11px]">
+                                <li><b>Báo lỗi API Key:</b> Kiểm tra lại xem đã copy đủ ký tự <code class="font-mono">AIzaSy...</code> chưa hoặc tạo khóa mới tại Google AI Studio.</li>
+                                <li><b>Robot chưa kết nối:</b> Đảm bảo cửa sổ đen <code class="font-mono">KHOI_DONG_ROBOT.bat</code> đang mở và bấm lại nút <b>Kiểm tra kết nối Robot</b>.</li>
+                                <li><b>Tải lại bản mới nhất:</b> Nhấn <kbd class="px-1 bg-white border rounded">Ctrl + Shift + R</kbd> trên trình duyệt để cập nhật giao diện mới.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                <span class="text-[11px] text-slate-500 hidden sm:inline">Mọi dữ liệu & API Key đều được mã hóa cục bộ an toàn trên thiết bị của bạn.</span>
+                <button type="button" onclick="toggleGuideModal(false)" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition ml-auto">
+                    Đã Hiểu Rõ & Bắt Đầu Sử Dụng
                 </button>
             </div>
         </div>
@@ -378,7 +498,7 @@
                         </p>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] transition">
-                                ⬇ Tải Robot Tự Động (.py)
+                                ⬇ Tải Robot 1-Click (.bat)
                             </button>
                             <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] border border-slate-600 transition">
                                 Kiểm tra kết nối Robot
@@ -1343,18 +1463,21 @@
 
         function downloadDesktopRobotAgent() {
             const robotScript = [
-                'import os, time, json, base64, random, threading',
+                'import os, sys, time, json, base64, random, threading, subprocess, traceback',
                 'from http.server import HTTPServer, BaseHTTPRequestHandler',
-                'from playwright.sync_api import sync_playwright',
                 '',
-                '# ==============================================================================',
-                '# ROBOT TỰ ĐỘNG ĐIỀU KHIỂN CHUỘT & BÀN PHÍM (KHÔNG CẦN ĐỤNG TAY)',
-                '# Cài đặt 1 lần: pip install playwright && playwright install chromium',
-                '# Chạy Robot: python fb_desktop_agent.py',
-                '# ==============================================================================',
+                'try:',
+                '    from playwright.sync_api import sync_playwright',
+                'except ImportError:',
+                '    print("[HE THONG] Dang tu dong cai dat thu vien dieu khien trinh duyet (chi lam 1 lan, doi 1-2 phut)...")',
+                '    subprocess.check_call([sys.executable, "-m", "pip", "install", "playwright"])',
+                '    subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])',
+                '    from playwright.sync_api import sync_playwright',
+                '',
                 'PORT = 8765',
-                'PROFILE_DIR = os.path.join(os.getcwd(), "fb_robot_profile")',
-                'TEMP_IMG_PATH = os.path.join(os.getcwd(), "temp_product_upload.jpg")',
+                'BASE_DIR = os.path.dirname(os.path.abspath(__file__))',
+                'PROFILE_DIR = os.path.join(BASE_DIR, "fb_robot_profile")',
+                'TEMP_IMG_PATH = os.path.join(BASE_DIR, "temp_product_upload.jpg")',
                 'TASK_QUEUE = []',
                 'LAST_POST_URL = ""',
                 '',
@@ -1385,12 +1508,13 @@
                 'def run_robot():',
                 '    global LAST_POST_URL',
                 '    threading.Thread(target=lambda: HTTPServer(("127.0.0.1", PORT), BridgeHandler).serve_forever(), daemon=True).start()',
-                '    print(f"[ROBOT] Đã bật cầu nối tự động tại http://127.0.0.1:{PORT}")',
+                '    print(f"[ROBOT] Da bat cau noi tu dong tai http://127.0.0.1:{PORT}")',
+                '    print("[ROBOT] Dang mo trinh duyet dieu khien tu dong...")',
                 '    with sync_playwright() as p:',
                 '        ctx = p.chromium.launch_persistent_context(PROFILE_DIR, headless=False, args=["--disable-notifications"])',
                 '        page = ctx.pages[0] if ctx.pages else ctx.new_page()',
                 '        page.goto("https://www.facebook.com", wait_until="domcontentloaded")',
-                '        print("[ROBOT] Nếu chưa đăng nhập Facebook trên cửa sổ vừa mở, hãy đăng nhập 1 lần duy nhất!")',
+                '        print("[ROBOT] SAN SANG! Hay dang nhap Facebook 1 lan duy nhat tren cua so trinh duyet vua mo!")',
                 '        while True:',
                 '            if not TASK_QUEUE:',
                 '                time.sleep(1); continue',
@@ -1401,7 +1525,7 @@
                 '                    with open(TEMP_IMG_PATH, "wb") as f: f.write(base64.b64decode(img_b64))',
                 '                for g_url in payload.get("groupUrls", []):',
                 '                    try:',
-                '                        print(f"[ROBOT] Đang tự động mở nhóm & đăng bài: {g_url}")',
+                '                        print(f"[ROBOT] Dang tu dong mo nhom & dang bai: {g_url}")',
                 '                        page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
                 '                        human_sleep(3, 5)',
                 '                        for txt in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai..."]:',
@@ -1420,7 +1544,7 @@
                 '                        for btn_txt in ["Đăng", "Post"]:',
                 '                            btn = dlg.locator(f\'div[aria-label="{btn_txt}"][role="button"]\').first',
                 '                            if btn.is_visible(timeout=2500): btn.click(); break',
-                '                        print("[ROBOT] Đã bấm Đăng bài thành công!")',
+                '                        print("[ROBOT] Da bam Dang bai thanh cong!")',
                 '                        human_sleep(6, 8)',
                 '                        page.goto(g_url, wait_until="domcontentloaded")',
                 '                        human_sleep(3, 5)',
@@ -1429,13 +1553,13 @@
                 '                            href = links[0].get_attribute("href").split("?")[0]',
                 '                            LAST_POST_URL = href if href.startswith("http") else "https://www.facebook.com" + href',
                 '                    except Exception as e:',
-                '                        print(f"[ROBOT LỖI ĐĂNG BÀI] {e}")',
+                '                        print(f"[ROBOT LOI DANG BAI] {e}")',
                 '            elif kind == "comment":',
                 '                target = LAST_POST_URL or (payload.get("groupUrls") or [""])[0]',
                 '                cmt = payload.get("commentText", "")',
                 '                if target and cmt:',
                 '                    try:',
-                '                        print(f"[ROBOT] Đang tự động thả bình luận seeding: {cmt}")',
+                '                        print(f"[ROBOT] Dang tu dong tha binh luan seeding: {cmt}")',
                 '                        page.goto(target, wait_until="domcontentloaded", timeout=60000)',
                 '                        human_sleep(3, 5)',
                 '                        for sel in [\'div[aria-label="Viết bình luận..."]\', \'div[aria-label="Write a comment..."]\', \'div[aria-label="Viết bình luận công khai..."]\']:',
@@ -1444,23 +1568,56 @@
                 '                                loc.click(); human_sleep(1, 2)',
                 '                                page.keyboard.type(cmt, delay=random.randint(25, 65))',
                 '                                page.keyboard.press("Enter")',
-                '                                print("[ROBOT] Đã gửi bình luận thành công!")',
+                '                                print("[ROBOT] Da gui binh luan thanh cong!")',
                 '                                break',
                 '                    except Exception as e:',
-                '                        print(f"[ROBOT LỖI COMMENT] {e}")',
+                '                        print(f"[ROBOT LOI COMMENT] {e}")',
                 '',
                 'if __name__ == "__main__":',
-                '    run_robot()'
+                '    try:',
+                '        run_robot()',
+                '    except Exception:',
+                '        traceback.print_exc()',
+                '        input("\\nNhan Enter de dong...")'
             ].join('\n');
 
-            const blob = new Blob([robotScript], { type: 'text/x-python;charset=utf-8' });
+            // Đóng gói thành file .bat tự nhận diện Python trên Windows và mở thẳng chỉ bằng 1 cú click
+            const batLines = [
+                '@echo off',
+                'chcp 65001 >nul',
+                'title ROBOT TU DONG FACEBOOK GROUP STUDIO',
+                'cd /d "%~dp0"',
+                'echo ===================================================',
+                'echo   DANG KHOI DONG ROBOT TU DONG CHUOT & BAN PHIM...',
+                'echo ===================================================',
+                '(',
+                ...robotScript.split('\n').map(line => {
+                    const escaped = line.replace(/\^/g, '^^').replace(/&/g, '^&').replace(/\|/g, '^|').replace(/</g, '^<').replace(/>/g, '^>').replace(/%/g, '%%');
+                    return escaped === '' ? 'echo.' : `echo ${escaped}`;
+                }),
+                ') > fb_desktop_agent.py',
+                'where py >nul 2>nul',
+                'if %errorlevel%==0 (',
+                '    py fb_desktop_agent.py',
+                ') else (',
+                '    where python >nul 2>nul',
+                '    if %errorlevel%==0 (',
+                '        python fb_desktop_agent.py',
+                '    ) else (',
+                '        echo [LOI] May tinh chua cai Python! Vui long cai Python tai python.org va tich chon Add to PATH.',
+                '    )',
+                ')',
+                'pause'
+            ].join('\r\n');
+
+            const blob = new Blob([batLines], { type: 'application/bat;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'fb_desktop_agent.py';
+            a.download = 'KHOI_DONG_ROBOT.bat';
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Đã tải file fb_desktop_agent.py! Chạy file này trên máy tính để bật Robot tự động.', 'success');
+            showToast('Đã tải file KHOI_DONG_ROBOT.bat! Bạn chỉ cần bấm đúp vào file này là chạy ngay!', 'success');
         }
 
         // =========================================================================
