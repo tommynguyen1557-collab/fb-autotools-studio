@@ -30,19 +30,11 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 0.3; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .animate-pulse-ring {
-            animation: pulse-ring 2s infinite ease-in-out;
-        }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- CỔNG ĐĂNG KÝ & ĐĂNG NHẬP BẢO MẬT SHA-256 (NHẤT QUÁN XUYÊN SUỐT MỌI BẢN CẬP NHẬT) -->
+    <!-- CỔNG ĐĂNG KÝ & ĐĂNG NHẬP BẢO MẬT SHA-256 -->
     <div id="authGateOverlay" class="fixed inset-0 z-50 bg-slate-900/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-5 my-auto">
             <div class="text-center space-y-1.5">
@@ -70,7 +62,7 @@
 
             <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-600"></div>
 
-            <!-- FORM DÀNH CHO NGƯỜI DÙNG (ĐĂNG NHẬP / ĐĂNG KÝ) -->
+            <!-- FORM DÀNH CHO NGƯỜI DÙNG -->
             <form id="userAuthForm" onsubmit="handleAuthSubmit(event)" class="space-y-3.5">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Gmail hoặc Số điện thoại</label>
@@ -102,7 +94,7 @@
                 </button>
             </form>
 
-            <!-- FORM ĐĂNG NHẬP ĐỘC QUYỀN CHO CHỦ SỞ HỮU (MASTER OWNER) -->
+            <!-- FORM ĐĂNG NHẬP ĐỘC QUYỀN CHO CHỦ SỞ HỮU -->
             <form id="ownerAuthForm" onsubmit="handleOwnerLogin(event)" class="hidden space-y-4">
                 <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
                     <p class="font-bold">Khu vực kiểm soát độc quyền của Chủ sở hữu</p>
@@ -147,7 +139,7 @@
             </div>
 
             <div class="p-6 overflow-y-auto custom-scrollbar grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- CỘT TRÁI: FORM CẤP QUYỀN & CHỌN THỜI HẠN -->
+                <!-- CỘT TRÁI: FORM CẤP QUYỀN -->
                 <div class="lg:col-span-5 space-y-4">
                     <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3.5">
                         <h4 class="text-xs font-extrabold text-amber-900 uppercase tracking-wider">1. Thiết lập Quyền Người Dùng</h4>
@@ -185,7 +177,6 @@
                         </button>
                     </div>
 
-                    <!-- KẾT QUẢ MÃ KÍCH HOẠT VỪA TẠO -->
                     <div id="generatedLicenseResultBox" class="hidden p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-emerald-900">Mã Kích Hoạt Đã Tạo Thành Công:</span>
@@ -199,9 +190,8 @@
                     </div>
                 </div>
 
-                <!-- CỘT PHẢI: BẢNG LỊCH 12 THÁNG TRONG NĂM & DANH SÁCH ĐÃ CẤP QUYỀN -->
+                <!-- CỘT PHẢI: BẢNG LỊCH 12 THÁNG & DANH SÁCH ĐÃ CẤP QUYỀN -->
                 <div class="lg:col-span-7 space-y-5">
-                    <!-- BẢNG LỊCH 12 THÁNG TRONG NĂM -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">2. Bảng Lịch Cấp Quyền Trong Năm</h4>
@@ -213,12 +203,9 @@
                         </div>
                         <p class="text-[11px] text-slate-500">Bấm trực tiếp vào bất kỳ ngày nào trong 12 tháng bên dưới để chọn làm mốc hết hạn sử dụng:</p>
 
-                        <div id="annualCalendarGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto custom-scrollbar pr-1">
-                            <!-- 12 tháng sẽ được render tự động bằng JS -->
-                        </div>
+                        <div id="annualCalendarGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto custom-scrollbar pr-1"></div>
                     </div>
 
-                    <!-- DANH SÁCH NGƯỜI DÙNG ĐÃ ĐƯỢC CẤP QUYỀN -->
                     <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2.5">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">3. Danh Sách Tài Khoản Đã Cấp Quyền</h4>
@@ -236,13 +223,12 @@
     <!-- MODAL HƯỚNG DẪN SỬ DỤNG TOOL CHI TIẾT TỪ A-Z -->
     <div id="guideModalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
-            <!-- Header Modal -->
             <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
                 <div class="flex items-center space-x-3">
-                    <span class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs text-white flex items-center justify-center font-extrabold text-base">📘</span>
+                    <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-extrabold text-base">📘</span>
                     <div>
                         <h3 class="font-extrabold text-base sm:text-lg">Cẩm Nang Cài Đặt & Vận Hành AI FB Group Studio (A–Z)</h3>
-                        <p class="text-[11px] text-blue-100">Hướng dẫn từng bước trực quan • Ai cũng có thể tự cài và chạy tự động chỉ sau 3 phút</p>
+                        <p class="text-[11px] text-blue-100">Hướng dẫn từng bước trực quan • Đăng tối đa 4 Ảnh + Video 1 phút (< 300MB) tự động</p>
                     </div>
                 </div>
                 <button type="button" onclick="toggleGuideModal(false)" class="p-2 rounded-xl text-blue-100 hover:text-white hover:bg-white/10 transition">
@@ -250,142 +236,39 @@
                 </button>
             </div>
 
-            <!-- Thanh điều hướng nhanh các phần -->
-            <div class="px-6 py-2.5 bg-slate-100 border-b border-slate-200 flex flex-wrap gap-1.5 text-[11px] font-bold">
-                <a href="#guide-sec-1" class="px-2.5 py-1 rounded-lg bg-white text-blue-700 border border-slate-200 hover:bg-blue-50 transition">1. Kích Hoạt Bản Quyền</a>
-                <a href="#guide-sec-2" class="px-2.5 py-1 rounded-lg bg-white text-indigo-700 border border-slate-200 hover:bg-indigo-50 transition">2. Lấy Google Gemini API Key</a>
-                <a href="#guide-sec-3" class="px-2.5 py-1 rounded-lg bg-white text-amber-800 border border-slate-200 hover:bg-amber-50 transition">3. Cài Robot Tự Động Chuột/Phím</a>
-                <a href="#guide-sec-4" class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 border border-slate-200 hover:bg-emerald-50 transition">4. Chạy Chiến Dịch & Seeding</a>
-                <a href="#guide-sec-5" class="px-2.5 py-1 rounded-lg bg-white text-rose-700 border border-slate-200 hover:bg-rose-50 transition">5. Mẹo An Toàn & Khắc Phục Lỗi</a>
-            </div>
-
-            <!-- Nội dung chi tiết -->
-            <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 text-sm text-slate-700 leading-relaxed">
-
-                <!-- TỔNG QUAN 2 CHẾ ĐỘ HOẠT ĐỘNG -->
-                <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 space-y-2">
-                    <h4 class="font-extrabold text-blue-950 text-xs uppercase tracking-wider">⚡ Công cụ hoạt động theo 2 chế độ thông minh:</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <div class="p-3 rounded-xl bg-white border border-blue-100 shadow-2xs">
-                            <p class="font-bold text-blue-700">🌐 Chế độ Web (Không cần cài đặt gì)</p>
-                            <p class="text-slate-600 mt-1">AI tự động phân tích ảnh sản phẩm, viết mới nội dung bài đăng & 5 bình luận seeding theo chu kỳ phút. Bạn chỉ cần bấm nút <b>Mở Nhóm</b> rồi nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">Ctrl + V</kbd> là đăng ngay.</p>
-                        </div>
-                        <div class="p-3 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 shadow-2xs">
-                            <p class="font-bold text-amber-400">🤖 Chế độ Robot Ngầm (100% Không đụng tay)</p>
-                            <p class="text-slate-300 mt-1">Kết nối thêm file Robot chạy nền trên Windows để máy tính <b>tự điều khiển chuột & bàn phím</b> mở từng Group, gõ phím đăng bài, tải ảnh lên và tự thả 5 bình luận seeding hoàn toàn tự động.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PHẦN 1: KÍCH HOẠT TÀI KHOẢN -->
-                <div id="guide-sec-1" class="space-y-2.5 scroll-mt-4">
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-lg bg-blue-600 text-white text-xs font-extrabold flex items-center justify-center">1</span>
-                        <h4 class="font-extrabold text-slate-900 text-base">Đăng Ký & Kích Hoạt Giấy Phép Sử Dụng</h4>
-                    </div>
-                    <ul class="space-y-1.5 text-xs text-slate-600 pl-8 list-disc">
-                        <li><strong>Bước 1:</strong> Liên hệ Chủ sở hữu công cụ, cung cấp địa chỉ <b>Gmail</b> hoặc <b>Số điện thoại</b> của bạn để nhận <b>Mã Cấp Quyền (License Key)</b> có dạng <code class="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-mono">FBA-20261231-XXXXXXXXXXXX</code>.</li>
-                        <li><strong>Bước 2:</strong> Tại màn hình mở khóa ban đầu, chọn tab <b>Tạo Tài Khoản</b> (nếu dùng lần đầu) → nhập đúng Gmail/SĐT đã đăng ký, đặt mật khẩu bảo mật (từ 6 ký tự) và dán <b>Mã Cấp Quyền</b> vào ô màu vàng.</li>
-                        <li><strong>Bước 3:</strong> Sau khi vào bên trong, bạn nên bấm nút <b>Sao lưu Tài khoản</b> (màu xanh lá trên thanh tiêu đề) để tải về file <code class="bg-slate-100 px-1 rounded">.json</code> lưu trữ cấu hình. Nếu sau này đổi trình duyệt hoặc sang máy tính khác, chỉ cần khôi phục file này là giữ nguyên toàn bộ cài đặt.</li>
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-5 text-xs text-slate-700 leading-relaxed">
+                <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-1.5">
+                    <h4 class="font-extrabold text-blue-950 text-sm">⚡ Tính năng nổi bật phiên bản Chuẩn Hóa Toàn Diện:</h4>
+                    <ul class="list-disc pl-5 space-y-1 text-slate-700">
+                        <li><strong>Hỗ trợ Đa Phương Tiện:</strong> Nạp cùng lúc <b>tối đa 4 hình ảnh sản phẩm</b> (AI Vision đọc đồng thời cả 4 góc chụp) kèm <b>1 Video dài tối đa 60 giây (dung lượng dưới 300MB)</b>.</li>
+                        <li><strong>Trình duyệt Robot Chrome Chuẩn:</strong> Tự động gỡ bỏ cờ tự động hóa giúp đăng nhập Facebook & vượt xác thực 2FA mượt mà, không bị kẹt màn hình trắng.</li>
+                        <li><strong>Tự động hóa 2 chiều:</strong> Vừa tự động viết mới & đăng bài theo chu kỳ phút, vừa tự động thả 5 bình luận seeding gây tò mò vào đúng bài vừa đăng.</li>
                     </ul>
                 </div>
 
-                <!-- PHẦN 2: LẤY GOOGLE GEMINI API KEY -->
-                <div id="guide-sec-2" class="space-y-2.5 scroll-mt-4">
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center">2</span>
-                        <h4 class="font-extrabold text-slate-900 text-base">Cách Lấy Mã Google Gemini API Key (Miễn Phí Trong 30 Giây)</h4>
-                    </div>
-                    <div class="pl-8 space-y-2 text-xs text-slate-600">
-                        <p>API Key là "bộ não" giúp AI đọc hiểu hình ảnh sản phẩm và tự sáng tạo bài viết mới không trùng lặp:</p>
-                        <ol class="list-decimal pl-4 space-y-1.5">
-                            <li>Bấm vào chữ <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline">Lấy API Key →</a> ở góc trên bên phải Mục 1 (hoặc truy cập <b>aistudio.google.com/apikey</b>) và đăng nhập bằng tài khoản Google (Gmail).</li>
-                            <li>Bấm nút màu xanh <b>Create API key</b> (Tạo khóa API) → chọn dự án có sẵn hoặc tạo mới.</li>
-                            <li>Copy dãy ký tự bắt đầu bằng <code class="px-1.5 py-0.5 bg-slate-100 border rounded font-mono font-bold text-slate-800">AIzaSy...</code> và dán vào ô <b>Google Gemini API Key *</b> trên công cụ. Hệ thống sẽ tự động lưu lại cho các lần sau.</li>
-                        </ol>
-                    </div>
+                <div class="space-y-2">
+                    <h4 class="font-extrabold text-slate-900 text-sm">Bước 1: Kích hoạt bản quyền & Lấy Google Gemini API Key</h4>
+                    <p>1. Đăng ký/Đăng nhập bằng Gmail hoặc SĐT kèm <b>Mã Cấp Quyền</b> do Chủ sở hữu cấp.<br>
+                    2. Bấm vào <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline">Lấy API Key →</a>, tạo khóa miễn phí dạng <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">AIzaSy...</code> và dán vào ô trên cùng.</p>
                 </div>
 
-                <!-- PHẦN 3: CÀI ĐẶT ROBOT TỰ ĐỘNG CHUỘT/BÀN PHÍM -->
-                <div id="guide-sec-3" class="space-y-3 scroll-mt-4">
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 text-xs font-extrabold flex items-center justify-center">3</span>
-                        <h4 class="font-extrabold text-slate-900 text-base">Cài Đặt Robot Tự Động Điều Khiển Chuột & Bàn Phím (Chỉ Làm 1 Lần)</h4>
-                    </div>
-                    <div class="pl-8 space-y-2.5 text-xs text-slate-600">
-                        <p>Nếu bạn muốn máy tính Windows tự động mở Facebook, tự gõ phím nhập bài, tự tải ảnh sản phẩm lên và tự thả bình luận ngầm mà <b>không cần đụng tay</b>, hãy làm đúng 3 bước sau:</p>
-
-                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                            <div>
-                                <span class="font-extrabold text-slate-900">Bước 3.1 — Cài đặt Python trên máy tính (Nếu máy chưa có):</span>
-                                <p class="mt-0.5">Tải Python miễn phí tại <a href="https://www.python.org/downloads/" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline">python.org/downloads</a>. Khi mở bộ cài, <strong class="text-rose-600">bắt buộc tích chọn ô vuông "Add python.exe to PATH"</strong> ở góc dưới cùng rồi bấm <b>Install Now</b>.</p>
-                            </div>
-                            <div>
-                                <span class="font-extrabold text-slate-900">Bước 3.2 — Tải & Khởi động Robot 1-Click:</span>
-                                <p class="mt-0.5">Tại khung màu đen <b>Robot Tự Động Chuột/Phím</b> ở cột bên trái giao diện Web, bấm nút màu vàng <b>⬇ Tải Robot 1-Click (.bat)</b>. Sau đó vào thư mục <b>Downloads</b> (Tải xuống) bấm đúp mở file <code class="px-1.5 py-0.5 bg-amber-100 text-amber-950 font-mono font-bold rounded">KHOI_DONG_ROBOT.bat</code>.</p>
-                                <p class="text-[11px] text-slate-500 mt-1 italic">* Ở lần chạy đầu tiên, cửa sổ đen sẽ tự động tải bộ điều khiển trình duyệt (mất khoảng 1–2 phút). Các lần sau chỉ mất 2 giây là mở ngay!</p>
-                            </div>
-                            <div>
-                                <span class="font-extrabold text-slate-900">Bước 3.3 — Đăng nhập Facebook 1 lần duy nhất & Kết nối:</span>
-                                <p class="mt-0.5">Khi cửa sổ trình duyệt của Robot tự động bật lên trang Facebook, bạn hãy <b>đăng nhập tài khoản Facebook dùng để đi đăng bài</b> trên cửa sổ đó (Robot sẽ tự lưu phiên đăng nhập cho mọi lần sau). Quay lại trang Web bấm <b>Kiểm tra kết nối Robot</b> → đèn chuyển sang <span class="text-emerald-600 font-bold">màu xanh lá (Đã kết nối Robot)</span> là hoàn tất!</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="space-y-2">
+                    <h4 class="font-extrabold text-slate-900 text-sm">Bước 2: Bật Robot Tự Động Chuột/Bàn Phím (1-Click trên Windows)</h4>
+                    <p>1. Cài Python tại <a href="https://www.python.org/downloads/" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline">python.org/downloads</a> (nhớ tích <b>Add python.exe to PATH</b>).<br>
+                    2. Bấm nút vàng <b>⬇ Tải Robot 1-Click (.bat)</b> trong khung đen bên trái, vào thư mục <b>Downloads</b> bấm đúp chạy file <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono font-bold">KHOI_DONG_ROBOT.bat</code>.<br>
+                    3. Cửa sổ trình duyệt Google Chrome của Robot mở lên trang chủ Facebook → bạn đăng nhập tài khoản Facebook 1 lần duy nhất (nếu gặp trang 2FA tải chậm, chỉ cần gõ <b>mbasic.facebook.com</b> trên thanh địa chỉ để nhập mã trong 3 giây rồi quay lại <b>www.facebook.com</b>).<br>
+                    4. Quay lại trang Web bấm <b>Kiểm tra kết nối Robot</b> thấy đèn xanh lá là hoàn tất!</p>
                 </div>
 
-                <!-- PHẦN 4: THIẾT LẬP & CHẠY CHIẾN DỊCH -->
-                <div id="guide-sec-4" class="space-y-2.5 scroll-mt-4">
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white text-xs font-extrabold flex items-center justify-center">4</span>
-                        <h4 class="font-extrabold text-slate-900 text-base">Thiết Lập Nội Dung & Vận Hành Chiến Dịch Tự Động</h4>
-                    </div>
-                    <div class="pl-8 space-y-2 text-xs text-slate-600">
-                        <ol class="list-decimal pl-4 space-y-1.5">
-                            <li><strong>Nhập danh sách Group mục tiêu:</strong> Dán đường link các nhóm Facebook muốn đăng vào ô <b>Danh sách Link Group Mục Tiêu</b> (mỗi nhóm 1 dòng). Hệ thống tự động làm sạch các tham số thừa như <code class="bg-slate-100 px-1 rounded">?locale=vi_VN</code>.</li>
-                            <li><strong>Cài đặt nhịp độ thời gian an toàn:</strong>
-                                <ul class="list-disc pl-4 mt-1 space-y-0.5 text-slate-500">
-                                    <li><b>Chu kỳ đăng lại (Phút):</b> Khoảng thời gian nghỉ giữa mỗi lần AI viết bài mới và đăng bài (khuyến nghị đặt từ <b>5 – 15 phút</b> để giống người dùng thật).</li>
-                                    <li><b>Chu kỳ comment (Phút):</b> Thời gian nghỉ giữa mỗi lượt thả 1 bình luận seeding gây tò mò (tối đa 5 bình luận/bài viết).</li>
-                                </ul>
-                            </li>
-                            <li><strong>Nạp hình ảnh & dữ liệu sản phẩm:</strong> Chọn ảnh sản phẩm rõ nét (hệ thống tự động nén tối ưu để AI đọc siêu tốc trong 2 giây). Nhập mô tả ngắn gọn về sản phẩm + 2–3 câu văn phong đang hot trong nhóm để AI bắt chước giọng điệu tự nhiên nhất.</li>
-                            <li><strong>Bấm "Chạy Chiến Dịch Tự Động":</strong> Hệ thống sẽ lập tức phân tích ảnh, xuất bài đăng #1, tự động truyền sang Robot đăng lên các nhóm và đếm ngược đồng hồ thả lần lượt 5 bình luận seeding!</li>
-                        </ol>
-                    </div>
+                <div class="space-y-2">
+                    <h4 class="font-extrabold text-slate-900 text-sm">Bước 3: Nạp tối đa 4 Ảnh + Video (≤ 1 phút, < 300MB) & Chạy Chiến Dịch</h4>
+                    <p>1. Chọn tối đa <b>4 ảnh sản phẩm</b> và/hoặc <b>1 video dưới 1 phút (dưới 300MB)</b> tại Mục 2.<br>
+                    2. Nhập mô tả sản phẩm, dán link các Group mục tiêu, đặt chu kỳ phút và bấm <b>Chạy Chiến Dịch Tự Động</b>.</p>
                 </div>
-
-                <!-- PHẦN 5: MẸO AN TOÀN & KHẮC PHỤC LỖI THƯỜNG GẶP -->
-                <div id="guide-sec-5" class="space-y-2.5 scroll-mt-4">
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-lg bg-rose-600 text-white text-xs font-extrabold flex items-center justify-center">5</span>
-                        <h4 class="font-extrabold text-slate-900 text-base">Bí Quyết Chống Khóa Nick & Xử Lý Nhanh Sự Cố</h4>
-                    </div>
-                    <div class="pl-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-1">
-                            <p class="font-bold text-emerald-900">🛡️ Nguyên tắc nuôi nick an toàn:</p>
-                            <ul class="list-disc pl-4 text-emerald-800 space-y-1 text-[11px]">
-                                <li>Không nên cài chu kỳ đăng quá dày (1–2 phút/lần) trên nick Facebook mới lập.</li>
-                                <li>Nên dùng nick phụ hoặc nick đã tham gia nhóm ổn định để chạy seeding.</li>
-                                <li>Không tắt cửa sổ đen của Robot khi chiến dịch đang chạy tự động.</li>
-                            </ul>
-                        </div>
-                        <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 space-y-1">
-                            <p class="font-bold text-amber-900">🔧 Xử lý nhanh nếu gặp thông báo:</p>
-                            <ul class="list-disc pl-4 text-amber-800 space-y-1 text-[11px]">
-                                <li><b>Báo lỗi API Key:</b> Kiểm tra lại xem đã copy đủ ký tự <code class="font-mono">AIzaSy...</code> chưa hoặc tạo khóa mới tại Google AI Studio.</li>
-                                <li><b>Robot chưa kết nối:</b> Đảm bảo cửa sổ đen <code class="font-mono">KHOI_DONG_ROBOT.bat</code> đang mở và bấm lại nút <b>Kiểm tra kết nối Robot</b>.</li>
-                                <li><b>Tải lại bản mới nhất:</b> Nhấn <kbd class="px-1 bg-white border rounded">Ctrl + Shift + R</kbd> trên trình duyệt để cập nhật giao diện mới.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- Footer Modal -->
-            <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
-                <span class="text-[11px] text-slate-500 hidden sm:inline">Mọi dữ liệu & API Key đều được mã hóa cục bộ an toàn trên thiết bị của bạn.</span>
-                <button type="button" onclick="toggleGuideModal(false)" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition ml-auto">
+            <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button type="button" onclick="toggleGuideModal(false)" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl shadow transition">
                     Đã Hiểu Rõ & Bắt Đầu Sử Dụng
                 </button>
             </div>
@@ -403,7 +286,7 @@
                 </div>
                 <div class="truncate">
                     <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate">AI FB Group Studio</h1>
-                    <p class="text-xs text-slate-500 hidden sm:block">Tự động xoay vòng nội dung & Seeding bình luận thông minh</p>
+                    <p class="text-xs text-slate-500 hidden sm:block">Tự động xoay vòng 4 Ảnh + Video & Seeding thông minh</p>
                 </div>
             </div>
 
@@ -420,7 +303,7 @@
                     <span>👑 Quản Lý Cấp Quyền</span>
                 </button>
 
-                <button type="button" onclick="exportAccountVault()" title="Xuất file hồ sơ tài khoản đã mã hóa để dùng xuyên suốt các bản cập nhật / tên miền mới" class="hidden md:inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
+                <button type="button" onclick="exportAccountVault()" title="Xuất file hồ sơ tài khoản đã mã hóa" class="hidden md:inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
@@ -489,12 +372,12 @@
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center space-x-2">
                                 <span id="robotStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                                <span class="text-xs font-bold text-white">Robot Tự Động Chuột/Phím (Không Đụng Tay)</span>
+                                <span class="text-xs font-bold text-white">Robot Tự Động Chuột/Phím (Chrome Chuẩn)</span>
                             </div>
                             <span id="robotStatusText" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">Chế độ Web</span>
                         </div>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Muốn máy tự động điều khiển chuột & bàn phím đăng bài + comment ngầm hoàn toàn không cần đụng tay, hãy tải & bật Robot chạy nền trên Windows:
+                            Mở trình duyệt Chrome chuẩn sạch dấu vết tự động hóa, đăng nhập trang chủ Facebook mượt mà & tự động đăng 4 ảnh + video 1 phút:
                         </p>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] transition">
@@ -510,7 +393,7 @@
                     <div class="grid grid-cols-2 gap-3 pt-1">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Chu kỳ đăng lại (Phút)</label>
-                            <input type="number" id="postIntervalInput" min="1" max="1440" value="3" oninput="syncCustomTimersUI()"
+                            <input type="number" id="postIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI()"
                                 class="w-full px-3.5 py-2 text-sm font-semibold text-blue-700 bg-blue-50/50 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                         </div>
                         <div>
@@ -521,27 +404,61 @@
                     </div>
                 </div>
 
-                <!-- Thẻ 2: Thông tin & Hình ảnh sản phẩm -->
+                <!-- Thẻ 2: Đa Phương Tiện Sản Phẩm (Tối đa 4 Ảnh + Video ≤ 1 phút, < 300MB) -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. Dữ Liệu Sản Phẩm (AI Vision)</h2>
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. Đa Phương Tiện (4 Ảnh + Video)</h2>
+                        <span id="mediaCountBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">0/4 Ảnh • 0 Video</span>
+                    </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Hình ảnh sản phẩm (AI tự động đọc & phân tích)</label>
-                        <label for="productImageInput" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-blue-50/50 hover:border-blue-400 transition relative overflow-hidden">
-                            <div id="imageUploadPlaceholder" class="flex flex-col items-center justify-center pt-4 pb-4 text-center px-4">
-                                <svg class="w-7 h-7 mb-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <p class="text-xs text-slate-600 font-medium">Bấm để chọn ảnh sản phẩm (JPG, PNG, WEBP)</p>
-                            </div>
-                            <img id="productImagePreview" src="" alt="Preview" class="hidden w-full h-full object-contain bg-slate-900/5 p-2">
-                            <input id="productImageInput" type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                    <!-- Khu vực chọn tối đa 4 ảnh -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-slate-700">Hình ảnh sản phẩm (Tối đa 4 ảnh)</label>
+                            <button type="button" id="clearAllImagesBtn" onclick="clearAllProductImages()" class="hidden text-[11px] font-semibold text-rose-600 hover:underline">Xóa hết ảnh</button>
+                        </div>
+
+                        <label for="productImagesInput" class="flex flex-col items-center justify-center w-full py-3.5 px-4 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-blue-50/50 hover:border-blue-400 transition text-center">
+                            <svg class="w-6 h-6 mb-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="text-xs text-slate-700 font-semibold">Bấm để chọn tối đa 4 ảnh (JPG, PNG, WEBP)</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">AI tự động phân tích toàn bộ các góc chụp sản phẩm</p>
+                            <input id="productImagesInput" type="file" accept="image/*" multiple class="hidden" onchange="handleMultiImageUpload(event)">
                         </label>
+
+                        <!-- Lưới hiển thị tối đa 4 ảnh đã chọn -->
+                        <div id="multiImagePreviewGrid" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1"></div>
+                    </div>
+
+                    <!-- Khu vực chọn Video tối đa 1 phút (< 300MB) -->
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-slate-700">Video sản phẩm (Tối đa 60 giây • Dưới 300MB)</label>
+                            <button type="button" id="removeVideoBtn" onclick="clearProductVideo()" class="hidden text-[11px] font-semibold text-rose-600 hover:underline">Gỡ video</button>
+                        </div>
+
+                        <label id="videoUploadLabel" for="productVideoInput" class="flex items-center justify-center gap-2.5 w-full py-3 px-4 border-2 border-dashed border-indigo-200 rounded-2xl cursor-pointer bg-indigo-50/40 hover:bg-indigo-50 hover:border-indigo-400 transition">
+                            <svg class="w-5 h-5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="text-xs font-semibold text-indigo-800">Chọn 1 Video ngắn (MP4, MOV • ≤ 1 phút, < 300MB)</span>
+                            <input id="productVideoInput" type="file" accept="video/mp4,video/quicktime,video/webm,video/*" class="hidden" onchange="handleVideoUpload(event)">
+                        </label>
+
+                        <!-- Khung xem trước Video -->
+                        <div id="videoPreviewBox" class="hidden rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 p-2 space-y-1.5">
+                            <video id="productVideoPreview" controls class="w-full max-h-40 rounded-xl bg-black"></video>
+                            <div class="flex items-center justify-between px-1 text-[11px] text-slate-300">
+                                <span id="videoMetaName" class="truncate font-medium max-w-[65%]">video.mp4</span>
+                                <span id="videoMetaSpec" class="text-emerald-400 font-bold shrink-0">0s • 0 MB</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Mô tả sản phẩm / Dịch vụ gốc <span class="text-rose-500">*</span></label>
-                        <textarea id="productInfoInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Ví dụ: Serum dưỡng trắng mờ thâm chiết xuất tự nhiên, dùng được cho da nhạy cảm, đang giảm 30% hôm nay..."
+                        <textarea id="productInfoInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Ví dụ: Nhẫn bạc S925 đính đá cao cấp, sáng bóng bền màu, bảo hành trọn đời, ưu đãi hôm nay..."
                             class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
                     </div>
                 </div>
@@ -580,15 +497,14 @@
             <!-- CỘT PHẢI: BẢNG ĐIỀU KHIỂN THỜI GIAN THỰC & KẾT QUẢ AI (7 CỘT) -->
             <div class="lg:col-span-7 space-y-6">
 
-                <!-- Bộ đếm thời gian kép (Đăng bài & Seeding Comment) -->
+                <!-- Bộ đếm thời gian kép -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Đồng hồ đăng bài -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between relative overflow-hidden">
                         <div>
-                            <span id="postIntervalBadge" class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">Chu kỳ 3 phút</span>
+                            <span id="postIntervalBadge" class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">Chu kỳ 5 phút</span>
                             <p class="text-xs text-slate-500 mt-2">Lần làm mới bài đăng tiếp theo</p>
                             <div class="flex items-baseline space-x-2 mt-0.5">
-                                <span id="postTimerDisplay" class="text-3xl font-extrabold text-slate-900 tracking-tight">03:00</span>
+                                <span id="postTimerDisplay" class="text-3xl font-extrabold text-slate-900 tracking-tight">05:00</span>
                                 <span class="text-xs text-slate-400">phút</span>
                             </div>
                         </div>
@@ -598,7 +514,6 @@
                         </div>
                     </div>
 
-                    <!-- Đồng hồ Seeding Comment -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between relative overflow-hidden">
                         <div>
                             <span id="commentIntervalBadge" class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">Mỗi 5 phút (Max 5)</span>
@@ -635,10 +550,9 @@
                         </div>
                     </div>
 
-                    <!-- Góc nhìn chuyên gia phân tích sản phẩm -->
                     <div id="aiExpertAnalysisBox" class="hidden p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900 space-y-1">
                         <span class="font-bold flex items-center space-x-1">
-                            <span>💡 Góc nhìn Chuyên gia Marketing (Phân tích từ ảnh & dữ liệu):</span>
+                            <span>💡 Góc nhìn Chuyên gia Marketing (Phân tích đa góc chụp & dữ liệu):</span>
                         </span>
                         <p id="aiExpertAnalysisText" class="leading-relaxed text-amber-800"></p>
                     </div>
@@ -646,9 +560,8 @@
                     <textarea id="generatedPostOutput" rows="6" placeholder="Nội dung bài viết do AI biên soạn sẽ xuất hiện tại đây sau khi bạn bấm Chạy Chiến Dịch..."
                         class="w-full p-4 text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"></textarea>
 
-                    <!-- Thanh mở nhanh các nhóm đã nhập -->
                     <div id="groupQuickLinksContainer" class="flex flex-wrap gap-2 pt-1"></div>
-                    <p class="text-[11px] text-slate-400 italic">💡 Mẹo: Bấm vào nút <b>Mở Nhóm</b> bên trên, hệ thống sẽ tự động copy sẵn bài viết & mở thẳng trang nhóm Facebook để bạn chỉ cần nhấn <b>Ctrl + V</b> là đăng ngay.</p>
+                    <p class="text-[11px] text-slate-400 italic">💡 Mẹo: Khi bật Robot, hệ thống tự động đăng đủ tối đa 4 ảnh + video 1 phút lên từng nhóm. Ở Chế độ Web, bấm <b>Mở Nhóm</b> để copy sẵn bài viết và nhấn <b>Ctrl + V</b>.</p>
                 </div>
 
                 <!-- Khung 5 Bình Luận Seeding Gây Tò Mò -->
@@ -668,14 +581,14 @@
                     </div>
                 </div>
 
-                <!-- Nhật ký hoạt động thời gian thực (Live Log) -->
+                <!-- Nhật ký hoạt động thời gian thực -->
                 <div class="bg-slate-900 rounded-2xl shadow-sm p-4 text-slate-300 space-y-2">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nhật ký hệ thống (Live Console)</span>
                         <button type="button" onclick="document.getElementById('liveLogContainer').innerHTML=''" class="text-[11px] text-slate-500 hover:text-slate-300">Xóa log</button>
                     </div>
                     <div id="liveLogContainer" class="h-32 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
-                        <div class="text-[11px] font-mono text-slate-400">[Hệ thống] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio.</div>
+                        <div class="text-[11px] font-mono text-slate-400">[Hệ thống] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio (Hỗ trợ 4 Ảnh + Video 1 phút < 300MB).</div>
                     </div>
                 </div>
 
@@ -694,7 +607,6 @@
         const PERSISTENT_SESSION_KEY = 'FB_AI_STUDIO_ACTIVE_SESSION_V1';
         const CORE_CRYPTO_SALT = 'FB_AI_STUDIO_CORE_SALT_2025_PERSISTENT';
 
-        // MÃ BÍ MẬT ĐỘC QUYỀN CỦA CHỦ SỞ HỮU (Bạn có thể đổi chuỗi này thành mật khẩu riêng của bạn)
         const OWNER_MASTER_SECRET = 'TOMMY_OWNER_2025';
         const LICENSE_SIGN_SECRET = 'FB_AI_OWNER_SIGNATURE_TOMMY_2025_EXCLUSIVE';
 
@@ -719,11 +631,6 @@
                         userConfigs: parsed.userConfigs || {},
                         issuedLicenses: Array.isArray(parsed.issuedLicenses) ? parsed.issuedLicenses : []
                     };
-                }
-                const legacyUsers = JSON.parse(localStorage.getItem('fb_ai_encrypted_users') || '{}');
-                if (Object.keys(legacyUsers).length > 0) {
-                    defaultVault.users = legacyUsers;
-                    saveCoreVault(defaultVault);
                 }
             } catch (e) {
                 console.error('Vault read error:', e);
@@ -796,17 +703,14 @@
             errorBox.classList.remove('hidden');
         }
 
-        // Tạo chữ ký SHA-256 gắn chặt giữa (Tài khoản người dùng + Ngày hết hạn + Chìa khóa Chủ sở hữu)
         async function computeLicenseSignature(normalizedIdentifier, expiryYYYYMMDD) {
             const payload = `${LICENSE_SIGN_SECRET}|${normalizedIdentifier}|${expiryYYYYMMDD}`;
             const fullHash = await hashStringSHA256(payload);
             return fullHash.slice(0, 12).toUpperCase();
         }
 
-        // Xác thực mã cấp quyền do Chủ sở hữu phát hành
         async function verifyUserLicenseKey(normalizedIdentifier, rawLicenseKey) {
             const cleanKey = (rawLicenseKey || '').trim().toUpperCase();
-            // Định dạng chuẩn: FBA-YYYYMMDD-XXXXXXXXXXXX
             const match = cleanKey.match(/^FBA-(\d{8})-([A-F0-9]{12})$/);
             if (!match) {
                 return { valid: false, reason: 'Mã cấp quyền không đúng định dạng (FBA-YYYYMMDD-XXXXXXXXXXXX)!' };
@@ -841,12 +745,11 @@
             };
         }
 
-        // Đăng nhập dành riêng cho Chủ Sở Hữu
         async function handleOwnerLogin(e) {
             e.preventDefault();
             const enteredSecret = document.getElementById('ownerMasterSecretInput').value.trim();
             if (enteredSecret !== OWNER_MASTER_SECRET) {
-                showAuthError('Mã Bí Mật Chủ Sở Hữu không chính xác! Chỉ chủ nhân của hệ thống mới có quyền truy cập.');
+                showAuthError('Mã Bí Mật Chủ Sở Hữu không chính xác!');
                 return;
             }
 
@@ -1225,23 +1128,28 @@
 
         function toggleGuideModal(show) {
             const modal = document.getElementById('guideModalOverlay');
-            if (modal) {
-                modal.classList.toggle('hidden', !show);
-            }
+            if (modal) modal.classList.toggle('hidden', !show);
         }
 
         // =========================================================================
-        // 2. CẤU HÌNH CHIẾN DỊCH, HÌNH ẢNH & LƯU TRỮ TỰ ĐỘNG THEO TÀI KHOẢN
+        // 2. QUẢN LÝ ĐA PHƯƠNG TIỆN (TỐI ĐA 4 ẢNH + VIDEO ≤ 60 GIÂY, < 300MB)
         // =========================================================================
         const ROBOT_BRIDGE_URL = 'http://127.0.0.1:8765';
+        const MAX_PRODUCT_IMAGES = 4;
+        const MAX_VIDEO_SIZE_BYTES = 300 * 1024 * 1024; // 300 MB
+        const MAX_VIDEO_DURATION_SEC = 62; // Cho phép tối đa 1 phút (60s + 2s sai số)
+
         const state = {
             isRunning: false,
+            isProcessingCycle: false,
             robotConnected: false,
-            imageBase64: '',
-            imageMimeType: 'image/jpeg',
+            images: [], // Mảng tối đa 4 phần tử: { name, base64, mimeType, previewUrl }
+            videoFile: null, // Đối tượng File video (< 300MB, <= 1 phút)
+            videoObjectUrl: '',
+            videoDurationSec: 0,
             postCycleCount: 0,
             commentCount: 0,
-            postSecondsRemaining: 180,
+            postSecondsRemaining: 300,
             commentSecondsRemaining: 300,
             curiousCommentsQueue: [],
             activeGroupUrls: [],
@@ -1249,7 +1157,7 @@
         };
 
         function getPostIntervalSeconds() {
-            const mins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '3', 10));
+            const mins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '5', 10));
             return mins * 60;
         }
 
@@ -1266,7 +1174,7 @@
         }
 
         function syncCustomTimersUI() {
-            const postMins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '3', 10));
+            const postMins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '5', 10));
             const cmtMins = Math.max(1, parseInt(document.getElementById('commentIntervalInput')?.value || '5', 10));
 
             const postBadge = document.getElementById('postIntervalBadge');
@@ -1290,7 +1198,7 @@
                 geminiApiKey: document.getElementById('geminiApiKeyInput')?.value || '',
                 sourceAccountUrl: document.getElementById('sourceAccountUrlInput')?.value || '',
                 groupUrls: document.getElementById('groupUrlsInput')?.value || '',
-                postInterval: document.getElementById('postIntervalInput')?.value || '3',
+                postInterval: document.getElementById('postIntervalInput')?.value || '5',
                 commentInterval: document.getElementById('commentIntervalInput')?.value || '5',
                 productInfo: document.getElementById('productInfoInput')?.value || '',
                 hotPosts: document.getElementById('hotPostsInput')?.value || ''
@@ -1308,7 +1216,7 @@
             if (document.getElementById('geminiApiKeyInput')) document.getElementById('geminiApiKeyInput').value = cfg.geminiApiKey || '';
             if (document.getElementById('sourceAccountUrlInput')) document.getElementById('sourceAccountUrlInput').value = cfg.sourceAccountUrl || '';
             if (document.getElementById('groupUrlsInput')) document.getElementById('groupUrlsInput').value = cfg.groupUrls || '';
-            if (document.getElementById('postIntervalInput')) document.getElementById('postIntervalInput').value = cfg.postInterval || '3';
+            if (document.getElementById('postIntervalInput')) document.getElementById('postIntervalInput').value = cfg.postInterval || '5';
             if (document.getElementById('commentIntervalInput')) document.getElementById('commentIntervalInput').value = cfg.commentInterval || '5';
             if (document.getElementById('productInfoInput')) document.getElementById('productInfoInput').value = cfg.productInfo || '';
             if (document.getElementById('hotPostsInput')) document.getElementById('hotPostsInput').value = cfg.hotPosts || '';
@@ -1325,7 +1233,6 @@
             window.open(fullUrl, '_blank', 'noopener,noreferrer');
         }
 
-        // Tự động nối các đường link Facebook bị rớt dòng lẻ (ví dụ ?locale=vi_VN)
         function parseCleanGroupUrls(rawText) {
             const lines = (rawText || '').split('\n').map(l => l.trim()).filter(Boolean);
             const cleaned = [];
@@ -1341,7 +1248,6 @@
             return cleaned;
         }
 
-        // Nén và chuẩn hóa ảnh trên Canvas xuống ~150KB để gửi API cực nhanh, không bao giờ treo
         function compressImageForAI(dataUrl, maxDimension = 1024, quality = 0.82) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -1380,34 +1286,170 @@
             });
         }
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = () => reject(new Error('Không thể đọc tệp ' + file.name));
+                reader.readAsDataURL(file);
+            });
+        }
 
-            if (file.size > 15 * 1024 * 1024) {
-                showToast('Ảnh quá lớn (>15MB). Vui lòng chọn ảnh nhẹ hơn!', 'warning');
+        function updateMediaSummaryBadge() {
+            const badge = document.getElementById('mediaCountBadge');
+            if (badge) {
+                badge.textContent = `${state.images.length}/${MAX_PRODUCT_IMAGES} Ảnh • ${state.videoFile ? '1' : '0'} Video`;
+            }
+            const clearImgBtn = document.getElementById('clearAllImagesBtn');
+            if (clearImgBtn) {
+                clearImgBtn.classList.toggle('hidden', state.images.length === 0);
+            }
+        }
+
+        function renderMultiImageGrid() {
+            const grid = document.getElementById('multiImagePreviewGrid');
+            if (!grid) return;
+
+            if (state.images.length === 0) {
+                grid.classList.add('hidden');
+                grid.innerHTML = '';
+                updateMediaSummaryBadge();
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const rawDataUrl = e.target.result;
-                const optimized = await compressImageForAI(rawDataUrl, 1024, 0.82);
-                state.imageBase64 = optimized.base64;
-                state.imageMimeType = optimized.mimeType;
+            grid.classList.remove('hidden');
+            grid.innerHTML = '';
 
-                const previewImg = document.getElementById('productImagePreview');
-                const placeholder = document.getElementById('imageUploadPlaceholder');
-                if (previewImg && placeholder) {
-                    previewImg.src = optimized.previewUrl;
-                    previewImg.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
+            state.images.forEach((imgObj, idx) => {
+                const card = document.createElement('div');
+                card.className = 'relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-square';
+                card.innerHTML = `
+                    <img src="${imgObj.previewUrl}" alt="Ảnh ${idx + 1}" class="w-full h-full object-cover">
+                    <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-slate-900/75 text-white text-[10px] font-bold">#${idx + 1}</span>
+                    <button type="button" title="Xóa ảnh này" class="del-img-btn absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white text-xs font-bold flex items-center justify-center shadow hover:bg-rose-700 transition">×</button>
+                `;
+                card.querySelector('.del-img-btn').onclick = () => {
+                    state.images.splice(idx, 1);
+                    renderMultiImageGrid();
+                };
+                grid.appendChild(card);
+            });
+            updateMediaSummaryBadge();
+        }
+
+        async function handleMultiImageUpload(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+
+            const remainingSlots = MAX_PRODUCT_IMAGES - state.images.length;
+            if (remainingSlots <= 0) {
+                showToast(`Bạn đã chọn đủ tối đa ${MAX_PRODUCT_IMAGES} ảnh! Hãy xóa bớt nếu muốn đổi ảnh.`, 'warning');
+                event.target.value = '';
+                return;
+            }
+
+            const filesToProcess = files.slice(0, remainingSlots);
+            if (files.length > remainingSlots) {
+                showToast(`Chỉ nhận tối đa ${MAX_PRODUCT_IMAGES} ảnh. Đã tự động lấy ${remainingSlots} ảnh đầu tiên.`, 'warning');
+            }
+
+            for (const file of filesToProcess) {
+                if (file.size > 20 * 1024 * 1024) {
+                    showToast(`Ảnh "${file.name}" vượt quá 20MB, đã bỏ qua.`, 'warning');
+                    continue;
                 }
-                const compressedKB = Math.round((optimized.base64.length * 3) / 4 / 1024);
-                addLog(`Đã nạp & tối ưu ảnh sản phẩm: ${file.name} (${Math.round(file.size / 1024)} KB → ${compressedKB} KB)`, 'info');
-                showToast('Đã tối ưu ảnh sản phẩm sẵn sàng cho AI phân tích siêu tốc!', 'success');
+                try {
+                    const rawUrl = await readFileAsDataURL(file);
+                    const optimized = await compressImageForAI(rawUrl, 1024, 0.82);
+                    state.images.push({
+                        name: file.name,
+                        base64: optimized.base64,
+                        mimeType: optimized.mimeType,
+                        previewUrl: optimized.previewUrl
+                    });
+                } catch (err) {
+                    addLog(err.message, 'error');
+                }
+            }
+
+            event.target.value = '';
+            renderMultiImageGrid();
+            addLog(`Đã nạp ${state.images.length}/${MAX_PRODUCT_IMAGES} hình ảnh sản phẩm sẵn sàng cho AI Vision & Robot.`, 'info');
+            showToast(`Đã cập nhật ${state.images.length}/${MAX_PRODUCT_IMAGES} hình ảnh sản phẩm!`, 'success');
+        }
+
+        function clearAllProductImages() {
+            state.images = [];
+            renderMultiImageGrid();
+        }
+
+        function handleVideoUpload(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            if (file.size > MAX_VIDEO_SIZE_BYTES) {
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+                showToast(`Video nặng ${sizeMB}MB (vượt quá giới hạn 300MB)! Vui lòng chọn video dưới 300MB.`, 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const tempUrl = URL.createObjectURL(file);
+            const probeVideo = document.createElement('video');
+            probeVideo.preload = 'metadata';
+
+            probeVideo.onloadedmetadata = function() {
+                const duration = probeVideo.duration || 0;
+                if (duration > MAX_VIDEO_DURATION_SEC) {
+                    URL.revokeObjectURL(tempUrl);
+                    showToast(`Video dài ${Math.round(duration)} giây (vượt quá giới hạn 1 phút / 60 giây)!`, 'error');
+                    event.target.value = '';
+                    return;
+                }
+
+                if (state.videoObjectUrl) {
+                    URL.revokeObjectURL(state.videoObjectUrl);
+                }
+
+                state.videoFile = file;
+                state.videoObjectUrl = tempUrl;
+                state.videoDurationSec = Math.round(duration);
+
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+                document.getElementById('productVideoPreview').src = tempUrl;
+                document.getElementById('videoMetaName').textContent = file.name;
+                document.getElementById('videoMetaSpec').textContent = `${state.videoDurationSec}s • ${sizeMB} MB`;
+                document.getElementById('videoPreviewBox').classList.remove('hidden');
+                document.getElementById('removeVideoBtn').classList.remove('hidden');
+
+                updateMediaSummaryBadge();
+                addLog(`Đã nạp Video sản phẩm: ${file.name} (${state.videoDurationSec} giây, ${sizeMB} MB)`, 'success');
+                showToast(`Đã nạp Video ${state.videoDurationSec}s (${sizeMB}MB) thành công!`, 'success');
             };
-            reader.readAsDataURL(file);
+
+            probeVideo.onerror = function() {
+                URL.revokeObjectURL(tempUrl);
+                showToast('Không thể đọc định dạng video này. Vui lòng chọn file MP4 hoặc MOV!', 'error');
+                event.target.value = '';
+            };
+
+            probeVideo.src = tempUrl;
+        }
+
+        function clearProductVideo() {
+            if (state.videoObjectUrl) {
+                URL.revokeObjectURL(state.videoObjectUrl);
+            }
+            state.videoFile = null;
+            state.videoObjectUrl = '';
+            state.videoDurationSec = 0;
+
+            const input = document.getElementById('productVideoInput');
+            if (input) input.value = '';
+            document.getElementById('productVideoPreview').src = '';
+            document.getElementById('videoPreviewBox').classList.add('hidden');
+            document.getElementById('removeVideoBtn').classList.add('hidden');
+            updateMediaSummaryBadge();
         }
 
         function fetchWithTimeout(url, options = {}, timeoutMs = 25000) {
@@ -1417,6 +1459,9 @@
                 .finally(() => clearTimeout(timer));
         }
 
+        // =========================================================================
+        // 3. CẦU NỐI ROBOT TỰ ĐỘNG (TRUYỀN ĐA ẢNH + VIDEO < 300MB QUA FORMDATA)
+        // =========================================================================
         async function checkDesktopRobotBridge(notifyUser = false) {
             const dot = document.getElementById('robotStatusDot');
             const txt = document.getElementById('robotStatusText');
@@ -1429,7 +1474,7 @@
                         txt.textContent = 'Đã kết nối Robot';
                         txt.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700';
                     }
-                    if (notifyUser) showToast('Đã kết nối thành công với Robot Tự Động trên máy tính!', 'success');
+                    if (notifyUser) showToast('Đã kết nối thành công với Robot Chrome Chuẩn trên máy tính!', 'success');
                     return true;
                 }
             } catch (_) {
@@ -1439,21 +1484,62 @@
                     txt.textContent = 'Chế độ Web';
                     txt.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300';
                 }
-                if (notifyUser) showToast('Chưa bật file Robot (.py) trên máy tính. Đang chạy ở chế độ Web.', 'info');
+                if (notifyUser) showToast('Chưa bật file KHOI_DONG_ROBOT.bat trên máy tính. Đang chạy ở chế độ Web.', 'info');
             }
             return false;
         }
 
-        async function dispatchTaskToDesktopRobot(endpointPath, payload) {
+        function base64ToBlob(base64, mimeType = 'image/jpeg') {
+            const byteChars = atob(base64);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+                byteNumbers[i] = byteChars.charCodeAt(i);
+            }
+            return new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
+        }
+
+        // Truyền dữ liệu bài đăng + tối đa 4 ảnh + video (< 300MB) qua Multipart FormData siêu nhẹ không treo RAM
+        async function dispatchPostMultipartToRobot(groupUrls, postContent) {
+            if (!state.robotConnected) {
+                const connected = await checkDesktopRobotBridge(false);
+                if (!connected) return false;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('groupUrls', JSON.stringify(groupUrls));
+                formData.append('postContent', postContent);
+
+                state.images.forEach((imgObj, idx) => {
+                    const imgBlob = base64ToBlob(imgObj.base64, imgObj.mimeType);
+                    formData.append('mediaFiles', imgBlob, `product_img_${idx + 1}.jpg`);
+                });
+
+                if (state.videoFile) {
+                    formData.append('mediaFiles', state.videoFile, state.videoFile.name || 'product_video.mp4');
+                }
+
+                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/auto-post-media`, {
+                    method: 'POST',
+                    body: formData
+                }, 60000);
+                return res.ok;
+            } catch (err) {
+                addLog(`Cảnh báo truyền file sang Robot: ${err.message}`, 'warning');
+                return false;
+            }
+        }
+
+        async function dispatchCommentToRobot(groupUrls, commentText) {
             if (!state.robotConnected) {
                 const connected = await checkDesktopRobotBridge(false);
                 if (!connected) return false;
             }
             try {
-                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}${endpointPath}`, {
+                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/auto-comment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ groupUrls, commentText })
                 }, 5000);
                 return res.ok;
             } catch (_) {
@@ -1461,23 +1547,34 @@
             }
         }
 
+        function utf8ToBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
         function downloadDesktopRobotAgent() {
-            const robotScript = [
-                'import os, sys, time, json, base64, random, threading, subprocess, traceback',
+            // Mã nguồn Python Robot tối ưu: Chrome chuẩn chống trắng trang 2FA + nhận multipart 4 ảnh & video < 300MB
+            const pythonCode = [
+                'import os, sys, time, json, random, shutil, threading, subprocess, traceback, cgi',
                 'from http.server import HTTPServer, BaseHTTPRequestHandler',
                 '',
                 'try:',
                 '    from playwright.sync_api import sync_playwright',
                 'except ImportError:',
-                '    print("[HE THONG] Dang tu dong cai dat thu vien dieu khien trinh duyet (chi lam 1 lan, doi 1-2 phut)...")',
+                '    print("[HE THONG] Dang cai dat thu vien dieu khien trinh duyet (chi 1 lan, doi 1-2 phut)...")',
                 '    subprocess.check_call([sys.executable, "-m", "pip", "install", "playwright"])',
                 '    subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])',
                 '    from playwright.sync_api import sync_playwright',
                 '',
                 'PORT = 8765',
                 'BASE_DIR = os.path.dirname(os.path.abspath(__file__))',
-                'PROFILE_DIR = os.path.join(BASE_DIR, "fb_robot_profile")',
-                'TEMP_IMG_PATH = os.path.join(BASE_DIR, "temp_product_upload.jpg")',
+                'PROFILE_DIR = os.path.join(BASE_DIR, "fb_chrome_clean_profile")',
+                'MEDIA_TMP_DIR = os.path.join(BASE_DIR, "robot_media_temp")',
+                'os.makedirs(MEDIA_TMP_DIR, exist_ok=True)',
                 'TASK_QUEUE = []',
                 'LAST_POST_URL = ""',
                 '',
@@ -1493,14 +1590,38 @@
                 '            self.send_response(200); self._cors(); self.end_headers()',
                 '            self.wfile.write(b\'{"status":"ok"}\')',
                 '    def do_POST(self):',
-                '        length = int(self.headers.get("Content-Length", 0))',
-                '        data = json.loads(self.rfile.read(length).decode("utf-8") or "{}")',
-                '        if self.path == "/auto-post":',
-                '            TASK_QUEUE.append(("post", data))',
+                '        if self.path == "/auto-post-media":',
+                '            for old_f in os.listdir(MEDIA_TMP_DIR):',
+                '                try: os.remove(os.path.join(MEDIA_TMP_DIR, old_f))',
+                '                except Exception: pass',
+                '            ctype, pdict = cgi.parse_header(self.headers.get("Content-Type", ""))',
+                '            saved_files = []',
+                '            group_urls = []',
+                '            post_content = ""',
+                '            if ctype == "multipart/form-data":',
+                '                pdict["boundary"] = bytes(pdict["boundary"], "utf-8")',
+                '                pdict["CONTENT-LENGTH"] = int(self.headers.get("Content-Length", 0))',
+                '                form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={"REQUEST_METHOD": "POST", "CONTENT_TYPE": self.headers.get("Content-Type")})',
+                '                group_urls = json.loads(form.getvalue("groupUrls", "[]"))',
+                '                post_content = form.getvalue("postContent", "")',
+                '                if "mediaFiles" in form:',
+                '                    items = form["mediaFiles"] if isinstance(form["mediaFiles"], list) else [form["mediaFiles"]]',
+                '                    for idx, item in enumerate(items):',
+                '                        if item.filename:',
+                '                            safe_name = f"{idx+1}_{os.path.basename(item.filename)}"',
+                '                            dest_path = os.path.join(MEDIA_TMP_DIR, safe_name)',
+                '                            with open(dest_path, "wb") as out_f:',
+                '                                shutil.copyfileobj(item.file, out_f)',
+                '                            saved_files.append(dest_path)',
+                '            TASK_QUEUE.append(("post", {"groupUrls": group_urls, "postContent": post_content, "mediaPaths": saved_files}))',
+                '            self.send_response(200); self._cors(); self.end_headers()',
+                '            self.wfile.write(b\'{"queued":true}\')',
                 '        elif self.path == "/auto-comment":',
+                '            length = int(self.headers.get("Content-Length", 0))',
+                '            data = json.loads(self.rfile.read(length).decode("utf-8") or "{}")',
                 '            TASK_QUEUE.append(("comment", data))',
-                '        self.send_response(200); self._cors(); self.end_headers()',
-                '        self.wfile.write(b\'{"queued":true}\')',
+                '            self.send_response(200); self._cors(); self.end_headers()',
+                '            self.wfile.write(b\'{"queued":true}\')',
                 '    def log_message(self, *args): pass',
                 '',
                 'def human_sleep(a=1.5, b=3.0): time.sleep(random.uniform(a, b))',
@@ -1508,28 +1629,31 @@
                 'def run_robot():',
                 '    global LAST_POST_URL',
                 '    threading.Thread(target=lambda: HTTPServer(("127.0.0.1", PORT), BridgeHandler).serve_forever(), daemon=True).start()',
-                '    print(f"[ROBOT] Da bat cau noi tu dong tai http://127.0.0.1:{PORT}")',
-                '    print("[ROBOT] Dang mo trinh duyet dieu khien tu dong...")',
+                '    print(f"[ROBOT] Cau noi tu dong san sang tai http://127.0.0.1:{PORT}")',
                 '    with sync_playwright() as p:',
-                '        launch_opts = {"headless": False, "args": ["--disable-notifications", "--disable-blink-features=AutomationControlled"]}',
+                '        launch_opts = {',
+                '            "headless": False,',
+                '            "viewport": None,',
+                '            "ignore_default_args": ["--enable-automation"],',
+                '            "args": ["--start-maximized", "--disable-notifications", "--disable-blink-features=AutomationControlled"]',
+                '        }',
                 '        try:',
                 '            ctx = p.chromium.launch_persistent_context(PROFILE_DIR, channel="chrome", **launch_opts)',
+                '            print("[ROBOT] Dang chay tren trinh duyet Google Chrome chuan!")',
                 '        except Exception:',
                 '            ctx = p.chromium.launch_persistent_context(PROFILE_DIR, **launch_opts)',
                 '        page = ctx.pages[0] if ctx.pages else ctx.new_page()',
                 '        page.goto("https://www.facebook.com", wait_until="domcontentloaded")',
-                '        print("[ROBOT] SAN SANG! Hay dang nhap Facebook 1 lan duy nhat tren cua so trinh duyet vua mo!")',
+                '        print("[ROBOT] Hay dang nhap Facebook tren cua so trinh duyet vua mo (chi can lam 1 lan duy nhat)!")',
                 '        while True:',
                 '            if not TASK_QUEUE:',
                 '                time.sleep(1); continue',
                 '            kind, payload = TASK_QUEUE.pop(0)',
                 '            if kind == "post":',
-                '                img_b64 = payload.get("imageBase64", "")',
-                '                if img_b64:',
-                '                    with open(TEMP_IMG_PATH, "wb") as f: f.write(base64.b64decode(img_b64))',
+                '                media_paths = [m for m in payload.get("mediaPaths", []) if os.path.exists(m)]',
                 '                for g_url in payload.get("groupUrls", []):',
                 '                    try:',
-                '                        print(f"[ROBOT] Dang tu dong mo nhom & dang bai: {g_url}")',
+                '                        print(f"[ROBOT] Dang mo nhom & dang bai ({len(media_paths)} tep dinh kem): {g_url}")',
                 '                        page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
                 '                        human_sleep(3, 5)',
                 '                        for txt in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai..."]:',
@@ -1541,15 +1665,18 @@
                 '                        box.click()',
                 '                        for ch in payload.get("postContent", ""):',
                 '                            if ch == "\\n": page.keyboard.press("Enter")',
-                '                            else: page.keyboard.type(ch, delay=random.randint(20, 55))',
-                '                        if img_b64 and os.path.exists(TEMP_IMG_PATH):',
-                '                            dlg.locator(\'input[type="file"]\').first.set_input_files(TEMP_IMG_PATH)',
-                '                            human_sleep(4, 6)',
+                '                            else: page.keyboard.type(ch, delay=random.randint(15, 45))',
+                '                        if media_paths:',
+                '                            print(f"[ROBOT] Dang tai len {len(media_paths)} tep (Anh/Video)...")',
+                '                            file_inp = dlg.locator(\'input[type="file"]\').first',
+                '                            file_inp.set_input_files(media_paths)',
+                '                            has_video = any(m.lower().endswith((".mp4", ".mov", ".webm", ".avi")) for m in media_paths)',
+                '                            human_sleep(10, 15) if has_video else human_sleep(4, 6)',
                 '                        for btn_txt in ["Đăng", "Post"]:',
                 '                            btn = dlg.locator(f\'div[aria-label="{btn_txt}"][role="button"]\').first',
-                '                            if btn.is_visible(timeout=2500): btn.click(); break',
+                '                            if btn.is_visible(timeout=4000): btn.click(); break',
                 '                        print("[ROBOT] Da bam Dang bai thanh cong!")',
-                '                        human_sleep(6, 8)',
+                '                        human_sleep(7, 10)',
                 '                        page.goto(g_url, wait_until="domcontentloaded")',
                 '                        human_sleep(3, 5)',
                 '                        links = page.locator(\'div[role="feed"] a[href*="/posts/"], div[role="feed"] a[href*="/permalink/"]\').all()',
@@ -1563,7 +1690,7 @@
                 '                cmt = payload.get("commentText", "")',
                 '                if target and cmt:',
                 '                    try:',
-                '                        print(f"[ROBOT] Dang tu dong tha binh luan seeding: {cmt}")',
+                '                        print(f"[ROBOT] Dang tha binh luan seeding: {cmt}")',
                 '                        page.goto(target, wait_until="domcontentloaded", timeout=60000)',
                 '                        human_sleep(3, 5)',
                 '                        for sel in [\'div[aria-label="Viết bình luận..."]\', \'div[aria-label="Write a comment..."]\', \'div[aria-label="Viết bình luận công khai..."]\']:',
@@ -1585,30 +1712,29 @@
                 '        input("\\nNhan Enter de dong...")'
             ].join('\n');
 
-            // Đóng gói thành file .bat tự nhận diện Python trên Windows và mở thẳng chỉ bằng 1 cú click
+            const b64Payload = utf8ToBase64(pythonCode);
+
+            // File .bat giải mã Base64 sạch 100%, không bao giờ lỗi ký tự đặc biệt của CMD
             const batLines = [
                 '@echo off',
                 'chcp 65001 >nul',
-                'title ROBOT TU DONG FACEBOOK GROUP STUDIO',
+                'title ROBOT TU DONG FACEBOOK GROUP STUDIO (CHROME CHUAN)',
                 'cd /d "%~dp0"',
-                'echo ===================================================',
-                'echo   DANG KHOI DONG ROBOT TU DONG CHUOT & BAN PHIM...',
-                'echo ===================================================',
-                '(',
-                ...robotScript.split('\n').map(line => {
-                    const escaped = line.replace(/\^/g, '^^').replace(/&/g, '^&').replace(/\|/g, '^|').replace(/</g, '^<').replace(/>/g, '^>').replace(/%/g, '%%');
-                    return escaped === '' ? 'echo.' : `echo ${escaped}`;
-                }),
-                ') > fb_desktop_agent.py',
+                'echo ==========================================================',
+                'echo   DANG KHOI DONG ROBOT TU DONG (4 ANH + VIDEO 1 PHUT)...',
+                'echo ==========================================================',
+                `set "PY_B64=${b64Payload}"`,
                 'where py >nul 2>nul',
                 'if %errorlevel%==0 (',
+                '    py -c "import os,base64;open(\'fb_desktop_agent.py\',\'wb\').write(base64.b64decode(os.environ[\'PY_B64\']))"',
                 '    py fb_desktop_agent.py',
                 ') else (',
                 '    where python >nul 2>nul',
                 '    if %errorlevel%==0 (',
+                '        python -c "import os,base64;open(\'fb_desktop_agent.py\',\'wb\').write(base64.b64decode(os.environ[\'PY_B64\']))"',
                 '        python fb_desktop_agent.py',
                 '    ) else (',
-                '        echo [LOI] May tinh chua cai Python! Vui long cai Python tai python.org va tich chon Add to PATH.',
+                '        echo [LOI] May tinh chua cai Python! Vui long tai Python tai python.org va tich chon Add to PATH.',
                 '    )',
                 ')',
                 'pause'
@@ -1621,11 +1747,11 @@
             a.download = 'KHOI_DONG_ROBOT.bat';
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Đã tải file KHOI_DONG_ROBOT.bat! Bạn chỉ cần bấm đúp vào file này là chạy ngay!', 'success');
+            showToast('Đã tải file KHOI_DONG_ROBOT.bat (Bản Chrome chuẩn chống lỗi 2FA)!', 'success');
         }
 
         // =========================================================================
-        // 3. TÍCH HỢP GOOGLE GEMINI VISION AI & ĐIỀU PHỐI LỊCH TRÌNH TỰ ĐỘNG
+        // 4. GOOGLE GEMINI VISION AI (PHÂN TÍCH ĐỒNG THỜI TỐI ĐA 4 ẢNH)
         // =========================================================================
         function safeParseAIJson(rawText) {
             let cleaned = (rawText || '').trim();
@@ -1650,26 +1776,32 @@
             if (!apiKey) {
                 throw new Error('Vui lòng nhập Google Gemini API Key ở mục 1!');
             }
-            if (!productInfo && !state.imageBase64) {
-                throw new Error('Vui lòng nhập mô tả sản phẩm hoặc tải lên ít nhất 1 hình ảnh sản phẩm!');
+            if (!productInfo && state.images.length === 0 && !state.videoFile) {
+                throw new Error('Vui lòng nhập mô tả sản phẩm hoặc nạp ít nhất 1 ảnh / video!');
             }
+
+            const mediaContextNote = [
+                state.images.length > 0 ? `Có ${state.images.length} hình ảnh sản phẩm chụp nhiều góc độ đính kèm.` : '',
+                state.videoFile ? `Có kèm 1 video review thực tế dài ${state.videoDurationSec} giây (${state.videoFile.name}).` : ''
+            ].filter(Boolean).join(' ');
 
             const promptText = `
 Bạn là một chuyên gia Marketing thực chiến và bậc thầy tâm lý khách hàng trên Facebook.
-Đây là lần đăng bài xoay vòng thứ #${cycleNumber}. Hãy phân tích thật kỹ hình ảnh sản phẩm đính kèm (nếu có) và thông tin sản phẩm bên dưới để:
+Đây là lần đăng bài xoay vòng thứ #${cycleNumber}. ${mediaContextNote}
+Hãy phân tích thật kỹ toàn bộ hình ảnh sản phẩm đính kèm và thông tin sản phẩm bên dưới để:
 1. Viết lại một bài đăng hoàn toàn mới mẻ, tự nhiên, cuốn hút, hòa nhập với văn phong của các bài đăng hot trong nhóm hiện tại, tuyệt đối không trùng lặp câu chữ với các lần trước và tránh từ khóa vi phạm chính sách Facebook.
-2. Tạo đúng 5 bình luận seeding ngắn gọn, tự nhiên đóng vai khách hàng thật đặt những câu hỏi kích thích sự tò mò cao độ về sản phẩm (hỏi chi tiết thấy trên ảnh, công dụng thực tế, cách dùng, ưu đãi...).
+2. Tạo đúng 5 bình luận seeding ngắn gọn, tự nhiên đóng vai khách hàng thật đặt những câu hỏi kích thích sự tò mò cao độ về sản phẩm (hỏi chi tiết thấy trên bộ ảnh/video, công dụng thực tế, cách dùng, ưu đãi...).
 
 TÀI KHOẢN ĐĂNG BÀI NGUỒN: ${sourceAccount || 'Tài khoản cá nhân/Fanpage bán hàng'}
 THÔNG TIN SẢN PHẨM GỐC:
-${productInfo || 'Phân tích trực tiếp từ hình ảnh sản phẩm đính kèm.'}
+${productInfo || 'Phân tích trực tiếp từ bộ hình ảnh & video sản phẩm đính kèm.'}
 
 DỮ LIỆU BÀI VIẾT HOT TRONG NHÓM:
 ${hotPosts || 'Nhóm cộng đồng năng động, thích chia sẻ trải nghiệm thực tế và hỏi đáp ngắn gọn.'}
 
 Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 {
-  "expert_analysis": "Tóm tắt ngắn gọn 2 câu phân tích điểm ăn tiền nhất của sản phẩm...",
+  "expert_analysis": "Tóm tắt ngắn gọn 2 câu phân tích điểm ăn tiền nhất từ bộ ảnh & dữ liệu sản phẩm...",
   "post_content": "Nội dung bài đăng hoàn chỉnh đã tối ưu...",
   "curious_comments": [
     "Bình luận tò mò 1...",
@@ -1681,14 +1813,14 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 }`;
 
             const parts = [{ text: promptText }];
-            if (state.imageBase64) {
+            state.images.forEach(imgObj => {
                 parts.push({
                     inlineData: {
-                        mimeType: state.imageMimeType,
-                        data: state.imageBase64
+                        mimeType: imgObj.mimeType,
+                        data: imgObj.base64
                     }
                 });
-            }
+            });
 
             const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
             let lastErrorMessage = '';
@@ -1733,17 +1865,18 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
         }
 
         async function executePostGenerationCycle() {
+            if (state.isProcessingCycle) return;
+            state.isProcessingCycle = true;
+
             state.postCycleCount += 1;
             updateStatusBadge('running', `AI đang phân tích vòng #${state.postCycleCount}...`);
-            addLog(`Bắt đầu chu kỳ đăng bài #${state.postCycleCount}: AI đang phân tích hình ảnh & dữ liệu nhóm...`, 'info');
+            addLog(`Bắt đầu chu kỳ #${state.postCycleCount}: AI phân tích ${state.images.length} ảnh${state.videoFile ? ' + 1 video' : ''}...`, 'info');
 
             try {
                 const aiResult = await callGeminiMarketingAI(state.postCycleCount);
 
                 const postOutputEl = document.getElementById('generatedPostOutput');
-                if (postOutputEl) {
-                    postOutputEl.value = aiResult.post_content || '';
-                }
+                if (postOutputEl) postOutputEl.value = aiResult.post_content || '';
 
                 const analysisBox = document.getElementById('aiExpertAnalysisBox');
                 const analysisText = document.getElementById('aiExpertAnalysisText');
@@ -1763,17 +1896,12 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 renderCommentsQueueUI();
                 updateCountersUI();
 
-                // Nếu Robot tự động trên máy tính đang chạy, gửi lệnh tự đăng bài & tải ảnh ngầm
-                const sentToRobot = await dispatchTaskToDesktopRobot('/auto-post', {
-                    groupUrls: state.activeGroupUrls,
-                    postContent: aiResult.post_content || '',
-                    imageBase64: state.imageBase64 || ''
-                });
+                const sentToRobot = await dispatchPostMultipartToRobot(state.activeGroupUrls, aiResult.post_content || '');
 
                 if (sentToRobot) {
-                    addLog(`Đã truyền lệnh sang Robot máy tính: Tự động mở ${state.activeGroupUrls.length} nhóm & đăng bài ngầm!`, 'success');
+                    addLog(`Robot đã nhận lệnh: Tự đăng lên ${state.activeGroupUrls.length} nhóm kèm ${state.images.length} ảnh${state.videoFile ? ' + video 1 phút' : ''}!`, 'success');
                 } else {
-                    addLog(`Hoàn tất biên soạn bài đăng #${state.postCycleCount} và 5 câu bình luận seeding gây tò mò!`, 'success');
+                    addLog(`Hoàn tất biên soạn bài đăng #${state.postCycleCount} và 5 bình luận seeding!`, 'success');
                 }
                 showToast(`Đã tạo xong bài đăng mới (Lần #${state.postCycleCount})!`, 'success');
                 updateStatusBadge('running', 'Đang chạy tự động');
@@ -1781,6 +1909,8 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 addLog(`Lỗi AI: ${err.message}`, 'error');
                 showToast(err.message, 'error');
                 stopCampaign();
+            } finally {
+                state.isProcessingCycle = false;
             }
         }
 
@@ -1796,13 +1926,10 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
             renderCommentsQueueUI();
             updateCountersUI();
 
-            const sentToRobot = await dispatchTaskToDesktopRobot('/auto-comment', {
-                groupUrls: state.activeGroupUrls,
-                commentText: cmtText
-            });
+            const sentToRobot = await dispatchCommentToRobot(state.activeGroupUrls, cmtText);
 
             if (sentToRobot) {
-                addLog(`Robot đã nhận lệnh tự động thả bình luận #${state.commentCount}/5: "${cmtText}"`, 'success');
+                addLog(`Robot đã nhận lệnh thả bình luận #${state.commentCount}/5: "${cmtText}"`, 'success');
             } else {
                 addLog(`Kích hoạt bình luận seeding #${state.commentCount}/5: "${cmtText}"`, 'success');
             }
@@ -1812,7 +1939,6 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
         async function startCampaign() {
             if (state.isRunning) return;
 
-            // Kiểm tra lại thời hạn cấp quyền trước khi cho phép chạy chiến dịch
             const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
             const vault = getCoreVault();
             if (activeSession && !activeSession.isOwner && activeSession.token && vault.users[activeSession.token]) {
@@ -1848,7 +1974,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 
             if (state.timerInterval) clearInterval(state.timerInterval);
             state.timerInterval = setInterval(async () => {
-                if (!state.isRunning) return;
+                if (!state.isRunning || state.isProcessingCycle) return;
 
                 state.postSecondsRemaining -= 1;
                 if (state.commentCount < 5 && state.curiousCommentsQueue.length > 0) {
@@ -1869,6 +1995,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 
         function stopCampaign() {
             state.isRunning = false;
+            state.isProcessingCycle = false;
             if (state.timerInterval) {
                 clearInterval(state.timerInterval);
                 state.timerInterval = null;
@@ -1974,7 +2101,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
         }
 
         // =========================================================================
-        // 4. TIỆN ÍCH CLIPBOARD, LOG & THÔNG BÁO GIAO DIỆN
+        // 5. TIỆN ÍCH CLIPBOARD, LOG & THÔNG BÁO GIAO DIỆN
         // =========================================================================
         function copyRawText(text, successMsg = 'Đã copy vào bộ nhớ tạm!') {
             if (!text) {
@@ -2049,7 +2176,6 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
             }, 3200);
         }
 
-        // Khôi phục phiên đăng nhập nhất quán khi tải trang (kèm kiểm tra thời hạn cấp quyền)
         window.addEventListener('DOMContentLoaded', () => {
             checkDesktopRobotBridge(false);
             const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
