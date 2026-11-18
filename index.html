@@ -1773,6 +1773,8 @@
                 '        input("\\nNhan Enter de dong...")'
             ].join('\n');
 
+            const b64Payload = utf8ToBase64(pythonCode);
+
             // Dùng %~f0 để đọc chính xác file .bat bất kể tên file, tự động tắt tiến trình cũ bị kẹt ngầm
             const batLines = [
                 '@echo off',
