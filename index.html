@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Facebook Group Auto Poster & Seeding Studio</title>
+    <!-- Tải Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter hiện đại -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,68 +31,90 @@
             background: #94a3b8;
         }
         @keyframes pulse-ring {
-            0% { transform: scale(0.85); opacity: 0.8; }
-            70% { transform: scale(1.3); opacity: 0; }
-            100% { transform: scale(1.3); opacity: 0; }
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.3; }
+            100% { transform: scale(0.95); opacity: 0.8; }
         }
-        .animate-pulse-ring::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 9999px;
-            border: 2px solid #22c55e;
-            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        .animate-pulse-ring {
+            animation: pulse-ring 2s infinite ease-in-out;
         }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- CỔNG ĐĂNG KÝ & ĐĂNG NHẬP BẢO MẬT SHA-256 (NHẤT QUÁN XUYÊN SUỐT MỌI BẢN CẬP NHẬT) -->
-    <div id="authGateOverlay" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-            <div class="text-center space-y-2">
+    <div id="authGateOverlay" class="fixed inset-0 z-50 bg-slate-900/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-5 my-auto">
+            <div class="text-center space-y-1.5">
                 <div class="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                     </svg>
                 </div>
                 <h2 class="text-xl font-extrabold text-slate-900">AI FB Group Studio</h2>
-                <p class="text-xs text-slate-500">Hệ thống bảo mật mã hóa SHA-256 • Đăng ký 1 lần dùng xuyên suốt mọi phiên bản cập nhật</p>
+                <p class="text-xs text-slate-500">Hệ thống bảo mật SHA-256 • Yêu cầu giấy phép từ Chủ sở hữu</p>
             </div>
 
-            <!-- Tabs Đăng Nhập / Đăng Ký -->
-            <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl text-xs font-bold">
+            <!-- Tabs Đăng Nhập / Đăng Ký / Chủ Sở Hữu -->
+            <div class="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-xl text-xs font-bold">
                 <button type="button" id="tabLoginBtn" onclick="switchAuthTab('login')" class="py-2 rounded-lg bg-white text-blue-600 shadow-sm transition">
                     Đăng Nhập
                 </button>
                 <button type="button" id="tabRegisterBtn" onclick="switchAuthTab('register')" class="py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
-                    Tạo Tài Khoản Mới
+                    Tạo Tài Khoản
+                </button>
+                <button type="button" id="tabOwnerBtn" onclick="switchAuthTab('owner')" class="py-2 rounded-lg text-amber-700 hover:text-amber-900 transition flex items-center justify-center gap-1">
+                    <span>👑 Chủ Tool</span>
                 </button>
             </div>
 
             <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-600"></div>
 
-            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+            <!-- FORM DÀNH CHO NGƯỜI DÙNG (ĐĂNG NHẬP / ĐĂNG KÝ) -->
+            <form id="userAuthForm" onsubmit="handleAuthSubmit(event)" class="space-y-3.5">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Gmail hoặc Số điện thoại</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Gmail hoặc Số điện thoại</label>
                     <input type="text" id="authIdentifierInput" required placeholder="vd: tenban@gmail.com hoặc 0912345678"
                         class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mật khẩu bảo mật (tối thiểu 6 ký tự)</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Mật khẩu bảo mật (tối thiểu 6 ký tự)</label>
                     <input type="password" id="authPasswordInput" required minlength="6" placeholder="••••••••"
                         class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 </div>
 
                 <div id="confirmPasswordWrapper" class="hidden">
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Xác nhận lại mật khẩu</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Xác nhận lại mật khẩu</label>
                     <input type="password" id="authConfirmPasswordInput" placeholder="••••••••"
                         class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 </div>
 
+                <div id="licenseKeyInputWrapper">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Mã Cấp Quyền Hoạt Động (License Key) <span class="text-rose-500">*</span></label>
+                    <input type="text" id="authLicenseKeyInput" placeholder="FBA-YYYYMMDD-XXXXXXXXXXXX"
+                        class="w-full px-3.5 py-2.5 text-sm font-mono uppercase bg-amber-50/60 border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                    <p class="text-[11px] text-slate-400 mt-1">Liên hệ Chủ sở hữu để nhận mã kích hoạt theo thời hạn sử dụng.</p>
+                </div>
+
                 <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition">
-                    Đăng Nhập & Mở Khóa Tool
+                    Xác Thực Quyền & Mở Khóa Tool
+                </button>
+            </form>
+
+            <!-- FORM ĐĂNG NHẬP ĐỘC QUYỀN CHO CHỦ SỞ HỮU (MASTER OWNER) -->
+            <form id="ownerAuthForm" onsubmit="handleOwnerLogin(event)" class="hidden space-y-4">
+                <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                    <p class="font-bold">Khu vực kiểm soát độc quyền của Chủ sở hữu</p>
+                    <p class="mt-0.5 text-[11px]">Đăng nhập bằng Chìa khóa Chủ sở hữu để mở bảng lịch năm, tạo mã cấp quyền và quản lý thời hạn hoạt động của toàn bộ người dùng.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mã Bí Mật Chủ Sở Hữu (Master Secret Key)</label>
+                    <input type="password" id="ownerMasterSecretInput" required placeholder="Nhập mã bí mật của riêng bạn..."
+                        class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-sm rounded-xl shadow-md shadow-amber-500/20 transition">
+                    Mở Bảng Điều Khiển Chủ Sở Hữu
                 </button>
             </form>
 
@@ -100,76 +126,178 @@
                     Khôi phục từ file Sao lưu Tài khoản (.json)
                     <input type="file" accept=".json" onchange="importAccountVault(event)" class="hidden">
                 </label>
-                <p class="text-[11px] text-slate-400">
-                    Tài khoản đăng ký 1 lần được đồng bộ xuyên suốt cho mọi bản cập nhật tiếp theo của hệ thống.
-                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BẢNG LỊCH NĂM & QUẢN LÝ CẤP QUYỀN ĐỘC QUYỀN CỦA CHỦ SỞ HỮU -->
+    <div id="ownerAdminModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-5xl max-h-[92vh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="w-9 h-9 rounded-xl bg-amber-500 text-slate-900 flex items-center justify-center font-extrabold text-base shadow">👑</span>
+                    <div>
+                        <h3 class="font-extrabold text-base">Trung Tâm Kiểm Soát & Cấp Quyền Chủ Sở Hữu</h3>
+                        <p class="text-[11px] text-slate-300">Tùy chỉnh lịch hoạt động trong năm • Sinh mã kích hoạt SHA-256 độc quyền theo từng tài khoản</p>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleOwnerAdminModal(false)" class="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto custom-scrollbar grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- CỘT TRÁI: FORM CẤP QUYỀN & CHỌN THỜI HẠN -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3.5">
+                        <h4 class="text-xs font-extrabold text-amber-900 uppercase tracking-wider">1. Thiết lập Quyền Người Dùng</h4>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Gmail hoặc SĐT của người được cấp quyền <span class="text-rose-500">*</span></label>
+                            <input type="text" id="adminTargetUserInput" placeholder="vd: khachhang@gmail.com hoặc 0987654321"
+                                class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tên gợi nhớ / Ghi chú khách hàng</label>
+                            <input type="text" id="adminTargetNoteInput" placeholder="vd: Anh Nam - Team Bán Hàng"
+                                class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Chọn nhanh thời hạn từ hôm nay</label>
+                            <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
+                                <button type="button" onclick="setQuickExpiryDays(7)" class="py-1.5 rounded-lg bg-white hover:bg-amber-500 hover:text-white border border-slate-200 text-slate-700 transition">7 Ngày</button>
+                                <button type="button" onclick="setQuickExpiryDays(30)" class="py-1.5 rounded-lg bg-white hover:bg-amber-500 hover:text-white border border-slate-200 text-slate-700 transition">1 Tháng</button>
+                                <button type="button" onclick="setQuickExpiryDays(90)" class="py-1.5 rounded-lg bg-white hover:bg-amber-500 hover:text-white border border-slate-200 text-slate-700 transition">3 Tháng</button>
+                                <button type="button" onclick="setQuickExpiryDays(365)" class="py-1.5 rounded-lg bg-white hover:bg-amber-500 hover:text-white border border-slate-200 text-slate-700 transition">1 Năm</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Ngày hết hạn chính xác (Hoặc bấm chọn trên Lịch Năm →)</label>
+                            <input type="date" id="adminExpiryDateInput" onchange="syncCalendarHighlightFromInput()"
+                                class="w-full px-3 py-2 text-sm font-bold text-blue-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <button type="button" onclick="generateUserLicenseKey()" class="w-full py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow transition">
+                            Cấp Quyền & Tạo Mã Kích Hoạt
+                        </button>
+                    </div>
+
+                    <!-- KẾT QUẢ MÃ KÍCH HOẠT VỪA TẠO -->
+                    <div id="generatedLicenseResultBox" class="hidden p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-900">Mã Kích Hoạt Đã Tạo Thành Công:</span>
+                            <button type="button" onclick="copyTextFromElement('generatedLicenseOutput', 'Đã copy Mã Kích Hoạt gửi cho người dùng!')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold">
+                                Copy Mã
+                            </button>
+                        </div>
+                        <input type="text" id="generatedLicenseOutput" readonly
+                            class="w-full px-3 py-2 text-xs font-mono font-bold text-emerald-950 bg-white border border-emerald-300 rounded-xl">
+                        <p id="generatedLicenseSummary" class="text-[11px] text-emerald-800"></p>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI: BẢNG LỊCH 12 THÁNG TRONG NĂM & DANH SÁCH ĐÃ CẤP QUYỀN -->
+                <div class="lg:col-span-7 space-y-5">
+                    <!-- BẢNG LỊCH 12 THÁNG TRONG NĂM -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">2. Bảng Lịch Cấp Quyền Trong Năm</h4>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="changeAdminCalendarYear(-1)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-bold hover:bg-slate-100">◀</button>
+                                <span id="adminCalendarYearLabel" class="px-3 py-1 rounded-lg bg-slate-900 text-white text-xs font-extrabold">2026</span>
+                                <button type="button" onclick="changeAdminCalendarYear(1)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-bold hover:bg-slate-100">▶</button>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Bấm trực tiếp vào bất kỳ ngày nào trong 12 tháng bên dưới để chọn làm mốc hết hạn sử dụng:</p>
+
+                        <div id="annualCalendarGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                            <!-- 12 tháng sẽ được render tự động bằng JS -->
+                        </div>
+                    </div>
+
+                    <!-- DANH SÁCH NGƯỜI DÙNG ĐÃ ĐƯỢC CẤP QUYỀN -->
+                    <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">3. Danh Sách Tài Khoản Đã Cấp Quyền</h4>
+                            <span id="issuedLicensesCountBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">0 tài khoản</span>
+                        </div>
+                        <div id="issuedLicensesList" class="space-y-2 max-h-44 overflow-y-auto custom-scrollbar">
+                            <p class="text-xs text-slate-400 italic">Chưa có tài khoản nào được cấp quyền trên thiết bị này.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- MODAL HƯỚNG DẪN SỬ DỤNG TOOL -->
-    <div id="guideModalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="guideModalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-2xl max-h-[88vh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <span class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">?</span>
-                    <h3 class="font-bold text-slate-900 text-base">Hướng Dẫn Vận Hành Chi Tiết</h3>
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm">?</span>
+                    <h3 class="font-bold text-slate-900 text-base">Hướng Dẫn Sử Dụng AI FB Group Studio</h3>
                 </div>
                 <button type="button" onclick="toggleGuideModal(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-6 overflow-y-auto custom-scrollbar space-y-5 text-sm text-slate-600 leading-relaxed">
-                <div class="p-4 rounded-2xl bg-blue-50 border border-blue-100 text-blue-900">
-                    <p class="font-bold mb-1">1. Chuẩn bị Gemini API Key (Miễn phí)</p>
-                    <p class="text-xs">Truy cập <a href="https://aistudio.google.com/apikey" target="_blank" class="underline font-bold text-blue-700">Google AI Studio</a>, tạo một API Key và dán vào ô cấu hình số 1. Hệ thống dùng model <b>Gemini 2.5 Flash</b> để đọc hình ảnh sản phẩm và viết bài chuẩn chuyên gia.</p>
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-4 text-sm text-slate-600 leading-relaxed">
+                <div class="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 text-blue-900 text-xs">
+                    <strong>Kiến trúc đồng nhất:</strong> Tài khoản & cài đặt của bạn được mã hóa SHA-256 và tự động giữ nguyên xuyên suốt mọi bản cập nhật sau này.
                 </div>
-                <div class="space-y-2">
-                    <p class="font-bold text-slate-800">2. Thiết lập Tài khoản nguồn & Nhóm mục tiêu</p>
-                    <ul class="list-disc pl-5 space-y-1 text-xs">
-                        <li>Dán <b>Link Facebook cá nhân / Fanpage nguồn</b> dùng để đi đăng bài và seeding.</li>
-                        <li>Dán <b>Link Hội Nhóm Facebook</b> cần đăng. Copy 3–5 bài viết đang có nhiều tương tác trong nhóm đó dán vào mục <b>Dữ liệu bài đăng Hot</b> để AI học văn phong tự nhiên của nhóm.</li>
-                    </ul>
-                </div>
-                <div class="space-y-2">
-                    <p class="font-bold text-slate-800">3. Cơ chế Vòng lặp Thông minh & Seeding 5 Bình luận</p>
-                    <ul class="list-disc pl-5 space-y-1 text-xs">
-                        <li><b>Chu kỳ đăng bài (Mặc định 3 phút):</b> Mỗi khi hết đếm ngược, AI tự động viết lại một phiên bản bài đăng hoàn toàn mới dựa trên ảnh sản phẩm & ngữ cảnh nhóm để tránh bị Facebook đánh dấu spam trùng lặp.</li>
-                        <li><b>Chu kỳ bình luận Seeding (Mặc định 5 phút/lần - Tối đa 5 comment):</b> AI tự sinh 5 câu hỏi/bình luận kích thích sự tò mò của khách hàng dựa trên chi tiết ảnh sản phẩm và lần lượt mở khóa từng câu theo đúng thời gian bạn cài đặt.</li>
-                    </ul>
-                </div>
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs">
-                    <b>Lưu ý bảo toàn tài khoản:</b> Hãy bấm nút <b>"Sao lưu Tài khoản"</b> trên thanh công cụ để tải về file <code>.json</code> đã mã hóa SHA-256. Khi bạn cập nhật tool lên phiên bản mới hoặc chuyển sang hosting khác, chỉ cần khôi phục file này là giữ nguyên toàn bộ tài khoản và cấu hình!
+                <div class="space-y-3">
+                    <div>
+                        <h4 class="font-bold text-slate-900">Bước 1: Kết nối AI & Tài khoản nguồn</h4>
+                        <p class="text-xs mt-1">Dán <strong>Google Gemini API Key</strong> (miễn phí tại Google AI Studio), nhập link trang cá nhân/Fanpage nguồn dùng để đi đăng bài, danh sách link các Group mục tiêu và tùy chỉnh số phút nghỉ giữa các lần đăng/bình luận.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900">Bước 2: Nạp hình ảnh & dữ liệu bài hot trong nhóm</h4>
+                        <p class="text-xs mt-1">Tải lên ảnh sản phẩm rõ nét để AI Vision phân tích chi tiết màu sắc, kiểu dáng. Dán thêm 2–3 đoạn nội dung bài viết đang nổi bật trong nhóm để AI học văn phong tự nhiên.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900">Bước 3: Vận hành chu kỳ đăng bài & Seeding 5 bình luận</h4>
+                        <p class="text-xs mt-1">Bấm <strong>Chạy Chiến Dịch Tự Động</strong>. AI sẽ tự động viết bài mới sau mỗi chu kỳ (mặc định 3 phút) để tránh trùng lặp, đồng thời lần lượt mở khóa từng câu bình luận seeding gây tò mò sau mỗi chu kỳ bình luận (mặc định 5 phút, tối đa 5 bình luận).</p>
+                    </div>
                 </div>
             </div>
-            <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end">
-                <button type="button" onclick="toggleGuideModal(false)" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition">
-                    Đã Hiểu, Bắt Đầu Làm Việc
+            <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button type="button" onclick="toggleGuideModal(false)" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
+                    Đã Hiểu & Bắt Đầu
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- THANH ĐIỀU HƯỚNG (HEADER) -->
+    <!-- THANH TIÊU ĐỀ (HEADER) -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold shadow-sm">
-                    AI
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
                 </div>
-                <div>
-                    <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">FB Group AI Auto Poster & Seeding</h1>
-                    <p class="text-[11px] text-slate-500 hidden sm:block">Phân tích hình ảnh sản phẩm • Tự động xoay vòng content • Seeding 5 bình luận tò mò</p>
+                <div class="truncate">
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate">AI FB Group Studio</h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Tự động xoay vòng nội dung & Seeding bình luận thông minh</p>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 shrink-0">
                 <button type="button" onclick="toggleGuideModal(true)" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                     <span class="hidden sm:inline">Hướng dẫn sử dụng</span>
                     <span class="sm:hidden">Hướng dẫn</span>
+                </button>
+
+                <button type="button" id="headerOwnerPanelBtn" onclick="toggleOwnerAdminModal(true)" class="hidden inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-sm transition">
+                    <span>👑 Quản Lý Cấp Quyền</span>
                 </button>
 
                 <button type="button" onclick="exportAccountVault()" title="Xuất file hồ sơ tài khoản đã mã hóa để dùng xuyên suốt các bản cập nhật / tên miền mới" class="hidden md:inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
@@ -179,13 +307,21 @@
                     Sao lưu Tài khoản
                 </button>
 
+                <span id="licenseExpiryBadge" class="hidden xl:inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    HSD: --/--/----
+                </span>
+
                 <span id="statusBadge" class="hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
                     <span class="w-2 h-2 rounded-full bg-slate-400 mr-2"></span> Sẵn sàng
                 </span>
 
-                <div class="flex items-center bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs">
-                    <span id="currentUserLabel" class="font-semibold text-slate-700 mr-2 max-w-[110px] truncate">Chưa đăng nhập</span>
-                    <button type="button" onclick="logoutUser()" class="text-rose-600 hover:text-rose-800 font-bold" title="Đăng xuất">Thoát</button>
+                <div class="flex items-center space-x-1.5 pl-2 border-l border-slate-200">
+                    <span id="currentUserLabel" class="text-xs font-semibold text-slate-700 max-w-[115px] truncate">Khách</span>
+                    <button type="button" onclick="logoutUser()" title="Đăng xuất tài khoản" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -195,190 +331,208 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- CỘT TRÁI: CẤU HÌNH & DỮ LIỆU ĐẦU VÀO (5 CỘT) -->
-            <div class="lg:col-span-5 space-y-5">
+            <!-- CỘT TRÁI: CẤU HÌNH & NẠP DỮ LIỆU ĐẦU VÀO (5 CỘT) -->
+            <div class="lg:col-span-5 space-y-6">
 
-                <!-- THẺ 1: API KEY, TÀI KHOẢN NGUỒN & CÀI ĐẶT THỜI GIAN -->
+                <!-- Thẻ 1: Cấu hình API Key, Tài khoản nguồn & Thời gian -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center">
-                            <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-extrabold mr-2">1</span>
-                            Cấu hình Hệ thống & Thời gian
-                        </h2>
-                        <a href="https://aistudio.google.com/apikey" target="_blank" class="text-xs text-blue-600 hover:underline font-medium">Lấy API Key →</a>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">1. Kết Nối AI, Tài Khoản & Thời Gian</h2>
+                        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:underline font-medium">Lấy API Key →</a>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Google Gemini API Key <span class="text-rose-500">*</span></label>
-                        <input type="password" id="apiKeyInput" oninput="autoSaveDraftInputs()" placeholder="AIzaSy..."
-                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        <input type="password" id="geminiApiKeyInput" oninput="saveUserConfigToVault()" placeholder="AIzaSy..."
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Link Tài khoản Nguồn (Nick/Page đăng bài)</label>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Link Tài Khoản Đăng Nhập Nguồn (Facebook / Fanpage)</label>
                         <div class="flex gap-2">
-                            <input type="url" id="sourceAccountUrlInput" oninput="autoSaveDraftInputs()" placeholder="https://www.facebook.com/profile.php?id=..."
-                                class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                            <button type="button" onclick="openExternalLink('sourceAccountUrlInput')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition whitespace-nowrap">
+                            <input type="url" id="sourceAccountUrlInput" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/profile.php?id=..."
+                                class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <button type="button" onclick="openSourceAccountUrl()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition shrink-0">
                                 Mở Nick
                             </button>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Link Hội Nhóm Facebook Mục Tiêu</label>
-                        <div class="flex gap-2">
-                            <input type="url" id="groupUrlInput" oninput="autoSaveDraftInputs()" placeholder="https://www.facebook.com/groups/..."
-                                class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                            <button type="button" onclick="openExternalLink('groupUrlInput')" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-xl transition whitespace-nowrap">
-                                Mở Group
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Danh sách Link Group Mục Tiêu (Mỗi dòng 1 link)</label>
+                        <textarea id="groupUrlsInput" rows="2" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/groups/ten_nhom_1&#10;https://www.facebook.com/groups/ten_nhom_2"
+                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
+                    </div>
+
+                    <!-- Tùy chỉnh chu kỳ thời gian đăng bài & bình luận -->
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Chu kỳ đăng lại (Phút)</label>
+                            <input type="number" id="postIntervalInput" min="1" max="1440" value="3" oninput="syncCustomTimersUI()"
+                                class="w-full px-3.5 py-2 text-sm font-semibold text-blue-700 bg-blue-50/50 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Chu kỳ comment (Phút)</label>
+                            <input type="number" id="commentIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI()"
+                                class="w-full px-3.5 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50/50 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 2: Thông tin & Hình ảnh sản phẩm -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. Dữ Liệu Sản Phẩm (AI Vision)</h2>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Hình ảnh sản phẩm (AI tự động đọc & phân tích)</label>
+                        <label for="productImageInput" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-blue-50/50 hover:border-blue-400 transition relative overflow-hidden">
+                            <div id="imageUploadPlaceholder" class="flex flex-col items-center justify-center pt-4 pb-4 text-center px-4">
+                                <svg class="w-7 h-7 mb-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <p class="text-xs text-slate-600 font-medium">Bấm để chọn ảnh sản phẩm (JPG, PNG, WEBP)</p>
+                            </div>
+                            <img id="productImagePreview" src="" alt="Preview" class="hidden w-full h-full object-contain bg-slate-900/5 p-2">
+                            <input id="productImageInput" type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Mô tả sản phẩm / Dịch vụ gốc <span class="text-rose-500">*</span></label>
+                        <textarea id="productInfoInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Ví dụ: Serum dưỡng trắng mờ thâm chiết xuất tự nhiên, dùng được cho da nhạy cảm, đang giảm 30% hôm nay..."
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
+                    </div>
+                </div>
+
+                <!-- Thẻ 3: Dữ liệu bài đăng hot trong Group -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">3. Ngữ Cảnh Bài Hot Trong Group</h2>
+                        <span class="text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-semibold">Tối ưu văn phong</span>
+                    </div>
+                    <textarea id="hotPostsInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Dán 2-3 đoạn nội dung hoặc chủ đề đang được nhiều tương tác trong group để AI học văn phong tự nhiên..."
+                        class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
+                </div>
+
+                <!-- Nút điều khiển chính -->
+                <div class="flex gap-3">
+                    <button type="button" id="startCampaignBtn" onclick="startCampaign()" class="flex-1 py-3.5 px-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Chạy Chiến Dịch Tự Động</span>
+                    </button>
+
+                    <button type="button" id="stopCampaignBtn" onclick="stopCampaign()" class="hidden py-3.5 px-5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center space-x-2 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                        </svg>
+                        <span>Dừng</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- CỘT PHẢI: BẢNG ĐIỀU KHIỂN THỜI GIAN THỰC & KẾT QUẢ AI (7 CỘT) -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Bộ đếm thời gian kép (Đăng bài & Seeding Comment) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Đồng hồ đăng bài -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between relative overflow-hidden">
+                        <div>
+                            <span id="postIntervalBadge" class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">Chu kỳ 3 phút</span>
+                            <p class="text-xs text-slate-500 mt-2">Lần làm mới bài đăng tiếp theo</p>
+                            <div class="flex items-baseline space-x-2 mt-0.5">
+                                <span id="postTimerDisplay" class="text-3xl font-extrabold text-slate-900 tracking-tight">03:00</span>
+                                <span class="text-xs text-slate-400">phút</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block">Đã tạo bài</span>
+                            <span id="postCycleCountDisplay" class="text-2xl font-bold text-blue-600">#0</span>
+                        </div>
+                    </div>
+
+                    <!-- Đồng hồ Seeding Comment -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between relative overflow-hidden">
+                        <div>
+                            <span id="commentIntervalBadge" class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">Mỗi 5 phút (Max 5)</span>
+                            <p class="text-xs text-slate-500 mt-2">Bình luận seeding tiếp theo</p>
+                            <div class="flex items-baseline space-x-2 mt-0.5">
+                                <span id="commentTimerDisplay" class="text-3xl font-extrabold text-slate-900 tracking-tight">05:00</span>
+                                <span class="text-xs text-slate-400">phút</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block">Tiến độ Seeding</span>
+                            <span id="commentCountDisplay" class="text-2xl font-bold text-indigo-600">0 / 5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khung kết quả Bài Đăng AI vừa tối ưu -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Nội Dung Bài Đăng Mới Nhất</h3>
+                            <p class="text-xs text-slate-500">AI tự động biến tấu theo ngữ cảnh group để chống spam</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="executePostGenerationCycle()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
+                                Viết lại ngay
+                            </button>
+                            <button type="button" onclick="copyTextFromElement('generatedPostOutput', 'Đã sao chép nội dung bài đăng!')" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm flex items-center space-x-1.5 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                </svg>
+                                <span>Copy Bài Viết</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- TÙY CHỈNH THỜI GIAN ĐĂNG BÀI & COMMENT -->
-                    <div class="grid grid-cols-2 gap-3 pt-1">
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Chu kỳ đăng lại (Phút)</label>
-                            <input type="number" id="postIntervalInput" min="1" max="1440" value="3" oninput="syncCustomTimersUI(); autoSaveDraftInputs();"
-                                class="w-full px-2.5 py-1.5 text-sm font-bold text-blue-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Giãn cách Comment (Phút)</label>
-                            <input type="number" id="commentIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI(); autoSaveDraftInputs();"
-                                class="w-full px-2.5 py-1.5 text-sm font-bold text-indigo-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
+                    <!-- Góc nhìn chuyên gia phân tích sản phẩm -->
+                    <div id="aiExpertAnalysisBox" class="hidden p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900 space-y-1">
+                        <span class="font-bold flex items-center space-x-1">
+                            <span>💡 Góc nhìn Chuyên gia Marketing (Phân tích từ ảnh & dữ liệu):</span>
+                        </span>
+                        <p id="aiExpertAnalysisText" class="leading-relaxed text-amber-800"></p>
                     </div>
+
+                    <textarea id="generatedPostOutput" rows="6" placeholder="Nội dung bài viết do AI biên soạn sẽ xuất hiện tại đây sau khi bạn bấm Chạy Chiến Dịch..."
+                        class="w-full p-4 text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"></textarea>
+
+                    <!-- Thanh mở nhanh các nhóm đã nhập -->
+                    <div id="groupQuickLinksContainer" class="flex flex-wrap gap-2 pt-1"></div>
                 </div>
 
-                <!-- THẺ 2: THÔNG TIN & HÌNH ẢNH SẢN PHẨM -->
+                <!-- Khung 5 Bình Luận Seeding Gây Tò Mò -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <h2 class="text-sm font-bold text-slate-900 flex items-center">
-                        <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-extrabold mr-2">2</span>
-                        Dữ liệu Sản phẩm & Hình ảnh (AI Vision)
-                    </h2>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Mô tả sản phẩm / Ưu đãi gốc <span class="text-rose-500">*</span></label>
-                        <textarea id="productInfoInput" rows="3" oninput="autoSaveDraftInputs()" placeholder="Nhập tên sản phẩm, công dụng, giá bán, khuyến mãi..."
-                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition custom-scrollbar"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ảnh sản phẩm (Để AI phân tích chi tiết như chuyên gia)</label>
-                        <div class="flex items-center gap-3">
-                            <label class="flex-1 flex flex-col items-center justify-center px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/40 transition">
-                                <svg class="w-6 h-6 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span id="imageFileNameLabel" class="text-xs font-medium text-slate-600 text-center">Bấm để chọn ảnh sản phẩm (JPG, PNG, WEBP)</span>
-                                <input type="file" id="productImageInput" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
-                            </label>
-                            <div id="imagePreviewWrapper" class="hidden relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 shrink-0 shadow-sm">
-                                <img id="imagePreviewImg" src="" alt="Preview" class="w-full h-full object-cover">
-                                <button type="button" onclick="clearUploadedImage()" class="absolute top-1 right-1 w-5 h-5 bg-slate-900/70 text-white rounded-full text-xs flex items-center justify-center hover:bg-rose-600">×</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Dữ liệu các bài đăng Hot trong Group (Để AI học văn phong)</label>
-                        <textarea id="hotPostsInput" rows="3" oninput="autoSaveDraftInputs()" placeholder="Copy 2-4 bài viết đang nhiều tương tác trong nhóm dán vào đây để AI bắt trend..."
-                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition custom-scrollbar"></textarea>
-                    </div>
-
-                    <!-- NÚT ĐIỀU KHIỂN CHIẾN DỊCH -->
-                    <div class="pt-2 flex gap-2.5">
-                        <button type="button" id="startCampaignBtn" onclick="startCampaign()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 transition flex items-center justify-center space-x-2 text-sm">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                            <span>Chạy Chiến Dịch Tự Động</span>
-                        </button>
-                        <button type="button" id="stopCampaignBtn" onclick="stopCampaign()" disabled class="bg-slate-200 text-slate-400 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-1 text-sm cursor-not-allowed">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"></path></svg>
-                            <span>Dừng</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CỘT PHẢI: BẢNG ĐIỀU KHIỂN THỜI GIAN THỰC & KẾT QUẢ AI (7 CỘT) -->
-            <div class="lg:col-span-7 space-y-5">
-
-                <!-- BỘ ĐẾM THỜI GIAN THỰC -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-xs font-semibold text-slate-500">Đổi bài mới sau</span>
-                            <span id="postTimerTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">Chu kỳ 3 phút</span>
-                        </div>
-                        <div id="postCountdownDisplay" class="text-2xl font-extrabold text-slate-900 tracking-tight">03:00</div>
-                        <p class="text-[11px] text-slate-400 mt-1">Phiên bản bài đăng: <b id="postCycleCountDisplay" class="text-slate-700">0</b></p>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-xs font-semibold text-slate-500">Bình luận kế tiếp</span>
-                            <span id="commentTimerTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">Mỗi 5 phút</span>
-                        </div>
-                        <div id="commentCountdownDisplay" class="text-2xl font-extrabold text-indigo-600 tracking-tight">05:00</div>
-                        <p class="text-[11px] text-slate-400 mt-1">Tiến độ Seeding: <b id="commentProgressDisplay" class="text-slate-700">0 / 5</b></p>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-                        <span class="text-xs font-semibold text-slate-300">Tạo bài mới ngay lập tức</span>
-                        <button type="button" id="forceGenerateBtn" onclick="triggerImmediateGeneration()" class="mt-2 w-full py-2 px-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/15 transition flex items-center justify-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            Làm Mới Nội Dung AI
-                        </button>
-                    </div>
-                </div>
-
-                <!-- PHÂN TÍCH CHUYÊN GIA & BÀI VIẾT MỚI -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-slate-900 flex items-center">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span>
-                            Bài Đăng Đã Tối Ưu Bởi Chuyên Gia AI
-                        </h3>
-                        <button type="button" onclick="copyTextFromElement('generatedPostOutput', 'Đã sao chép nội dung bài viết!')" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition">
-                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            Copy Bài Đăng
-                        </button>
-                    </div>
-
-                    <div id="aiExpertInsightBox" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
-                        <span class="font-bold">Góc nhìn chuyên gia AI:</span> <span id="aiExpertInsightText"></span>
-                    </div>
-
-                    <textarea id="generatedPostOutput" rows="6" readonly placeholder="Nhấn 'Chạy Chiến Dịch Tự Động' hoặc 'Làm Mới Nội Dung AI' để chuyên gia AI phân tích hình ảnh sản phẩm và tạo bài đăng thu hút..."
-                        class="w-full p-3.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none custom-scrollbar leading-relaxed"></textarea>
-                </div>
-
-                <!-- DANH SÁCH 5 BÌNH LUẬN SEEDING GÂY TÒ MÒ -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-sm font-bold text-slate-900">Kịch Bản Seeding Bình Luận Tò Mò (Tối đa 5 Comment)</h3>
-                            <p class="text-[11px] text-slate-500">Tự động mở khóa lần lượt theo đúng thời gian giãn cách đã cài đặt</p>
+                            <h3 class="text-base font-bold text-slate-900">Kịch Bản 5 Bình Luận Gây Tò Mò (AI Seeding)</h3>
+                            <p class="text-xs text-slate-500">Tự động kích hoạt lần lượt theo chu kỳ đã cài đặt (Tối đa 5 bình luận)</p>
                         </div>
-                        <span id="unlockedBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">0 / 5 Đã mở</span>
+                        <button type="button" onclick="releaseNextCuriousComment()" class="px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition">
+                            + Mở comment tiếp
+                        </button>
                     </div>
 
-                    <div id="commentsListContainer" class="space-y-2.5">
-                        <div class="p-4 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400">
-                            Chưa có dữ liệu bình luận seeding. Hãy khởi chạy chiến dịch để AI tạo 5 câu hỏi kích thích khách hàng!
-                        </div>
+                    <div id="commentsQueueList" class="space-y-2.5 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                        <p class="text-xs text-slate-400 italic text-center py-6">Chưa có bình luận nào. Bấm chạy chiến dịch để AI tạo 5 bình luận seeding.</p>
                     </div>
                 </div>
 
-                <!-- NHẬT KÝ HOẠT ĐỘNG THỜI GIAN THỰC -->
-                <div class="bg-slate-900 rounded-2xl p-4 text-slate-300 shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-slate-100 uppercase tracking-wider">Nhật ký hệ thống (Live Logs)</span>
-                        <button type="button" onclick="clearLogs()" class="text-[11px] text-slate-400 hover:text-white">Xóa log</button>
+                <!-- Nhật ký hoạt động thời gian thực (Live Log) -->
+                <div class="bg-slate-900 rounded-2xl shadow-sm p-4 text-slate-300 space-y-2">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nhật ký hệ thống (Live Console)</span>
+                        <button type="button" onclick="document.getElementById('liveLogContainer').innerHTML=''" class="text-[11px] text-slate-500 hover:text-slate-300">Xóa log</button>
                     </div>
-                    <div id="systemLogsBox" class="h-32 overflow-y-auto custom-scrollbar space-y-1.5 font-mono text-[11px]">
-                        <div class="text-slate-400">[SYSTEM] Sẵn sàng vận hành. Vui lòng kiểm tra API Key và bấm Chạy Chiến Dịch.</div>
+                    <div id="liveLogContainer" class="h-32 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
+                        <div class="text-[11px] font-mono text-slate-400">[Hệ thống] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio.</div>
                     </div>
                 </div>
 
@@ -386,58 +540,31 @@
         </div>
     </main>
 
-    <!-- THÔNG BÁO NỔI (TOAST) -->
-    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <div id="toastInner" class="px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold text-white bg-slate-900 flex items-center space-x-2">
-            <span id="toastMessage">Thông báo</span>
-        </div>
-    </div>
+    <!-- CONTAINER THÔNG BÁO NỔI (TOAST) -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col items-end space-y-2 pointer-events-none"></div>
 
     <script>
         // =========================================================================
-        // 1. KIẾN TRÚC LƯU TRỮ NHẤT QUÁN XUYÊN SUỐT MỌI PHIÊN BẢN (CORE VAULT)
+        // 1. KIẾN TRÚC LƯU TRỮ NHẤT QUÁN & HỆ THỐNG CẤP QUYỀN CHỦ SỞ HỮU (OWNER)
         // =========================================================================
         const VAULT_STORAGE_KEY = 'FB_AI_STUDIO_CORE_VAULT_V1';
         const PERSISTENT_SESSION_KEY = 'FB_AI_STUDIO_ACTIVE_SESSION_V1';
         const CORE_CRYPTO_SALT = 'FB_AI_STUDIO_CORE_SALT_2025_PERSISTENT';
 
+        // MÃ BÍ MẬT ĐỘC QUYỀN CỦA CHỦ SỞ HỮU (Bạn có thể đổi chuỗi này thành mật khẩu riêng của bạn)
+        const OWNER_MASTER_SECRET = 'TOMMY_OWNER_2025';
+        const LICENSE_SIGN_SECRET = 'FB_AI_OWNER_SIGNATURE_TOMMY_2025_EXCLUSIVE';
+
         let authMode = 'login';
-
-        // Trạng thái chiến dịch thời gian thực
-        const state = {
-            isRunning: false,
-            isGenerating: false,
-            timerIntervalId: null,
-            postIntervalSec: 180,
-            commentIntervalSec: 300,
-            postCountdownSec: 180,
-            commentCountdownSec: 300,
-            postCycleCount: 0,
-            unlockedCommentCount: 0,
-            maxComments: 5,
-            commentsPool: [],
-            imageBase64: null,
-            imageMimeType: null
-        };
-
-        // Hàm làm sạch và parse JSON an toàn từ phản hồi AI
-        function safeParseAIJson(rawText) {
-            let cleaned = String(rawText || '').trim();
-            cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-            const firstBrace = cleaned.indexOf('{');
-            const lastBrace = cleaned.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-                cleaned = cleaned.slice(firstBrace, lastBrace + 1);
-            }
-            cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
-            return JSON.parse(cleaned);
-        }
+        let adminCalendarYear = new Date().getFullYear();
+        let selectedExpiryDateStr = '';
 
         function getCoreVault() {
             const defaultVault = {
                 schemaVersion: 1,
                 users: {},
-                userConfigs: {}
+                userConfigs: {},
+                issuedLicenses: []
             };
             try {
                 const raw = localStorage.getItem(VAULT_STORAGE_KEY);
@@ -446,7 +573,8 @@
                     return {
                         schemaVersion: 1,
                         users: parsed.users || {},
-                        userConfigs: parsed.userConfigs || {}
+                        userConfigs: parsed.userConfigs || {},
+                        issuedLicenses: Array.isArray(parsed.issuedLicenses) ? parsed.issuedLicenses : []
                     };
                 }
                 const legacyUsers = JSON.parse(localStorage.getItem('fb_ai_encrypted_users') || '{}');
@@ -460,9 +588,9 @@
             return defaultVault;
         }
 
-        function saveCoreVault(vaultData) {
+        function saveCoreVault(vaultObj) {
             try {
-                localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vaultData));
+                localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vaultObj));
             } catch (e) {
                 console.error('Vault write error:', e);
             }
@@ -475,32 +603,47 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        function validateIdentifier(value) {
-            const cleanVal = value.replace(/\s+/g, '');
+        function validateIdentifier(id) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const phoneRegex = /^(0|\+84)[0-9]{8,10}$/;
-            return emailRegex.test(cleanVal) || phoneRegex.test(cleanVal);
+            const phoneRegex = /^(\+84|84|0)(3|5|7|8|9)[0-9]{8}$/;
+            return emailRegex.test(id) || phoneRegex.test(id);
         }
 
         function switchAuthTab(mode) {
             authMode = mode;
             const loginBtn = document.getElementById('tabLoginBtn');
             const regBtn = document.getElementById('tabRegisterBtn');
+            const ownerBtn = document.getElementById('tabOwnerBtn');
+            const userForm = document.getElementById('userAuthForm');
+            const ownerForm = document.getElementById('ownerAuthForm');
             const confirmWrap = document.getElementById('confirmPasswordWrapper');
             const submitBtn = document.getElementById('authSubmitBtn');
             const errorBox = document.getElementById('authErrorBox');
 
             errorBox.classList.add('hidden');
+
+            loginBtn.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition';
+            regBtn.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition';
+            ownerBtn.className = 'py-2 rounded-lg text-amber-700 hover:text-amber-900 transition flex items-center justify-center gap-1';
+
+            if (mode === 'owner') {
+                ownerBtn.className = 'py-2 rounded-lg bg-amber-500 text-slate-950 shadow-sm transition flex items-center justify-center gap-1';
+                userForm.classList.add('hidden');
+                ownerForm.classList.remove('hidden');
+                return;
+            }
+
+            userForm.classList.remove('hidden');
+            ownerForm.classList.add('hidden');
+
             if (mode === 'login') {
                 loginBtn.className = 'py-2 rounded-lg bg-white text-blue-600 shadow-sm transition';
-                regBtn.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition';
                 confirmWrap.classList.add('hidden');
-                submitBtn.textContent = 'Đăng Nhập & Mở Khóa Tool';
+                submitBtn.textContent = 'Xác Thực Quyền & Mở Khóa Tool';
             } else {
                 regBtn.className = 'py-2 rounded-lg bg-white text-blue-600 shadow-sm transition';
-                loginBtn.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition';
                 confirmWrap.classList.remove('hidden');
-                submitBtn.textContent = 'Mã Hóa & Tạo Tài Khoản Mới';
+                submitBtn.textContent = 'Đăng Ký & Kích Hoạt Bản Quyền';
             }
         }
 
@@ -510,11 +653,72 @@
             errorBox.classList.remove('hidden');
         }
 
+        // Tạo chữ ký SHA-256 gắn chặt giữa (Tài khoản người dùng + Ngày hết hạn + Chìa khóa Chủ sở hữu)
+        async function computeLicenseSignature(normalizedIdentifier, expiryYYYYMMDD) {
+            const payload = `${LICENSE_SIGN_SECRET}|${normalizedIdentifier}|${expiryYYYYMMDD}`;
+            const fullHash = await hashStringSHA256(payload);
+            return fullHash.slice(0, 12).toUpperCase();
+        }
+
+        // Xác thực mã cấp quyền do Chủ sở hữu phát hành
+        async function verifyUserLicenseKey(normalizedIdentifier, rawLicenseKey) {
+            const cleanKey = (rawLicenseKey || '').trim().toUpperCase();
+            // Định dạng chuẩn: FBA-YYYYMMDD-XXXXXXXXXXXX
+            const match = cleanKey.match(/^FBA-(\d{8})-([A-F0-9]{12})$/);
+            if (!match) {
+                return { valid: false, reason: 'Mã cấp quyền không đúng định dạng (FBA-YYYYMMDD-XXXXXXXXXXXX)!' };
+            }
+
+            const expiryCompact = match[1];
+            const providedSig = match[2];
+            const expectedSig = await computeLicenseSignature(normalizedIdentifier, expiryCompact);
+
+            if (providedSig !== expectedSig) {
+                return { valid: false, reason: 'Mã cấp quyền không khớp với Gmail/Số điện thoại này hoặc không hợp lệ!' };
+            }
+
+            const year = parseInt(expiryCompact.slice(0, 4), 10);
+            const month = parseInt(expiryCompact.slice(4, 6), 10) - 1;
+            const day = parseInt(expiryCompact.slice(6, 8), 10);
+            const expiryEndOfDay = new Date(year, month, day, 23, 59, 59, 999);
+
+            if (Date.now() > expiryEndOfDay.getTime()) {
+                return {
+                    valid: false,
+                    reason: `Mã cấp quyền đã hết hạn vào ngày ${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}. Vui lòng liên hệ Chủ sở hữu để gia hạn!`
+                };
+            }
+
+            const formattedDate = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+            return {
+                valid: true,
+                expiryCompact,
+                formattedDate,
+                expiresAt: expiryEndOfDay.getTime()
+            };
+        }
+
+        // Đăng nhập dành riêng cho Chủ Sở Hữu
+        async function handleOwnerLogin(e) {
+            e.preventDefault();
+            const enteredSecret = document.getElementById('ownerMasterSecretInput').value.trim();
+            if (enteredSecret !== OWNER_MASTER_SECRET) {
+                showAuthError('Mã Bí Mật Chủ Sở Hữu không chính xác! Chỉ chủ nhân của hệ thống mới có quyền truy cập.');
+                return;
+            }
+
+            const ownerToken = await hashStringSHA256(CORE_CRYPTO_SALT + 'MASTER_OWNER');
+            unlockAppSession(ownerToken, '👑 Chủ Sở Hữu (Master)', true, 'Vĩnh viễn (Owner)');
+            toggleOwnerAdminModal(true);
+            showToast('Chào mừng Chủ sở hữu! Đã mở trung tâm kiểm soát cấp quyền.', 'success');
+        }
+
         async function handleAuthSubmit(e) {
             e.preventDefault();
             const identifier = document.getElementById('authIdentifierInput').value.trim().toLowerCase().replace(/\s+/g, '');
             const password = document.getElementById('authPasswordInput').value;
             const confirmPassword = document.getElementById('authConfirmPasswordInput').value;
+            const licenseKey = document.getElementById('authLicenseKeyInput').value.trim().toUpperCase();
 
             if (!validateIdentifier(identifier)) {
                 showAuthError('Vui lòng nhập đúng định dạng Email (Gmail) hoặc Số điện thoại!');
@@ -535,36 +739,77 @@
                     return;
                 }
 
+                const licenseCheck = await verifyUserLicenseKey(identifier, licenseKey);
+                if (!licenseCheck.valid) {
+                    showAuthError(licenseCheck.reason);
+                    return;
+                }
+
                 vault.users[idHash] = {
                     passHash: passHash,
+                    licenseKey: licenseKey,
+                    expiresAt: licenseCheck.expiresAt,
+                    expiryLabel: licenseCheck.formattedDate,
                     maskedId: identifier.includes('@')
                         ? identifier.replace(/(.{2})(.*)(@.*)/, '$1***$3')
                         : identifier.replace(/(\d{3})\d+(\d{3})/, '$1****$2'),
                     createdAt: Date.now()
                 };
                 saveCoreVault(vault);
-                unlockAppSession(idHash, vault.users[idHash].maskedId);
-                showToast('Tạo tài khoản nhất quán thành công! Dùng xuyên suốt mọi bản cập nhật.', 'success');
+                unlockAppSession(idHash, vault.users[idHash].maskedId, false, licenseCheck.formattedDate);
+                showToast(`Kích hoạt thành công! Quyền sử dụng đến hết ngày ${licenseCheck.formattedDate}.`, 'success');
             } else {
                 const record = vault.users[idHash];
                 if (!record || record.passHash !== passHash) {
                     showAuthError('Thông tin Gmail/SĐT hoặc mật khẩu không chính xác!');
                     return;
                 }
-                unlockAppSession(idHash, record.maskedId);
-                showToast('Đăng nhập thành công! Đã tải cấu hình của bạn.', 'success');
+
+                const keyToVerify = licenseKey || record.licenseKey || '';
+                const licenseCheck = await verifyUserLicenseKey(identifier, keyToVerify);
+                if (!licenseCheck.valid) {
+                    showAuthError(licenseCheck.reason);
+                    return;
+                }
+
+                record.licenseKey = keyToVerify;
+                record.expiresAt = licenseCheck.expiresAt;
+                record.expiryLabel = licenseCheck.formattedDate;
+                vault.users[idHash] = record;
+                saveCoreVault(vault);
+
+                unlockAppSession(idHash, record.maskedId, false, licenseCheck.formattedDate);
+                showToast(`Đăng nhập thành công! Thời hạn sử dụng đến ${licenseCheck.formattedDate}.`, 'success');
             }
         }
 
-        function unlockAppSession(sessionToken, maskedLabel) {
+        function unlockAppSession(sessionToken, maskedLabel, isOwner = false, expiryLabel = '') {
             localStorage.setItem(PERSISTENT_SESSION_KEY, JSON.stringify({
                 token: sessionToken,
-                label: maskedLabel
+                label: maskedLabel,
+                isOwner: isOwner,
+                expiryLabel: expiryLabel
             }));
             document.getElementById('authGateOverlay').classList.add('hidden');
             document.getElementById('currentUserLabel').textContent = maskedLabel;
+
+            const ownerPanelBtn = document.getElementById('headerOwnerPanelBtn');
+            const expiryBadge = document.getElementById('licenseExpiryBadge');
+
+            if (isOwner) {
+                ownerPanelBtn.classList.remove('hidden');
+                expiryBadge.textContent = 'Quyền Chủ Sở Hữu';
+                expiryBadge.classList.remove('hidden');
+            } else {
+                ownerPanelBtn.classList.add('hidden');
+                if (expiryLabel) {
+                    expiryBadge.textContent = `HSD: ${expiryLabel}`;
+                    expiryBadge.classList.remove('hidden');
+                }
+            }
+
             loadUserConfigFromVault(sessionToken);
-            addLog(`Đã mở khóa phiên làm việc nhất quán cho tài khoản: ${maskedLabel}`, 'success');
+            addLog(`Đã mở khóa phiên làm việc cho: ${maskedLabel} (${isOwner ? 'Toàn quyền Chủ sở hữu' : 'Hạn dùng đến ' + expiryLabel})`, 'success');
         }
 
         function logoutUser() {
@@ -572,55 +817,225 @@
             localStorage.removeItem(PERSISTENT_SESSION_KEY);
             document.getElementById('authPasswordInput').value = '';
             document.getElementById('authConfirmPasswordInput').value = '';
+            document.getElementById('ownerMasterSecretInput').value = '';
+            document.getElementById('headerOwnerPanelBtn').classList.add('hidden');
+            document.getElementById('ownerAdminModal').classList.add('hidden');
             document.getElementById('authGateOverlay').classList.remove('hidden');
             showToast('Đã khóa phiên làm việc và đăng xuất.', 'info');
         }
 
-        function saveUserConfigToVault(configObj) {
-            const session = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
-            if (!session || !session.token) return;
+        // =========================================================================
+        // 1B. BẢNG LỊCH NĂM & QUẢN LÝ CẤP QUYỀN ĐỘC QUYỀN CỦA CHỦ SỞ HỮU
+        // =========================================================================
+        function toggleOwnerAdminModal(show) {
+            const modal = document.getElementById('ownerAdminModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                if (!selectedExpiryDateStr) {
+                    setQuickExpiryDays(30);
+                } else {
+                    renderAnnualCalendar(adminCalendarYear);
+                }
+                renderIssuedLicensesList();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function setQuickExpiryDays(daysToAdd) {
+            const target = new Date();
+            target.setDate(target.getDate() + daysToAdd);
+            const yyyy = target.getFullYear();
+            const mm = String(target.getMonth() + 1).padStart(2, '0');
+            const dd = String(target.getDate()).padStart(2, '0');
+            selectedExpiryDateStr = `${yyyy}-${mm}-${dd}`;
+            adminCalendarYear = yyyy;
+
+            document.getElementById('adminExpiryDateInput').value = selectedExpiryDateStr;
+            renderAnnualCalendar(adminCalendarYear);
+        }
+
+        function syncCalendarHighlightFromInput() {
+            const val = document.getElementById('adminExpiryDateInput').value;
+            if (!val) return;
+            selectedExpiryDateStr = val;
+            const parsedYear = parseInt(val.split('-')[0], 10);
+            if (!isNaN(parsedYear)) {
+                adminCalendarYear = parsedYear;
+            }
+            renderAnnualCalendar(adminCalendarYear);
+        }
+
+        function changeAdminCalendarYear(delta) {
+            adminCalendarYear += delta;
+            renderAnnualCalendar(adminCalendarYear);
+        }
+
+        function renderAnnualCalendar(year) {
+            document.getElementById('adminCalendarYearLabel').textContent = year;
+            const grid = document.getElementById('annualCalendarGrid');
+            grid.innerHTML = '';
+
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            const monthNames = [
+                'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
+                'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
+                'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+            ];
+
+            for (let m = 0; m < 12; m++) {
+                const monthBox = document.createElement('div');
+                monthBox.className = 'bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs';
+
+                const title = document.createElement('div');
+                title.className = 'text-[11px] font-extrabold text-slate-800 mb-1.5 text-center border-b border-slate-100 pb-1';
+                title.textContent = `${monthNames[m]} / ${year}`;
+                monthBox.appendChild(title);
+
+                const daysHeader = document.createElement('div');
+                daysHeader.className = 'grid grid-cols-7 text-[9px] font-bold text-slate-400 text-center mb-1';
+                ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].forEach(d => {
+                    const span = document.createElement('span');
+                    span.textContent = d;
+                    daysHeader.appendChild(span);
+                });
+                monthBox.appendChild(daysHeader);
+
+                const daysGrid = document.createElement('div');
+                daysGrid.className = 'grid grid-cols-7 gap-0.5 text-center';
+
+                const firstDayOfMonth = new Date(year, m, 1).getDay();
+                const offset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+                const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+                for (let empty = 0; empty < offset; empty++) {
+                    daysGrid.appendChild(document.createElement('span'));
+                }
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = d;
+
+                    let btnClass = 'text-[10px] py-1 rounded-md font-medium transition ';
+                    if (dateStr === selectedExpiryDateStr) {
+                        btnClass += 'bg-amber-500 text-slate-950 font-extrabold shadow-sm ring-2 ring-amber-300';
+                    } else if (dateStr === todayStr) {
+                        btnClass += 'bg-blue-100 text-blue-700 font-bold';
+                    } else if (dateStr < todayStr) {
+                        btnClass += 'text-slate-300 hover:bg-slate-100';
+                    } else {
+                        btnClass += 'text-slate-700 hover:bg-amber-100 hover:text-amber-900';
+                    }
+
+                    btn.className = btnClass;
+                    btn.onclick = () => {
+                        selectedExpiryDateStr = dateStr;
+                        document.getElementById('adminExpiryDateInput').value = dateStr;
+                        renderAnnualCalendar(year);
+                    };
+                    daysGrid.appendChild(btn);
+                }
+
+                monthBox.appendChild(daysGrid);
+                grid.appendChild(monthBox);
+            }
+        }
+
+        async function generateUserLicenseKey() {
+            const rawTarget = document.getElementById('adminTargetUserInput').value.trim().toLowerCase().replace(/\s+/g, '');
+            const note = document.getElementById('adminTargetNoteInput').value.trim();
+            const expiryInput = document.getElementById('adminExpiryDateInput').value;
+
+            if (!validateIdentifier(rawTarget)) {
+                showToast('Vui lòng nhập đúng Gmail hoặc Số điện thoại của người được cấp quyền!', 'error');
+                return;
+            }
+            if (!expiryInput) {
+                showToast('Vui lòng chọn ngày hết hạn trên lịch năm!', 'warning');
+                return;
+            }
+
+            const expiryCompact = expiryInput.replace(/-/g, '');
+            const signature = await computeLicenseSignature(rawTarget, expiryCompact);
+            const fullLicenseKey = `FBA-${expiryCompact}-${signature}`;
+
+            const [y, m, d] = expiryInput.split('-');
+            const formattedExpiry = `${d}/${m}/${y}`;
+
+            document.getElementById('generatedLicenseOutput').value = fullLicenseKey;
+            document.getElementById('generatedLicenseSummary').textContent =
+                `Cấp cho: ${rawTarget} • Có hiệu lực đến hết ngày: ${formattedExpiry}`;
+            document.getElementById('generatedLicenseResultBox').classList.remove('hidden');
+
             const vault = getCoreVault();
-            vault.userConfigs[session.token] = {
-                ...(vault.userConfigs[session.token] || {}),
-                ...configObj,
-                updatedAt: Date.now()
+            const existingIdx = vault.issuedLicenses.findIndex(item => item.identifier === rawTarget);
+            const record = {
+                identifier: rawTarget,
+                note: note || 'Người dùng được cấp phép',
+                licenseKey: fullLicenseKey,
+                expiryDate: expiryInput,
+                formattedExpiry: formattedExpiry,
+                issuedAt: Date.now()
             };
+
+            if (existingIdx >= 0) {
+                vault.issuedLicenses[existingIdx] = record;
+            } else {
+                vault.issuedLicenses.unshift(record);
+            }
             saveCoreVault(vault);
+            renderIssuedLicensesList();
+            showToast(`Đã cấp quyền cho ${rawTarget} đến ngày ${formattedExpiry}!`, 'success');
         }
 
-        function autoSaveDraftInputs() {
-            saveUserConfigToVault({
-                apiKey: document.getElementById('apiKeyInput').value.trim(),
-                sourceAccount: document.getElementById('sourceAccountUrlInput').value.trim(),
-                groupUrl: document.getElementById('groupUrlInput').value.trim(),
-                productInfo: document.getElementById('productInfoInput').value,
-                hotPosts: document.getElementById('hotPostsInput').value,
-                postMins: parseInt(document.getElementById('postIntervalInput').value, 10) || 3,
-                cmtMins: parseInt(document.getElementById('commentIntervalInput').value, 10) || 5
-            });
-        }
-
-        function loadUserConfigFromVault(userToken) {
+        function renderIssuedLicensesList() {
             const vault = getCoreVault();
-            const cfg = vault.userConfigs[userToken] || {
-                apiKey: localStorage.getItem('fb_ai_gemini_key') || '',
-                sourceAccount: localStorage.getItem('fb_ai_source_account') || '',
-                groupUrl: localStorage.getItem('fb_ai_group_url') || '',
-                productInfo: localStorage.getItem('fb_ai_product_info') || '',
-                hotPosts: localStorage.getItem('fb_ai_hot_posts') || '',
-                postMins: localStorage.getItem('fb_ai_post_mins') || 3,
-                cmtMins: localStorage.getItem('fb_ai_cmt_mins') || 5
-            };
+            const listEl = document.getElementById('issuedLicensesList');
+            const badge = document.getElementById('issuedLicensesCountBadge');
+            const items = vault.issuedLicenses || [];
 
-            if (cfg.apiKey) document.getElementById('apiKeyInput').value = cfg.apiKey;
-            if (cfg.sourceAccount) document.getElementById('sourceAccountUrlInput').value = cfg.sourceAccount;
-            if (cfg.groupUrl) document.getElementById('groupUrlInput').value = cfg.groupUrl;
-            if (cfg.productInfo) document.getElementById('productInfoInput').value = cfg.productInfo;
-            if (cfg.hotPosts) document.getElementById('hotPostsInput').value = cfg.hotPosts;
-            if (cfg.postMins) document.getElementById('postIntervalInput').value = cfg.postMins;
-            if (cfg.cmtMins) document.getElementById('commentIntervalInput').value = cfg.cmtMins;
+            badge.textContent = `${items.length} tài khoản`;
+            if (!items.length) {
+                listEl.innerHTML = '<p class="text-xs text-slate-400 italic">Chưa có tài khoản nào được cấp quyền trên thiết bị này.</p>';
+                return;
+            }
 
-            syncCustomTimersUI();
+            listEl.innerHTML = '';
+            const now = Date.now();
+            items.forEach((item, index) => {
+                const [y, m, d] = item.expiryDate.split('-').map(Number);
+                const expTime = new Date(y, m - 1, d, 23, 59, 59, 999).getTime();
+                const isExpired = now > expTime;
+
+                const row = document.createElement('div');
+                row.className = 'p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 text-xs';
+                row.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-slate-800 truncate">${item.identifier}</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isExpired ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">
+                                ${isExpired ? 'Hết hạn' : 'Đang hoạt động'}
+                            </span>
+                        </div>
+                        <div class="text-[11px] text-slate-500 truncate">${item.note} • HSD: <b>${item.formattedExpiry}</b></div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" class="copy-lic-btn px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-blue-50 text-blue-700 font-bold text-[11px]">Copy Mã</button>
+                        <button type="button" class="del-lic-btn px-2 py-1 rounded-lg bg-white border border-slate-200 hover:bg-rose-50 text-rose-600 font-bold text-[11px]" title="Xóa khỏi danh sách">×</button>
+                    </div>
+                `;
+                row.querySelector('.copy-lic-btn').onclick = () => copyRawText(item.licenseKey, `Đã copy mã của ${item.identifier}!`);
+                row.querySelector('.del-lic-btn').onclick = () => {
+                    const v = getCoreVault();
+                    v.issuedLicenses.splice(index, 1);
+                    saveCoreVault(v);
+                    renderIssuedLicensesList();
+                };
+                listEl.appendChild(row);
+            });
         }
 
         function exportAccountVault() {
@@ -629,10 +1044,10 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `FB_AI_Studio_Account_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `FB_AI_Studio_Vault_Backup_${new Date().toISOString().slice(0, 10)}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Đã xuất file Sao lưu Tài khoản mã hóa!', 'success');
+            showToast('Đã tải xuống file sao lưu tài khoản & cấu hình!', 'success');
         }
 
         function importAccountVault(event) {
@@ -642,415 +1057,341 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (!imported.users || typeof imported.users !== 'object') {
+                    if (!imported || typeof imported !== 'object' || !imported.users) {
                         throw new Error('Định dạng file sao lưu không hợp lệ.');
                     }
-                    const currentVault = getCoreVault();
-                    currentVault.users = { ...currentVault.users, ...imported.users };
-                    currentVault.userConfigs = { ...currentVault.userConfigs, ...(imported.userConfigs || {}) };
-                    saveCoreVault(currentVault);
-                    showToast('Khôi phục tài khoản & cấu hình thành công! Hãy đăng nhập ngay.', 'success');
+                    const current = getCoreVault();
+                    current.users = { ...current.users, ...imported.users };
+                    current.userConfigs = { ...current.userConfigs, ...(imported.userConfigs || {}) };
+                    if (Array.isArray(imported.issuedLicenses)) {
+                        const existingIds = new Set(current.issuedLicenses.map(i => i.identifier));
+                        imported.issuedLicenses.forEach(item => {
+                            if (!existingIds.has(item.identifier)) {
+                                current.issuedLicenses.push(item);
+                            }
+                        });
+                    }
+                    saveCoreVault(current);
+                    showToast('Khôi phục dữ liệu tài khoản thành công! Bạn có thể đăng nhập ngay.', 'success');
                 } catch (err) {
-                    showAuthError('File sao lưu không hợp lệ hoặc bị hỏng!');
+                    showAuthError('Không thể đọc file sao lưu: ' + err.message);
                 }
             };
             reader.readAsText(file);
         }
 
-        // =========================================================================
-        // 2. XỬ LÝ GIAO DIỆN, HÌNH ẢNH & TIỆN ÍCH
-        // =========================================================================
         function toggleGuideModal(show) {
             const modal = document.getElementById('guideModalOverlay');
-            if (show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
+            if (modal) {
+                modal.classList.toggle('hidden', !show);
             }
         }
 
-        function openExternalLink(inputId) {
-            const val = document.getElementById(inputId).value.trim();
-            if (!val) {
-                showToast('Vui lòng nhập đường dẫn URL trước khi mở!', 'warning');
-                return;
-            }
-            const formattedUrl = val.startsWith('http') ? val : 'https://' + val;
-            window.open(formattedUrl, '_blank', 'noopener,noreferrer');
+        // =========================================================================
+        // 2. CẤU HÌNH CHIẾN DỊCH, HÌNH ẢNH & LƯU TRỮ TỰ ĐỘNG THEO TÀI KHOẢN
+        // =========================================================================
+        const state = {
+            isRunning: false,
+            imageBase64: '',
+            imageMimeType: 'image/jpeg',
+            postCycleCount: 0,
+            commentCount: 0,
+            postSecondsRemaining: 180,
+            commentSecondsRemaining: 300,
+            curiousCommentsQueue: [],
+            activeGroupUrls: [],
+            timerInterval: null
+        };
+
+        function getPostIntervalSeconds() {
+            const mins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '3', 10));
+            return mins * 60;
         }
 
-        function formatSecondsToMMSS(totalSeconds) {
-            const mins = Math.floor(Math.max(0, totalSeconds) / 60);
-            const secs = Math.max(0, totalSeconds) % 60;
-            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        function getCommentIntervalSeconds() {
+            const mins = Math.max(1, parseInt(document.getElementById('commentIntervalInput')?.value || '5', 10));
+            return mins * 60;
+        }
+
+        function formatSecondsMMSS(totalSec) {
+            const m = Math.floor(Math.max(0, totalSec) / 60);
+            const s = Math.max(0, totalSec) % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
 
         function syncCustomTimersUI() {
-            const postInput = document.getElementById('postIntervalInput');
-            const cmtInput = document.getElementById('commentIntervalInput');
+            const postMins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '3', 10));
+            const cmtMins = Math.max(1, parseInt(document.getElementById('commentIntervalInput')?.value || '5', 10));
 
-            const postMins = Math.min(1440, Math.max(1, parseInt(postInput.value, 10) || 3));
-            const cmtMins = Math.min(1440, Math.max(1, parseInt(cmtInput.value, 10) || 5));
-
-            state.postIntervalSec = postMins * 60;
-            state.commentIntervalSec = cmtMins * 60;
-
-            document.getElementById('postTimerTag').textContent = `Chu kỳ ${postMins} phút`;
-            document.getElementById('commentTimerTag').textContent = `Mỗi ${cmtMins} phút`;
+            const postBadge = document.getElementById('postIntervalBadge');
+            const cmtBadge = document.getElementById('commentIntervalBadge');
+            if (postBadge) postBadge.textContent = `Chu kỳ ${postMins} phút`;
+            if (cmtBadge) cmtBadge.textContent = `Mỗi ${cmtMins} phút (Max 5)`;
 
             if (!state.isRunning) {
-                state.postCountdownSec = state.postIntervalSec;
-                state.commentCountdownSec = state.commentIntervalSec;
-                updateCountersUI();
+                state.postSecondsRemaining = postMins * 60;
+                state.commentSecondsRemaining = cmtMins * 60;
+                const postTimerEl = document.getElementById('postTimerDisplay');
+                const cmtTimerEl = document.getElementById('commentTimerDisplay');
+                if (postTimerEl) postTimerEl.textContent = formatSecondsMMSS(state.postSecondsRemaining);
+                if (cmtTimerEl) cmtTimerEl.textContent = formatSecondsMMSS(state.commentSecondsRemaining);
             }
+            saveUserConfigToVault();
         }
 
-        function updateCountersUI() {
-            document.getElementById('postCountdownDisplay').textContent = formatSecondsToMMSS(state.postCountdownSec);
-            document.getElementById('commentCountdownDisplay').textContent =
-                state.unlockedCommentCount >= state.maxComments ? 'HOÀN TẤT' : formatSecondsToMMSS(state.commentCountdownSec);
-            document.getElementById('postCycleCountDisplay').textContent = state.postCycleCount;
-            document.getElementById('commentProgressDisplay').textContent = `${state.unlockedCommentCount} / ${state.maxComments}`;
-            document.getElementById('unlockedBadge').textContent = `${state.unlockedCommentCount} / ${state.maxComments} Đã mở`;
+        function saveUserConfigToVault() {
+            const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
+            if (!activeSession || !activeSession.token) return;
+
+            const vault = getCoreVault();
+            vault.userConfigs[activeSession.token] = {
+                apiKey: document.getElementById('geminiApiKeyInput')?.value || '',
+                sourceAccountUrl: document.getElementById('sourceAccountUrlInput')?.value || '',
+                groupUrls: document.getElementById('groupUrlsInput')?.value || '',
+                postInterval: document.getElementById('postIntervalInput')?.value || '3',
+                commentInterval: document.getElementById('commentIntervalInput')?.value || '5',
+                productInfo: document.getElementById('productInfoInput')?.value || '',
+                hotPostsContext: document.getElementById('hotPostsInput')?.value || ''
+            };
+            saveCoreVault(vault);
+        }
+
+        function loadUserConfigFromVault(sessionToken) {
+            const vault = getCoreVault();
+            const cfg = vault.userConfigs?.[sessionToken];
+            if (cfg) {
+                if (document.getElementById('geminiApiKeyInput')) document.getElementById('geminiApiKeyInput').value = cfg.apiKey || '';
+                if (document.getElementById('sourceAccountUrlInput')) document.getElementById('sourceAccountUrlInput').value = cfg.sourceAccountUrl || '';
+                if (document.getElementById('groupUrlsInput')) document.getElementById('groupUrlsInput').value = cfg.groupUrls || '';
+                if (document.getElementById('postIntervalInput')) document.getElementById('postIntervalInput').value = cfg.postInterval || '3';
+                if (document.getElementById('commentIntervalInput')) document.getElementById('commentIntervalInput').value = cfg.commentInterval || '5';
+                if (document.getElementById('productInfoInput')) document.getElementById('productInfoInput').value = cfg.productInfo || '';
+                if (document.getElementById('hotPostsInput')) document.getElementById('hotPostsInput').value = cfg.hotPostsContext || '';
+            }
+            syncCustomTimersUI();
+        }
+
+        function openSourceAccountUrl() {
+            const url = (document.getElementById('sourceAccountUrlInput')?.value || '').trim();
+            if (!url) {
+                showToast('Vui lòng nhập đường link tài khoản nguồn trước!', 'warning');
+                return;
+            }
+            const target = url.startsWith('http') ? url : 'https://' + url;
+            window.open(target, '_blank', 'noopener,noreferrer');
         }
 
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (file.size > 10 * 1024 * 1024) {
-                showToast('Vui lòng chọn ảnh có dung lượng dưới 10MB!', 'warning');
+            if (file.size > 8 * 1024 * 1024) {
+                showToast('Ảnh quá lớn (>8MB). Vui lòng chọn ảnh nhẹ hơn để AI xử lý nhanh!', 'warning');
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const dataUrl = e.target.result;
-                const commaIndex = dataUrl.indexOf(',');
-                state.imageBase64 = dataUrl.slice(commaIndex + 1);
+                state.imageBase64 = dataUrl.split(',')[1];
                 state.imageMimeType = file.type || 'image/jpeg';
 
-                document.getElementById('imagePreviewImg').src = dataUrl;
-                document.getElementById('imagePreviewWrapper').classList.remove('hidden');
-                document.getElementById('imageFileNameLabel').textContent = file.name;
-                addLog(`Đã nạp hình ảnh sản phẩm (${file.name}) cho AI Vision phân tích.`, 'info');
+                const previewImg = document.getElementById('productImagePreview');
+                const placeholder = document.getElementById('imageUploadPlaceholder');
+                if (previewImg && placeholder) {
+                    previewImg.src = dataUrl;
+                    previewImg.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                addLog(`Đã nạp hình ảnh sản phẩm: ${file.name} (${Math.round(file.size / 1024)} KB)`, 'info');
+                showToast('Đã tải ảnh sản phẩm lên sẵn sàng cho AI phân tích!', 'success');
             };
             reader.readAsDataURL(file);
         }
 
-        function clearUploadedImage() {
-            state.imageBase64 = null;
-            state.imageMimeType = null;
-            document.getElementById('productImageInput').value = '';
-            document.getElementById('imagePreviewWrapper').classList.add('hidden');
-            document.getElementById('imageFileNameLabel').textContent = 'Bấm để chọn ảnh sản phẩm (JPG, PNG, WEBP)';
-        }
-
-        function copyTextFromElement(elementId, successMsg) {
-            const el = document.getElementById(elementId);
-            const text = el ? (el.value || el.textContent || '').trim() : '';
-            if (!text) {
-                showToast('Chưa có nội dung để sao chép!', 'warning');
-                return;
-            }
-            copyRawText(text, successMsg);
-        }
-
-        function copyRawText(text, successMsg) {
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = text;
-            tempTextArea.style.position = 'fixed';
-            tempTextArea.style.left = '-9999px';
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
-                document.execCommand('copy');
-                showToast(successMsg || 'Đã sao chép vào bộ nhớ tạm!', 'success');
-            } catch (err) {
-                showToast('Không thể tự động copy, vui lòng bôi đen thủ công.', 'warning');
-            }
-            document.body.removeChild(tempTextArea);
-        }
-
-        function addLog(message, type = 'info') {
-            const logBox = document.getElementById('systemLogsBox');
-            const timeStr = new Date().toLocaleTimeString('vi-VN', { hour12: false });
-            let colorClass = 'text-slate-300';
-            if (type === 'success') colorClass = 'text-emerald-400';
-            if (type === 'warning') colorClass = 'text-amber-400';
-            if (type === 'error') colorClass = 'text-rose-400';
-
-            const line = document.createElement('div');
-            line.className = colorClass;
-            line.textContent = `[${timeStr}] ${message}`;
-            logBox.appendChild(line);
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-
-        function clearLogs() {
-            document.getElementById('systemLogsBox').innerHTML = '';
-        }
-
-        let toastTimeoutId = null;
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toastNotification');
-            const inner = document.getElementById('toastInner');
-            const msgEl = document.getElementById('toastMessage');
-
-            msgEl.textContent = message;
-            inner.className = 'px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold text-white flex items-center space-x-2 ' +
-                (type === 'success' ? 'bg-emerald-600' : type === 'warning' ? 'bg-amber-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-900');
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            if (toastTimeoutId) clearTimeout(toastTimeoutId);
-            toastTimeoutId = setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3200);
-        }
-
         // =========================================================================
-        // 3. GỌI GOOGLE GEMINI AI PHÂN TÍCH HÌNH ẢNH & TẠO CONTENT + 5 SEEDING CMT
+        // 3. TÍCH HỢP GOOGLE GEMINI VISION AI & ĐIỀU PHỐI LỊCH TRÌNH TỰ ĐỘNG
         // =========================================================================
-        async function callGeminiMarketingAI() {
-            if (state.isGenerating) return;
+        function safeParseAIJson(rawText) {
+            let cleaned = (rawText || '').trim();
+            if (cleaned.startsWith('```')) {
+                cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+            }
+            cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+            return JSON.parse(cleaned);
+        }
 
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
-            const productInfo = document.getElementById('productInfoInput').value.trim();
-            const hotPosts = document.getElementById('hotPostsInput').value.trim();
-            const sourceAccount = document.getElementById('sourceAccountUrlInput').value.trim();
+        async function callGeminiMarketingAI(cycleNumber) {
+            const apiKey = (document.getElementById('geminiApiKeyInput')?.value || '').trim();
+            const productInfo = (document.getElementById('productInfoInput')?.value || '').trim();
+            const hotPosts = (document.getElementById('hotPostsInput')?.value || '').trim();
+            const sourceAccount = (document.getElementById('sourceAccountUrlInput')?.value || '').trim();
 
             if (!apiKey) {
-                showToast('Vui lòng nhập Google Gemini API Key ở mục 1!', 'error');
-                addLog('Lỗi: Thiếu Gemini API Key.', 'error');
-                return;
+                throw new Error('Vui lòng nhập Google Gemini API Key ở mục 1!');
             }
             if (!productInfo && !state.imageBase64) {
-                showToast('Vui lòng nhập mô tả sản phẩm hoặc tải ảnh sản phẩm lên!', 'warning');
-                return;
+                throw new Error('Vui lòng nhập mô tả sản phẩm hoặc tải lên ít nhất 1 hình ảnh sản phẩm!');
             }
 
-            state.isGenerating = true;
-            const forceBtn = document.getElementById('forceGenerateBtn');
-            forceBtn.disabled = true;
-            forceBtn.classList.add('opacity-60');
+            const promptText = `
+Bạn là một chuyên gia Marketing thực chiến và bậc thầy tâm lý khách hàng trên Facebook.
+Đây là lần đăng bài xoay vòng thứ #${cycleNumber}. Hãy phân tích thật kỹ hình ảnh sản phẩm đính kèm (nếu có) và thông tin sản phẩm bên dưới để:
+1. Viết lại một bài đăng hoàn toàn mới mẻ, tự nhiên, cuốn hút, hòa nhập với văn phong của các bài đăng hot trong nhóm hiện tại, tuyệt đối không trùng lặp câu chữ với các lần trước và tránh từ khóa vi phạm chính sách Facebook.
+2. Tạo đúng 5 bình luận seeding ngắn gọn, tự nhiên đóng vai khách hàng thật đặt những câu hỏi kích thích sự tò mò cao độ về sản phẩm (hỏi chi tiết thấy trên ảnh, công dụng thực tế, cách dùng, ưu đãi...).
 
-            addLog(`AI đang phân tích hình ảnh sản phẩm & văn phong nhóm (Chu kỳ #${state.postCycleCount + 1})...`, 'info');
-
-            const promptText = `Bạn là một chuyên gia Marketing thực chiến và bậc thầy tâm lý khách hàng trên Facebook Group.
-Hãy thực hiện các nhiệm vụ sau:
-1. Phân tích kỹ thông tin sản phẩm được cung cấp (và xem trực tiếp hình ảnh đính kèm nếu có) để nhận diện điểm nổi bật về thiết kế, màu sắc, công dụng, giá trị thực tế.
-2. Dựa trên ngữ cảnh các bài viết đang hot trong hội nhóm (và góc nhìn của tài khoản nguồn: ${sourceAccount || 'Người dùng chia sẻ thực tế'}), hãy viết một bài đăng mới hoàn toàn tự nhiên, thu hút, không trùng lặp với các lần đăng trước (Lần lặp thứ ${state.postCycleCount + 1}), tránh từ ngữ quảng cáo thô cứng dễ bị Facebook bóp tương tác.
-3. Tạo đúng 5 bình luận seeding ngắn gọn, đóng vai khách hàng tò mò đặt câu hỏi về chi tiết trên hình ảnh sản phẩm, trải nghiệm thực tế, cách dùng hoặc ưu đãi để kích thích người đọc tương tác.
-
-THÔNG TIN SẢN PHẨM:
+TÀI KHOẢN ĐĂNG BÀI NGUỒN: ${sourceAccount || 'Tài khoản cá nhân/Fanpage bán hàng'}
+THÔNG TIN SẢN PHẨM GỐC:
 ${productInfo || 'Phân tích trực tiếp từ hình ảnh sản phẩm đính kèm.'}
 
-DỮ LIỆU CÁC BÀI VIẾT HOT TRONG NHÓM:
-${hotPosts || 'Cộng đồng thảo luận cởi mở, thích chia sẻ trải nghiệm thật và hỏi đáp ngắn gọn.'}
+DỮ LIỆU BÀI VIẾT HOT TRONG NHÓM:
+${hotPosts || 'Nhóm cộng đồng năng động, thích chia sẻ trải nghiệm thực tế và hỏi đáp ngắn gọn.'}
 
-Trả về kết quả JSON theo đúng cấu trúc:
+Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 {
-  "expert_analysis": "Tóm tắt ngắn gọn 1-2 câu điểm đắt giá nhất AI nhìn thấy từ sản phẩm/hình ảnh",
-  "post_content": "Nội dung bài viết hoàn chỉnh sẵn sàng đăng lên Facebook Group",
+  "expert_analysis": "Tóm tắt ngắn gọn 2 câu phân tích điểm ăn tiền nhất của sản phẩm...",
+  "post_content": "Nội dung bài đăng hoàn chỉnh đã tối ưu...",
   "curious_comments": [
-    "Câu bình luận tò mò 1",
-    "Câu bình luận tò mò 2",
-    "Câu bình luận tò mò 3",
-    "Câu bình luận tò mò 4",
-    "Câu bình luận tò mò 5"
+    "Bình luận tò mò 1...",
+    "Bình luận tò mò 2...",
+    "Bình luận tò mò 3...",
+    "Bình luận tò mò 4...",
+    "Bình luận tò mò 5..."
   ]
 }`;
 
             const parts = [{ text: promptText }];
             if (state.imageBase64) {
                 parts.push({
-                    inline_data: {
-                        mime_type: state.imageMimeType || 'image/jpeg',
+                    inlineData: {
+                        mimeType: state.imageMimeType,
                         data: state.imageBase64
                     }
                 });
             }
 
-            try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: parts }],
-                        generationConfig: {
-                            temperature: 0.85,
-                            responseMimeType: 'application/json'
-                        }
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data?.error?.message || `HTTP Error ${response.status}`);
-                }
-
-                const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                const parsed = safeParseAIJson(rawText);
-
-                state.postCycleCount += 1;
-                document.getElementById('generatedPostOutput').value = parsed.post_content || '';
-
-                if (parsed.expert_analysis) {
-                    document.getElementById('aiExpertInsightText').textContent = parsed.expert_analysis;
-                    document.getElementById('aiExpertInsightBox').classList.remove('hidden');
-                }
-
-                const newComments = Array.isArray(parsed.curious_comments) ? parsed.curious_comments.slice(0, 5) : [];
-                while (newComments.length < 5) {
-                    newComments.push(`Sản phẩm này nhìn thực tế đẹp quá, cho mình xin thêm thông tin chi tiết với ạ! (#${newComments.length + 1})`);
-                }
-
-                state.commentsPool = newComments;
-                // Khi tạo bài mới, mở sẵn bình luận đầu tiên (1/5), 4 bình luận còn lại mở dần mỗi 5 phút
-                state.unlockedCommentCount = 1;
-                state.commentCountdownSec = state.commentIntervalSec;
-
-                renderSeedingCommentsList();
-                updateCountersUI();
-
-                addLog(`AI đã biên soạn xong bài đăng phiên bản #${state.postCycleCount} và bộ 5 bình luận seeding!`, 'success');
-                showToast(`Đã tạo xong bài đăng mới (#${state.postCycleCount}) & mở khóa comment 1/5!`, 'success');
-            } catch (error) {
-                console.error('Gemini API Error:', error);
-                addLog(`Lỗi gọi Gemini AI: ${error.message}`, 'error');
-                showToast(`Lỗi AI: ${error.message}`, 'error');
-            } finally {
-                state.isGenerating = false;
-                forceBtn.disabled = false;
-                forceBtn.classList.remove('opacity-60');
-            }
-        }
-
-        function renderSeedingCommentsList() {
-            const container = document.getElementById('commentsListContainer');
-            if (!state.commentsPool.length) return;
-
-            container.innerHTML = '';
-            state.commentsPool.forEach((cmtText, idx) => {
-                const isUnlocked = idx < state.unlockedCommentCount;
-                const card = document.createElement('div');
-                card.className = isUnlocked
-                    ? 'p-3 rounded-xl bg-indigo-50/70 border border-indigo-200 flex items-start justify-between gap-3 transition'
-                    : 'p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 opacity-65';
-
-                if (isUnlocked) {
-                    const leftDiv = document.createElement('div');
-                    leftDiv.className = 'space-y-1 flex-1';
-
-                    const badge = document.createElement('span');
-                    badge.className = 'inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-600 text-white';
-                    badge.textContent = `Comment #${idx + 1} • Sẵn sàng`;
-
-                    const p = document.createElement('p');
-                    p.className = 'text-xs text-slate-800 font-medium leading-relaxed';
-                    p.textContent = cmtText;
-
-                    leftDiv.appendChild(badge);
-                    leftDiv.appendChild(p);
-
-                    const copyBtn = document.createElement('button');
-                    copyBtn.type = 'button';
-                    copyBtn.className = 'shrink-0 px-3 py-1.5 rounded-lg bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 text-xs font-bold transition';
-                    copyBtn.textContent = 'Copy';
-                    copyBtn.onclick = () => copyRawText(cmtText, `Đã copy bình luận seeding #${idx + 1}!`);
-
-                    card.appendChild(leftDiv);
-                    card.appendChild(copyBtn);
-                } else {
-                    const lockText = document.createElement('div');
-                    lockText.className = 'text-xs text-slate-500 flex items-center gap-2';
-                    lockText.innerHTML = `<span class="font-bold text-slate-700">#${idx + 1}</span> <span>Đang khóa • Tự động mở sau khi đến lượt hẹn giờ</span>`;
-                    card.appendChild(lockText);
-                }
-
-                container.appendChild(card);
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts }],
+                    generationConfig: {
+                        temperature: 0.85,
+                        responseMimeType: 'application/json'
+                    }
+                })
             });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`);
+            }
+
+            const data = await response.json();
+            const rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            return safeParseAIJson(rawResponseText);
         }
 
-        // =========================================================================
-        // 4. ĐIỀU PHỐI BỘ ĐẾM THỜI GIAN THỰC (CHẠY CHIẾN DỊCH / DỪNG)
-        // =========================================================================
-        async function triggerImmediateGeneration() {
-            autoSaveDraftInputs();
-            await callGeminiMarketingAI();
-            if (state.isRunning) {
-                state.postCountdownSec = state.postIntervalSec;
+        async function executePostGenerationCycle() {
+            state.postCycleCount += 1;
+            updateStatusBadge('running', `AI đang phân tích vòng #${state.postCycleCount}...`);
+            addLog(`Bắt đầu chu kỳ đăng bài #${state.postCycleCount}: AI đang phân tích hình ảnh & dữ liệu nhóm...`, 'info');
+
+            try {
+                const aiResult = await callGeminiMarketingAI(state.postCycleCount);
+
+                const postOutputEl = document.getElementById('generatedPostOutput');
+                if (postOutputEl) {
+                    postOutputEl.value = aiResult.post_content || '';
+                }
+
+                const analysisBox = document.getElementById('aiExpertAnalysisBox');
+                const analysisText = document.getElementById('aiExpertAnalysisText');
+                if (analysisBox && analysisText && aiResult.expert_analysis) {
+                    analysisText.textContent = aiResult.expert_analysis;
+                    analysisBox.classList.remove('hidden');
+                }
+
+                state.curiousCommentsQueue = Array.isArray(aiResult.curious_comments)
+                    ? aiResult.curious_comments.slice(0, 5)
+                    : [];
+                state.commentCount = 0;
+                state.postSecondsRemaining = getPostIntervalSeconds();
+                state.commentSecondsRemaining = getCommentIntervalSeconds();
+
+                renderGroupQuickLaunchButtons();
+                renderCommentsQueueUI();
                 updateCountersUI();
+
+                addLog(`Hoàn tất biên soạn bài đăng #${state.postCycleCount} và 5 câu bình luận seeding gây tò mò!`, 'success');
+                showToast(`Đã tạo xong bài đăng mới (Lần #${state.postCycleCount})!`, 'success');
+                updateStatusBadge('running', 'Đang chạy tự động');
+            } catch (err) {
+                addLog(`Lỗi AI: ${err.message}`, 'error');
+                showToast(err.message, 'error');
+                stopCampaign();
             }
+        }
+
+        function releaseNextCuriousComment() {
+            if (state.commentCount >= 5 || state.commentCount >= state.curiousCommentsQueue.length) {
+                return;
+            }
+            const idx = state.commentCount;
+            const cmtText = state.curiousCommentsQueue[idx];
+            state.commentCount += 1;
+            state.commentSecondsRemaining = getCommentIntervalSeconds();
+
+            renderCommentsQueueUI();
+            updateCountersUI();
+            addLog(`Kích hoạt bình luận seeding #${state.commentCount}/5: "${cmtText}"`, 'success');
+            showToast(`Đã mở khóa Bình luận Seeding #${state.commentCount}/5!`, 'info');
         }
 
         async function startCampaign() {
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
-            const productInfo = document.getElementById('productInfoInput').value.trim();
+            if (state.isRunning) return;
 
+            const apiKey = (document.getElementById('geminiApiKeyInput')?.value || '').trim();
             if (!apiKey) {
-                showToast('Vui lòng nhập Google Gemini API Key trước khi chạy!', 'error');
-                document.getElementById('apiKeyInput').focus();
-                return;
-            }
-            if (!productInfo && !state.imageBase64) {
-                showToast('Vui lòng nhập mô tả sản phẩm hoặc chọn ảnh sản phẩm!', 'warning');
-                document.getElementById('productInfoInput').focus();
+                showToast('Vui lòng nhập Gemini API Key trước khi chạy!', 'warning');
+                document.getElementById('geminiApiKeyInput')?.focus();
                 return;
             }
 
-            syncCustomTimersUI();
-            autoSaveDraftInputs();
+            const rawGroups = (document.getElementById('groupUrlsInput')?.value || '')
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean);
+            state.activeGroupUrls = rawGroups;
 
+            saveUserConfigToVault();
             state.isRunning = true;
-            state.postCountdownSec = state.postIntervalSec;
-            state.commentCountdownSec = state.commentIntervalSec;
-
-            // Khóa ô chỉnh thời gian khi đang chạy để đảm bảo đồng bộ
-            document.getElementById('postIntervalInput').disabled = true;
-            document.getElementById('commentIntervalInput').disabled = true;
 
             const startBtn = document.getElementById('startCampaignBtn');
             const stopBtn = document.getElementById('stopCampaignBtn');
-            startBtn.disabled = true;
-            startBtn.classList.add('opacity-60', 'cursor-not-allowed');
-            stopBtn.disabled = false;
-            stopBtn.className = 'bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-rose-500/20 transition flex items-center justify-center space-x-1 text-sm cursor-pointer';
+            if (startBtn) startBtn.classList.add('hidden');
+            if (stopBtn) stopBtn.classList.remove('hidden');
 
-            const badge = document.getElementById('statusBadge');
-            badge.innerHTML = `<span class="relative w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse-ring"></span> Đang chạy tự động`;
-            badge.className = 'hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+            await executePostGenerationCycle();
 
-            addLog(`Khởi chạy chiến dịch: Đổi bài mỗi ${Math.round(state.postIntervalSec / 60)} phút • Seeding comment mỗi ${Math.round(state.commentIntervalSec / 60)} phút (tối đa 5 cmt).`, 'success');
+            if (!state.isRunning) return;
 
-            // Gọi AI tạo bài đăng đầu tiên ngay lập tức
-            await callGeminiMarketingAI();
-
-            if (state.timerIntervalId) clearInterval(state.timerIntervalId);
-            state.timerIntervalId = setInterval(async () => {
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            state.timerInterval = setInterval(async () => {
                 if (!state.isRunning) return;
 
-                // 1. Đếm ngược chu kỳ làm mới bài đăng
-                if (state.postCountdownSec > 0) {
-                    state.postCountdownSec -= 1;
-                } else if (!state.isGenerating) {
-                    state.postCountdownSec = state.postIntervalSec;
-                    addLog('Đã đến chu kỳ đăng bài mới! AI đang tự động xoay vòng nội dung...', 'info');
-                    await callGeminiMarketingAI();
+                state.postSecondsRemaining -= 1;
+                if (state.commentCount < 5 && state.curiousCommentsQueue.length > 0) {
+                    state.commentSecondsRemaining -= 1;
                 }
 
-                // 2. Đếm ngược chu kỳ mở khóa bình luận seeding (tối đa 5 bình luận)
-                if (state.commentsPool.length > 0 && state.unlockedCommentCount < state.maxComments) {
-                    if (state.commentCountdownSec > 0) {
-                        state.commentCountdownSec -= 1;
-                    } else {
-                        state.unlockedCommentCount += 1;
-                        state.commentCountdownSec = state.commentIntervalSec;
-                        renderSeedingCommentsList();
-                        addLog(`Đã mở khóa bình luận seeding #${state.unlockedCommentCount}/${state.maxComments}!`, 'success');
-                        showToast(`Đã mở khóa bình luận seeding #${state.unlockedCommentCount}/${state.maxComments}!`, 'info');
-                    }
+                if (state.commentCount < 5 && state.commentSecondsRemaining <= 0) {
+                    releaseNextCuriousComment();
+                }
+
+                if (state.postSecondsRemaining <= 0) {
+                    await executePostGenerationCycle();
                 }
 
                 updateCountersUI();
@@ -1059,38 +1400,205 @@ Trả về kết quả JSON theo đúng cấu trúc:
 
         function stopCampaign() {
             state.isRunning = false;
-            if (state.timerIntervalId) {
-                clearInterval(state.timerIntervalId);
-                state.timerIntervalId = null;
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
             }
-
-            document.getElementById('postIntervalInput').disabled = false;
-            document.getElementById('commentIntervalInput').disabled = false;
-
             const startBtn = document.getElementById('startCampaignBtn');
             const stopBtn = document.getElementById('stopCampaignBtn');
-            startBtn.disabled = false;
-            startBtn.classList.remove('opacity-60', 'cursor-not-allowed');
-            stopBtn.disabled = true;
-            stopBtn.className = 'bg-slate-200 text-slate-400 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-1 text-sm cursor-not-allowed';
-
-            const badge = document.getElementById('statusBadge');
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400 mr-2"></span> Đã tạm dừng`;
-            badge.className = 'hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600';
-
-            addLog('Đã dừng chiến dịch theo yêu cầu.', 'warning');
-            showToast('Đã dừng bộ đếm chiến dịch.', 'info');
+            if (startBtn) startBtn.classList.remove('hidden');
+            if (stopBtn) stopBtn.classList.add('hidden');
+            updateStatusBadge('idle', 'Đã tạm dừng');
+            addLog('Đã dừng chiến dịch tự động.', 'warning');
         }
 
-        // Khôi phục phiên đăng nhập nhất quán khi tải trang
+        function updateCountersUI() {
+            const postCycleEl = document.getElementById('postCycleCountDisplay');
+            const cmtCountEl = document.getElementById('commentCountDisplay');
+            const postTimerEl = document.getElementById('postTimerDisplay');
+            const cmtTimerEl = document.getElementById('commentTimerDisplay');
+
+            if (postCycleEl) postCycleEl.textContent = `#${state.postCycleCount}`;
+            if (cmtCountEl) cmtCountEl.textContent = `${state.commentCount} / 5`;
+            if (postTimerEl) postTimerEl.textContent = formatSecondsMMSS(state.postSecondsRemaining);
+            if (cmtTimerEl) {
+                cmtTimerEl.textContent = state.commentCount >= 5
+                    ? 'Hoàn tất 5/5'
+                    : formatSecondsMMSS(state.commentSecondsRemaining);
+            }
+        }
+
+        function renderGroupQuickLaunchButtons() {
+            const container = document.getElementById('groupQuickLinksContainer');
+            if (!container) return;
+
+            if (!state.activeGroupUrls.length) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = '';
+            state.activeGroupUrls.forEach((url, index) => {
+                const fullUrl = url.startsWith('http') ? url : 'https://' + url;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'inline-flex items-center px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 text-xs font-bold transition';
+                btn.innerHTML = `<span>Mở Nhóm #${index + 1}</span><svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>`;
+                btn.onclick = () => {
+                    const postText = document.getElementById('generatedPostOutput')?.value || '';
+                    if (postText) {
+                        copyRawText(postText, `Đã copy sẵn bài đăng & đang mở Nhóm #${index + 1}!`);
+                    }
+                    window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderCommentsQueueUI() {
+            const listEl = document.getElementById('commentsQueueList');
+            if (!listEl) return;
+
+            if (!state.curiousCommentsQueue.length) {
+                listEl.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-6">Chưa có bình luận nào. Bấm chạy chiến dịch để AI tạo 5 bình luận seeding.</p>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+            state.curiousCommentsQueue.forEach((cmt, index) => {
+                const isReleased = index < state.commentCount;
+                const isNext = index === state.commentCount;
+
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-2xl border transition flex items-start justify-between gap-3 ${
+                    isReleased
+                        ? 'bg-emerald-50/80 border-emerald-200'
+                        : isNext
+                            ? 'bg-amber-50/70 border-amber-200'
+                            : 'bg-slate-50 border-slate-200 opacity-80'
+                }`;
+
+                card.innerHTML = `
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold ${
+                                isReleased
+                                    ? 'bg-emerald-600 text-white'
+                                    : isNext
+                                        ? 'bg-amber-500 text-slate-950'
+                                        : 'bg-slate-200 text-slate-600'
+                            }">
+                                ${isReleased ? `✓ Đã kích hoạt #${index + 1}` : isNext ? `⏳ Sắp kích hoạt #${index + 1}` : `Chờ lượt #${index + 1}`}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-800 font-medium leading-relaxed">${cmt}</p>
+                    </div>
+                    <button type="button" class="copy-cmt-btn shrink-0 px-2.5 py-1.5 rounded-xl bg-white hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200 text-[11px] font-bold shadow-2xs transition">
+                        Copy
+                    </button>
+                `;
+                card.querySelector('.copy-cmt-btn').onclick = () => {
+                    copyRawText(cmt, `Đã copy bình luận seeding #${index + 1}!`);
+                };
+                listEl.appendChild(card);
+            });
+        }
+
+        // =========================================================================
+        // 4. TIỆN ÍCH CLIPBOARD, LOG & THÔNG BÁO GIAO DIỆN
+        // =========================================================================
+        function copyRawText(text, successMsg = 'Đã copy vào bộ nhớ tạm!') {
+            if (!text) {
+                showToast('Chưa có nội dung để copy!', 'warning');
+                return;
+            }
+            const tempArea = document.createElement('textarea');
+            tempArea.value = text;
+            tempArea.style.position = 'fixed';
+            tempArea.style.left = '-9999px';
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg, 'success');
+            } catch (err) {
+                showToast('Không thể copy tự động, vui lòng bôi đen và bấm Ctrl+C.', 'error');
+            }
+            document.body.removeChild(tempArea);
+        }
+
+        function copyTextFromElement(elementId, successMsg) {
+            const el = document.getElementById(elementId);
+            if (el) copyRawText(el.value || el.textContent, successMsg);
+        }
+
+        function updateStatusBadge(type, label) {
+            const badge = document.getElementById('statusBadge');
+            if (!badge) return;
+            if (type === 'running') {
+                badge.className = 'hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span> ${label}`;
+            } else {
+                badge.className = 'hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600';
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400 mr-2"></span> ${label}`;
+            }
+        }
+
+        function addLog(message, level = 'info') {
+            const logBox = document.getElementById('liveLogContainer');
+            if (!logBox) return;
+            const timeStr = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+            const colorMap = {
+                info: 'text-slate-300',
+                success: 'text-emerald-400',
+                warning: 'text-amber-400',
+                error: 'text-rose-400'
+            };
+            const line = document.createElement('div');
+            line.className = `text-[11px] font-mono ${colorMap[level] || 'text-slate-300'}`;
+            line.textContent = `[${timeStr}] ${message}`;
+            logBox.appendChild(line);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const bgMap = {
+                success: 'bg-emerald-600 text-white',
+                error: 'bg-rose-600 text-white',
+                warning: 'bg-amber-500 text-slate-950',
+                info: 'bg-slate-900 text-white'
+            };
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300 ${bgMap[type] || bgMap.info}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // Khôi phục phiên đăng nhập nhất quán khi tải trang (kèm kiểm tra thời hạn cấp quyền)
         window.addEventListener('DOMContentLoaded', () => {
             const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
             const vault = getCoreVault();
 
+            if (activeSession && activeSession.isOwner) {
+                unlockAppSession(activeSession.token, activeSession.label, true, 'Vĩnh viễn (Owner)');
+                return;
+            }
+
             if (activeSession && activeSession.token && vault.users[activeSession.token]) {
-                document.getElementById('authGateOverlay').classList.add('hidden');
-                document.getElementById('currentUserLabel').textContent = activeSession.label;
-                loadUserConfigFromVault(activeSession.token);
+                const userRecord = vault.users[activeSession.token];
+                if (userRecord.expiresAt && Date.now() <= userRecord.expiresAt) {
+                    unlockAppSession(activeSession.token, activeSession.label, false, userRecord.expiryLabel || activeSession.expiryLabel);
+                } else {
+                    localStorage.removeItem(PERSISTENT_SESSION_KEY);
+                    showAuthError('Thời hạn cấp quyền của bạn đã kết thúc! Vui lòng nhập Mã Kích Hoạt mới từ Chủ sở hữu.');
+                    syncCustomTimersUI();
+                }
             } else {
                 syncCustomTimersUI();
             }
