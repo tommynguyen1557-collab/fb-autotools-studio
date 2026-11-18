@@ -1270,27 +1270,39 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 });
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts }],
-                    generationConfig: {
-                        temperature: 0.85,
-                        responseMimeType: 'application/json'
-                    }
-                })
-            });
+            // Danh sách model mới nhất kèm dự phòng tự động để không bao giờ bị lỗi ngừng hỗ trợ model
+            const candidateModels = ['gemini-3.8-flash', 'gemini-3-flash-preview'];
+            let lastErrorMessage = '';
 
-            if (!response.ok) {
+            for (const modelName of candidateModels) {
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts }],
+                        generationConfig: {
+                            temperature: 0.85,
+                            responseMimeType: 'application/json'
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    return safeParseAIJson(rawResponseText);
+                }
+
                 const errData = await response.json().catch(() => ({}));
-                throw new Error(errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`);
+                lastErrorMessage = errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`;
+                // Nếu không phải lỗi không tìm thấy model thì báo lỗi ngay (ví dụ sai API key)
+                if (response.status !== 404 && !lastErrorMessage.toLowerCase().includes('no longer available')) {
+                    throw new Error(lastErrorMessage);
+                }
             }
 
-            const data = await response.json();
-            const rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            return safeParseAIJson(rawResponseText);
+            throw new Error(lastErrorMessage || 'Không thể kết nối tới model Gemini khả dụng.');
         }
 
         async function executePostGenerationCycle() {
