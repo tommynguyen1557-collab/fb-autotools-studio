@@ -1727,28 +1727,29 @@
 
             const b64Payload = utf8ToBase64(pythonCode);
 
-            // Lưu dữ liệu Base64 ở cuối file .bat để tránh hoàn toàn giới hạn 8191 ký tự của biến SET trong Windows CMD
+            // Dùng %~f0 để đọc chính xác file .bat bất kể tên file, không dùng chcp 65001 để tránh CMD nuốt dòng
             const batLines = [
                 '@echo off',
-                'chcp 65001 >nul',
                 'title ROBOT TU DONG FACEBOOK GROUP STUDIO (CHROME CHUAN)',
                 'cd /d "%~dp0"',
                 'echo ==========================================================',
                 'echo   DANG KHOI DONG ROBOT TU DONG (4 ANH + VIDEO 1 PHUT)...',
                 'echo ==========================================================',
+                'set "BAT_FILE=%~f0"',
                 'where py >nul 2>nul',
                 'if %errorlevel%==0 (',
-                '    py -c "import base64;lines=[l[9:].strip() for l in open(\'KHOI_DONG_ROBOT.bat\',encoding=\'utf-8\',errors=\'ignore\') if l.startswith(\'::PY_B64:\')];open(\'fb_desktop_agent.py\',\'wb\').write(base64.b64decode(\'\'.join(lines)))"',
+                '    py -c "import os,base64;lines=[l[9:].strip() for l in open(os.environ[\'BAT_FILE\'],encoding=\'utf-8\',errors=\'ignore\') if l.startswith(\'::PY_B64:\')];open(\'fb_desktop_agent.py\',\'wb\').write(base64.b64decode(\'\'.join(lines)))"',
                 '    py fb_desktop_agent.py',
-                ') else (',
-                '    where python >nul 2>nul',
-                '    if %errorlevel%==0 (',
-                '        python -c "import base64;lines=[l[9:].strip() for l in open(\'KHOI_DONG_ROBOT.bat\',encoding=\'utf-8\',errors=\'ignore\') if l.startswith(\'::PY_B64:\')];open(\'fb_desktop_agent.py\',\'wb\').write(base64.b64decode(\'\'.join(lines)))"',
-                '        python fb_desktop_agent.py',
-                '    ) else (',
-                '        echo [LOI] May tinh chua cai Python! Vui long tai Python tai python.org va tich chon Add to PATH.',
-                '    )',
+                '    goto :END_SCRIPT',
                 ')',
+                'where python >nul 2>nul',
+                'if %errorlevel%==0 (',
+                '    python -c "import os,base64;lines=[l[9:].strip() for l in open(os.environ[\'BAT_FILE\'],encoding=\'utf-8\',errors=\'ignore\') if l.startswith(\'::PY_B64:\')];open(\'fb_desktop_agent.py\',\'wb\').write(base64.b64decode(\'\'.join(lines)))"',
+                '    python fb_desktop_agent.py',
+                '    goto :END_SCRIPT',
+                ')',
+                'echo [LOI] May tinh chua cai Python! Vui long tai Python tai python.org va tich chon Add to PATH.',
+                ':END_SCRIPT',
                 'pause',
                 'exit /b',
                 `::PY_B64:${b64Payload}`
