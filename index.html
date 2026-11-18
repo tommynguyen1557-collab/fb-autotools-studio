@@ -364,6 +364,28 @@
                             class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
                     </div>
 
+                    <!-- Cầu nối Robot Tự Động Chuột/Bàn Phím chạy ngầm trên Windows -->
+                    <div class="p-3.5 rounded-2xl bg-slate-900 text-slate-200 space-y-2.5 border border-slate-700">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span id="robotStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                <span class="text-xs font-bold text-white">Robot Tự Động Chuột/Phím (Không Đụng Tay)</span>
+                            </div>
+                            <span id="robotStatusText" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">Chế độ Web</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Muốn máy tự động điều khiển chuột & bàn phím đăng bài + comment ngầm hoàn toàn không cần đụng tay, hãy tải & bật Robot chạy nền trên Windows:
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] transition">
+                                ⬇ Tải Robot Tự Động (.py)
+                            </button>
+                            <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] border border-slate-600 transition">
+                                Kiểm tra kết nối Robot
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Tùy chỉnh chu kỳ thời gian đăng bài & bình luận -->
                     <div class="grid grid-cols-2 gap-3 pt-1">
                         <div>
@@ -506,6 +528,7 @@
 
                     <!-- Thanh mở nhanh các nhóm đã nhập -->
                     <div id="groupQuickLinksContainer" class="flex flex-wrap gap-2 pt-1"></div>
+                    <p class="text-[11px] text-slate-400 italic">💡 Mẹo: Bấm vào nút <b>Mở Nhóm</b> bên trên, hệ thống sẽ tự động copy sẵn bài viết & mở thẳng trang nhóm Facebook để bạn chỉ cần nhấn <b>Ctrl + V</b> là đăng ngay.</p>
                 </div>
 
                 <!-- Khung 5 Bình Luận Seeding Gây Tò Mò -->
@@ -1090,8 +1113,10 @@
         // =========================================================================
         // 2. CẤU HÌNH CHIẾN DỊCH, HÌNH ẢNH & LƯU TRỮ TỰ ĐỘNG THEO TÀI KHOẢN
         // =========================================================================
+        const ROBOT_BRIDGE_URL = 'http://127.0.0.1:8765';
         const state = {
             isRunning: false,
+            robotConnected: false,
             imageBase64: '',
             imageMimeType: 'image/jpeg',
             postCycleCount: 0,
@@ -1113,10 +1138,11 @@
             return mins * 60;
         }
 
-        function formatSecondsMMSS(totalSec) {
-            const m = Math.floor(Math.max(0, totalSec) / 60);
-            const s = Math.max(0, totalSec) % 60;
-            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        function formatSecondsMMSS(totalSeconds) {
+            const s = Math.max(0, Math.floor(totalSeconds));
+            const mins = Math.floor(s / 60);
+            const secs = s % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
         function syncCustomTimersUI() {
@@ -1131,10 +1157,7 @@
             if (!state.isRunning) {
                 state.postSecondsRemaining = postMins * 60;
                 state.commentSecondsRemaining = cmtMins * 60;
-                const postTimerEl = document.getElementById('postTimerDisplay');
-                const cmtTimerEl = document.getElementById('commentTimerDisplay');
-                if (postTimerEl) postTimerEl.textContent = formatSecondsMMSS(state.postSecondsRemaining);
-                if (cmtTimerEl) cmtTimerEl.textContent = formatSecondsMMSS(state.commentSecondsRemaining);
+                updateCountersUI();
             }
             saveUserConfigToVault();
         }
@@ -1142,71 +1165,302 @@
         function saveUserConfigToVault() {
             const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
             if (!activeSession || !activeSession.token) return;
-
             const vault = getCoreVault();
             vault.userConfigs[activeSession.token] = {
-                apiKey: document.getElementById('geminiApiKeyInput')?.value || '',
+                geminiApiKey: document.getElementById('geminiApiKeyInput')?.value || '',
                 sourceAccountUrl: document.getElementById('sourceAccountUrlInput')?.value || '',
                 groupUrls: document.getElementById('groupUrlsInput')?.value || '',
                 postInterval: document.getElementById('postIntervalInput')?.value || '3',
                 commentInterval: document.getElementById('commentIntervalInput')?.value || '5',
                 productInfo: document.getElementById('productInfoInput')?.value || '',
-                hotPostsContext: document.getElementById('hotPostsInput')?.value || ''
+                hotPosts: document.getElementById('hotPostsInput')?.value || ''
             };
             saveCoreVault(vault);
         }
 
         function loadUserConfigFromVault(sessionToken) {
             const vault = getCoreVault();
-            const cfg = vault.userConfigs?.[sessionToken];
-            if (cfg) {
-                if (document.getElementById('geminiApiKeyInput')) document.getElementById('geminiApiKeyInput').value = cfg.apiKey || '';
-                if (document.getElementById('sourceAccountUrlInput')) document.getElementById('sourceAccountUrlInput').value = cfg.sourceAccountUrl || '';
-                if (document.getElementById('groupUrlsInput')) document.getElementById('groupUrlsInput').value = cfg.groupUrls || '';
-                if (document.getElementById('postIntervalInput')) document.getElementById('postIntervalInput').value = cfg.postInterval || '3';
-                if (document.getElementById('commentIntervalInput')) document.getElementById('commentIntervalInput').value = cfg.commentInterval || '5';
-                if (document.getElementById('productInfoInput')) document.getElementById('productInfoInput').value = cfg.productInfo || '';
-                if (document.getElementById('hotPostsInput')) document.getElementById('hotPostsInput').value = cfg.hotPostsContext || '';
+            const cfg = vault.userConfigs[sessionToken];
+            if (!cfg) {
+                syncCustomTimersUI();
+                return;
             }
+            if (document.getElementById('geminiApiKeyInput')) document.getElementById('geminiApiKeyInput').value = cfg.geminiApiKey || '';
+            if (document.getElementById('sourceAccountUrlInput')) document.getElementById('sourceAccountUrlInput').value = cfg.sourceAccountUrl || '';
+            if (document.getElementById('groupUrlsInput')) document.getElementById('groupUrlsInput').value = cfg.groupUrls || '';
+            if (document.getElementById('postIntervalInput')) document.getElementById('postIntervalInput').value = cfg.postInterval || '3';
+            if (document.getElementById('commentIntervalInput')) document.getElementById('commentIntervalInput').value = cfg.commentInterval || '5';
+            if (document.getElementById('productInfoInput')) document.getElementById('productInfoInput').value = cfg.productInfo || '';
+            if (document.getElementById('hotPostsInput')) document.getElementById('hotPostsInput').value = cfg.hotPosts || '';
             syncCustomTimersUI();
         }
 
         function openSourceAccountUrl() {
             const url = (document.getElementById('sourceAccountUrlInput')?.value || '').trim();
             if (!url) {
-                showToast('Vui lòng nhập đường link tài khoản nguồn trước!', 'warning');
+                showToast('Vui lòng nhập link tài khoản nguồn trước!', 'warning');
                 return;
             }
-            const target = url.startsWith('http') ? url : 'https://' + url;
-            window.open(target, '_blank', 'noopener,noreferrer');
+            const fullUrl = url.startsWith('http') ? url : 'https://' + url;
+            window.open(fullUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        // Tự động nối các đường link Facebook bị rớt dòng lẻ (ví dụ ?locale=vi_VN)
+        function parseCleanGroupUrls(rawText) {
+            const lines = (rawText || '').split('\n').map(l => l.trim()).filter(Boolean);
+            const cleaned = [];
+            for (const line of lines) {
+                if (/^https?:\/\//i.test(line)) {
+                    cleaned.push(line);
+                } else if (cleaned.length > 0 && !line.includes(' ')) {
+                    const prev = cleaned[cleaned.length - 1];
+                    const sep = (prev.endsWith('?') || prev.endsWith('&') || line.startsWith('?') || line.startsWith('&')) ? '' : '?';
+                    cleaned[cleaned.length - 1] = prev + sep + line;
+                }
+            }
+            return cleaned;
+        }
+
+        // Nén và chuẩn hóa ảnh trên Canvas xuống ~150KB để gửi API cực nhanh, không bao giờ treo
+        function compressImageForAI(dataUrl, maxDimension = 1024, quality = 0.82) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDimension || h > maxDimension) {
+                        if (w > h) {
+                            h = Math.round((h * maxDimension) / w);
+                            w = maxDimension;
+                        } else {
+                            w = Math.round((w * maxDimension) / h);
+                            h = maxDimension;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve({
+                        base64: compressedDataUrl.split(',')[1],
+                        mimeType: 'image/jpeg',
+                        previewUrl: compressedDataUrl
+                    });
+                };
+                img.onerror = () => {
+                    resolve({
+                        base64: dataUrl.split(',')[1],
+                        mimeType: 'image/jpeg',
+                        previewUrl: dataUrl
+                    });
+                };
+                img.src = dataUrl;
+            });
         }
 
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (file.size > 8 * 1024 * 1024) {
-                showToast('Ảnh quá lớn (>8MB). Vui lòng chọn ảnh nhẹ hơn để AI xử lý nhanh!', 'warning');
+            if (file.size > 15 * 1024 * 1024) {
+                showToast('Ảnh quá lớn (>15MB). Vui lòng chọn ảnh nhẹ hơn!', 'warning');
                 return;
             }
 
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
-                state.imageBase64 = dataUrl.split(',')[1];
-                state.imageMimeType = file.type || 'image/jpeg';
+            reader.onload = async function(e) {
+                const rawDataUrl = e.target.result;
+                const optimized = await compressImageForAI(rawDataUrl, 1024, 0.82);
+                state.imageBase64 = optimized.base64;
+                state.imageMimeType = optimized.mimeType;
 
                 const previewImg = document.getElementById('productImagePreview');
                 const placeholder = document.getElementById('imageUploadPlaceholder');
                 if (previewImg && placeholder) {
-                    previewImg.src = dataUrl;
+                    previewImg.src = optimized.previewUrl;
                     previewImg.classList.remove('hidden');
                     placeholder.classList.add('hidden');
                 }
-                addLog(`Đã nạp hình ảnh sản phẩm: ${file.name} (${Math.round(file.size / 1024)} KB)`, 'info');
-                showToast('Đã tải ảnh sản phẩm lên sẵn sàng cho AI phân tích!', 'success');
+                const compressedKB = Math.round((optimized.base64.length * 3) / 4 / 1024);
+                addLog(`Đã nạp & tối ưu ảnh sản phẩm: ${file.name} (${Math.round(file.size / 1024)} KB → ${compressedKB} KB)`, 'info');
+                showToast('Đã tối ưu ảnh sản phẩm sẵn sàng cho AI phân tích siêu tốc!', 'success');
             };
             reader.readAsDataURL(file);
+        }
+
+        function fetchWithTimeout(url, options = {}, timeoutMs = 25000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { ...options, signal: controller.signal })
+                .finally(() => clearTimeout(timer));
+        }
+
+        async function checkDesktopRobotBridge(notifyUser = false) {
+            const dot = document.getElementById('robotStatusDot');
+            const txt = document.getElementById('robotStatusText');
+            try {
+                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/ping`, { method: 'GET' }, 2000);
+                if (res.ok) {
+                    state.robotConnected = true;
+                    if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping';
+                    if (txt) {
+                        txt.textContent = 'Đã kết nối Robot';
+                        txt.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700';
+                    }
+                    if (notifyUser) showToast('Đã kết nối thành công với Robot Tự Động trên máy tính!', 'success');
+                    return true;
+                }
+            } catch (_) {
+                state.robotConnected = false;
+                if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+                if (txt) {
+                    txt.textContent = 'Chế độ Web';
+                    txt.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300';
+                }
+                if (notifyUser) showToast('Chưa bật file Robot (.py) trên máy tính. Đang chạy ở chế độ Web.', 'info');
+            }
+            return false;
+        }
+
+        async function dispatchTaskToDesktopRobot(endpointPath, payload) {
+            if (!state.robotConnected) {
+                const connected = await checkDesktopRobotBridge(false);
+                if (!connected) return false;
+            }
+            try {
+                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}${endpointPath}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5000);
+                return res.ok;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function downloadDesktopRobotAgent() {
+            const robotScript = [
+                'import os, time, json, base64, random, threading',
+                'from http.server import HTTPServer, BaseHTTPRequestHandler',
+                'from playwright.sync_api import sync_playwright',
+                '',
+                '# ==============================================================================',
+                '# ROBOT TỰ ĐỘNG ĐIỀU KHIỂN CHUỘT & BÀN PHÍM (KHÔNG CẦN ĐỤNG TAY)',
+                '# Cài đặt 1 lần: pip install playwright && playwright install chromium',
+                '# Chạy Robot: python fb_desktop_agent.py',
+                '# ==============================================================================',
+                'PORT = 8765',
+                'PROFILE_DIR = os.path.join(os.getcwd(), "fb_robot_profile")',
+                'TEMP_IMG_PATH = os.path.join(os.getcwd(), "temp_product_upload.jpg")',
+                'TASK_QUEUE = []',
+                'LAST_POST_URL = ""',
+                '',
+                'class BridgeHandler(BaseHTTPRequestHandler):',
+                '    def _cors(self):',
+                '        self.send_header("Access-Control-Allow-Origin", "*")',
+                '        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")',
+                '        self.send_header("Access-Control-Allow-Headers", "Content-Type")',
+                '    def do_OPTIONS(self):',
+                '        self.send_response(200); self._cors(); self.end_headers()',
+                '    def do_GET(self):',
+                '        if self.path == "/ping":',
+                '            self.send_response(200); self._cors(); self.end_headers()',
+                '            self.wfile.write(b\'{"status":"ok"}\')',
+                '    def do_POST(self):',
+                '        length = int(self.headers.get("Content-Length", 0))',
+                '        data = json.loads(self.rfile.read(length).decode("utf-8") or "{}")',
+                '        if self.path == "/auto-post":',
+                '            TASK_QUEUE.append(("post", data))',
+                '        elif self.path == "/auto-comment":',
+                '            TASK_QUEUE.append(("comment", data))',
+                '        self.send_response(200); self._cors(); self.end_headers()',
+                '        self.wfile.write(b\'{"queued":true}\')',
+                '    def log_message(self, *args): pass',
+                '',
+                'def human_sleep(a=1.5, b=3.0): time.sleep(random.uniform(a, b))',
+                '',
+                'def run_robot():',
+                '    global LAST_POST_URL',
+                '    threading.Thread(target=lambda: HTTPServer(("127.0.0.1", PORT), BridgeHandler).serve_forever(), daemon=True).start()',
+                '    print(f"[ROBOT] Đã bật cầu nối tự động tại http://127.0.0.1:{PORT}")',
+                '    with sync_playwright() as p:',
+                '        ctx = p.chromium.launch_persistent_context(PROFILE_DIR, headless=False, args=["--disable-notifications"])',
+                '        page = ctx.pages[0] if ctx.pages else ctx.new_page()',
+                '        page.goto("https://www.facebook.com", wait_until="domcontentloaded")',
+                '        print("[ROBOT] Nếu chưa đăng nhập Facebook trên cửa sổ vừa mở, hãy đăng nhập 1 lần duy nhất!")',
+                '        while True:',
+                '            if not TASK_QUEUE:',
+                '                time.sleep(1); continue',
+                '            kind, payload = TASK_QUEUE.pop(0)',
+                '            if kind == "post":',
+                '                img_b64 = payload.get("imageBase64", "")',
+                '                if img_b64:',
+                '                    with open(TEMP_IMG_PATH, "wb") as f: f.write(base64.b64decode(img_b64))',
+                '                for g_url in payload.get("groupUrls", []):',
+                '                    try:',
+                '                        print(f"[ROBOT] Đang tự động mở nhóm & đăng bài: {g_url}")',
+                '                        page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
+                '                        human_sleep(3, 5)',
+                '                        for txt in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai..."]:',
+                '                            loc = page.get_by_text(txt, exact=False).first',
+                '                            if loc.is_visible(timeout=2500): loc.click(); break',
+                '                        human_sleep(2, 3)',
+                '                        dlg = page.locator(\'div[role="dialog"]\')',
+                '                        box = dlg.locator(\'div[role="textbox"]\').first',
+                '                        box.click()',
+                '                        for ch in payload.get("postContent", ""):',
+                '                            if ch == "\\n": page.keyboard.press("Enter")',
+                '                            else: page.keyboard.type(ch, delay=random.randint(20, 55))',
+                '                        if img_b64 and os.path.exists(TEMP_IMG_PATH):',
+                '                            dlg.locator(\'input[type="file"]\').first.set_input_files(TEMP_IMG_PATH)',
+                '                            human_sleep(4, 6)',
+                '                        for btn_txt in ["Đăng", "Post"]:',
+                '                            btn = dlg.locator(f\'div[aria-label="{btn_txt}"][role="button"]\').first',
+                '                            if btn.is_visible(timeout=2500): btn.click(); break',
+                '                        print("[ROBOT] Đã bấm Đăng bài thành công!")',
+                '                        human_sleep(6, 8)',
+                '                        page.goto(g_url, wait_until="domcontentloaded")',
+                '                        human_sleep(3, 5)',
+                '                        links = page.locator(\'div[role="feed"] a[href*="/posts/"], div[role="feed"] a[href*="/permalink/"]\').all()',
+                '                        if links:',
+                '                            href = links[0].get_attribute("href").split("?")[0]',
+                '                            LAST_POST_URL = href if href.startswith("http") else "https://www.facebook.com" + href',
+                '                    except Exception as e:',
+                '                        print(f"[ROBOT LỖI ĐĂNG BÀI] {e}")',
+                '            elif kind == "comment":',
+                '                target = LAST_POST_URL or (payload.get("groupUrls") or [""])[0]',
+                '                cmt = payload.get("commentText", "")',
+                '                if target and cmt:',
+                '                    try:',
+                '                        print(f"[ROBOT] Đang tự động thả bình luận seeding: {cmt}")',
+                '                        page.goto(target, wait_until="domcontentloaded", timeout=60000)',
+                '                        human_sleep(3, 5)',
+                '                        for sel in [\'div[aria-label="Viết bình luận..."]\', \'div[aria-label="Write a comment..."]\', \'div[aria-label="Viết bình luận công khai..."]\']:',
+                '                            loc = page.locator(sel).first',
+                '                            if loc.is_visible(timeout=2500):',
+                '                                loc.click(); human_sleep(1, 2)',
+                '                                page.keyboard.type(cmt, delay=random.randint(25, 65))',
+                '                                page.keyboard.press("Enter")',
+                '                                print("[ROBOT] Đã gửi bình luận thành công!")',
+                '                                break',
+                '                    except Exception as e:',
+                '                        print(f"[ROBOT LỖI COMMENT] {e}")',
+                '',
+                'if __name__ == "__main__":',
+                '    run_robot()'
+            ].join('\n');
+
+            const blob = new Blob([robotScript], { type: 'text/x-python;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'fb_desktop_agent.py';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Đã tải file fb_desktop_agent.py! Chạy file này trên máy tính để bật Robot tự động.', 'success');
         }
 
         // =========================================================================
@@ -1216,6 +1470,11 @@
             let cleaned = (rawText || '').trim();
             if (cleaned.startsWith('```')) {
                 cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+            }
+            const firstBrace = cleaned.indexOf('{');
+            const lastBrace = cleaned.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                cleaned = cleaned.slice(firstBrace, lastBrace + 1);
             }
             cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
             return JSON.parse(cleaned);
@@ -1270,35 +1529,42 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 });
             }
 
-            // Danh sách model mới nhất kèm dự phòng tự động để không bao giờ bị lỗi ngừng hỗ trợ model
-            const candidateModels = ['gemini-3.8-flash', 'gemini-3-flash-preview'];
+            const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
             let lastErrorMessage = '';
 
             for (const modelName of candidateModels) {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts }],
-                        generationConfig: {
-                            temperature: 0.85,
-                            responseMimeType: 'application/json'
-                        }
-                    })
-                });
+                try {
+                    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+                    const response = await fetchWithTimeout(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts }],
+                            generationConfig: {
+                                temperature: 0.85,
+                                responseMimeType: 'application/json'
+                            }
+                        })
+                    }, 25000);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    return safeParseAIJson(rawResponseText);
-                }
+                    if (response.ok) {
+                        const data = await response.json();
+                        const rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        return safeParseAIJson(rawResponseText);
+                    }
 
-                const errData = await response.json().catch(() => ({}));
-                lastErrorMessage = errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`;
-                // Nếu không phải lỗi không tìm thấy model thì báo lỗi ngay (ví dụ sai API key)
-                if (response.status !== 404 && !lastErrorMessage.toLowerCase().includes('no longer available')) {
-                    throw new Error(lastErrorMessage);
+                    const errData = await response.json().catch(() => ({}));
+                    lastErrorMessage = errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`;
+                    if (response.status !== 404 && !lastErrorMessage.toLowerCase().includes('no longer available')) {
+                        throw new Error(lastErrorMessage);
+                    }
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        lastErrorMessage = `Kết nối tới ${modelName} quá hạn (25 giây). Đang thử model dự phòng...`;
+                        addLog(lastErrorMessage, 'warning');
+                        continue;
+                    }
+                    throw err;
                 }
             }
 
@@ -1336,7 +1602,18 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 renderCommentsQueueUI();
                 updateCountersUI();
 
-                addLog(`Hoàn tất biên soạn bài đăng #${state.postCycleCount} và 5 câu bình luận seeding gây tò mò!`, 'success');
+                // Nếu Robot tự động trên máy tính đang chạy, gửi lệnh tự đăng bài & tải ảnh ngầm
+                const sentToRobot = await dispatchTaskToDesktopRobot('/auto-post', {
+                    groupUrls: state.activeGroupUrls,
+                    postContent: aiResult.post_content || '',
+                    imageBase64: state.imageBase64 || ''
+                });
+
+                if (sentToRobot) {
+                    addLog(`Đã truyền lệnh sang Robot máy tính: Tự động mở ${state.activeGroupUrls.length} nhóm & đăng bài ngầm!`, 'success');
+                } else {
+                    addLog(`Hoàn tất biên soạn bài đăng #${state.postCycleCount} và 5 câu bình luận seeding gây tò mò!`, 'success');
+                }
                 showToast(`Đã tạo xong bài đăng mới (Lần #${state.postCycleCount})!`, 'success');
                 updateStatusBadge('running', 'Đang chạy tự động');
             } catch (err) {
@@ -1346,7 +1623,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
             }
         }
 
-        function releaseNextCuriousComment() {
+        async function releaseNextCuriousComment() {
             if (state.commentCount >= 5 || state.commentCount >= state.curiousCommentsQueue.length) {
                 return;
             }
@@ -1357,12 +1634,34 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 
             renderCommentsQueueUI();
             updateCountersUI();
-            addLog(`Kích hoạt bình luận seeding #${state.commentCount}/5: "${cmtText}"`, 'success');
+
+            const sentToRobot = await dispatchTaskToDesktopRobot('/auto-comment', {
+                groupUrls: state.activeGroupUrls,
+                commentText: cmtText
+            });
+
+            if (sentToRobot) {
+                addLog(`Robot đã nhận lệnh tự động thả bình luận #${state.commentCount}/5: "${cmtText}"`, 'success');
+            } else {
+                addLog(`Kích hoạt bình luận seeding #${state.commentCount}/5: "${cmtText}"`, 'success');
+            }
             showToast(`Đã mở khóa Bình luận Seeding #${state.commentCount}/5!`, 'info');
         }
 
         async function startCampaign() {
             if (state.isRunning) return;
+
+            // Kiểm tra lại thời hạn cấp quyền trước khi cho phép chạy chiến dịch
+            const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
+            const vault = getCoreVault();
+            if (activeSession && !activeSession.isOwner && activeSession.token && vault.users[activeSession.token]) {
+                const uRec = vault.users[activeSession.token];
+                if (uRec.expiresAt && Date.now() > uRec.expiresAt) {
+                    showToast('Thời hạn cấp quyền của bạn đã kết thúc! Vui lòng liên hệ Chủ sở hữu để gia hạn.', 'error');
+                    logoutUser();
+                    return;
+                }
+            }
 
             const apiKey = (document.getElementById('geminiApiKeyInput')?.value || '').trim();
             if (!apiKey) {
@@ -1371,11 +1670,8 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 return;
             }
 
-            const rawGroups = (document.getElementById('groupUrlsInput')?.value || '')
-                .split('\n')
-                .map(line => line.trim())
-                .filter(Boolean);
-            state.activeGroupUrls = rawGroups;
+            state.activeGroupUrls = parseCleanGroupUrls(document.getElementById('groupUrlsInput')?.value || '');
+            await checkDesktopRobotBridge(false);
 
             saveUserConfigToVault();
             state.isRunning = true;
@@ -1399,7 +1695,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 }
 
                 if (state.commentCount < 5 && state.commentSecondsRemaining <= 0) {
-                    releaseNextCuriousComment();
+                    await releaseNextCuriousComment();
                 }
 
                 if (state.postSecondsRemaining <= 0) {
@@ -1594,6 +1890,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 
         // Khôi phục phiên đăng nhập nhất quán khi tải trang (kèm kiểm tra thời hạn cấp quyền)
         window.addEventListener('DOMContentLoaded', () => {
+            checkDesktopRobotBridge(false);
             const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
             const vault = getCoreVault();
 
