@@ -285,7 +285,10 @@
                     </svg>
                 </div>
                 <div class="truncate">
-                    <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate">AI FB Group Studio</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate">AI FB Group Studio</h1>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">v3.8 Pro</span>
+                    </div>
                     <p class="text-xs text-slate-500 hidden sm:block">Tự động xoay vòng 4 Ảnh + Video & Seeding thông minh</p>
                 </div>
             </div>
@@ -589,7 +592,7 @@
                         <button type="button" onclick="document.getElementById('liveLogContainer').innerHTML=''" class="text-[11px] text-slate-500 hover:text-slate-300">Xóa log</button>
                     </div>
                     <div id="liveLogContainer" class="h-32 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
-                        <div class="text-[11px] font-mono text-slate-400">[Hệ thống] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio (Hỗ trợ 4 Ảnh + Video 1 phút < 300MB).</div>
+                        <div class="text-[11px] font-mono text-emerald-400">[Hệ thống v3.8 Pro] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio (Hỗ trợ 4 Ảnh + Video 1 phút &lt; 300MB).</div>
                     </div>
                 </div>
 
@@ -1896,10 +1899,12 @@
             const fallbackOrder = [
                 'gemini-3.8-flash',
                 'gemini-3.5-flash',
+                'gemini-3-flash-preview',
                 'gemini-3-flash',
                 'gemini-2.5-flash',
                 'gemini-2.5-pro'
             ];
+            if (!apiKey) return fallbackOrder;
             try {
                 const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`;
                 const res = await fetchWithTimeout(listUrl, { method: 'GET' }, 8000);
@@ -1908,9 +1913,8 @@
                 const available = (data.models || [])
                     .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
                     .map(m => (m.name || '').replace(/^models\//, ''))
-                    .filter(name => name.includes('flash') && !name.includes('lite') && !name.includes('8b') && !name.includes('2.0'));
+                    .filter(name => (name.includes('flash') || name.includes('pro')) && !name.includes('lite') && !name.includes('8b') && !name.includes('2.0') && !name.includes('1.5'));
                 if (available.length > 0) {
-                    // Ưu tiên phiên bản mới nhất lên đầu
                     available.sort((a, b) => b.localeCompare(a));
                     return [...new Set([...available, ...fallbackOrder])];
                 }
@@ -1924,9 +1928,6 @@
             const hotPosts = (document.getElementById('hotPostsInput')?.value || '').trim();
             const sourceAccount = (document.getElementById('sourceAccountUrlInput')?.value || '').trim();
 
-            if (!apiKey) {
-                throw new Error('Vui lòng nhập Google Gemini API Key ở mục 1!');
-            }
             if (!productInfo && state.images.length === 0 && !state.videoFile) {
                 throw new Error('Vui lòng nhập mô tả sản phẩm hoặc nạp ít nhất 1 ảnh / video!');
             }
@@ -1974,9 +1975,14 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
             });
 
             const candidateModels = await resolveAvailableGeminiModels(apiKey);
+            const triedModels = new Set();
             let lastErrorMessage = '';
 
-            for (const modelName of candidateModels) {
+            while (candidateModels.length > 0) {
+                const modelName = candidateModels.shift();
+                if (!modelName || triedModels.has(modelName)) continue;
+                triedModels.add(modelName);
+
                 try {
                     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
                     const response = await fetchWithTimeout(endpoint, {
@@ -1989,7 +1995,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                                 responseMimeType: 'application/json'
                             }
                         })
-                    }, 30000);
+                    }, 35000);
 
                     if (response.ok) {
                         const data = await response.json();
@@ -2000,14 +2006,22 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 
                     const errData = await response.json().catch(() => ({}));
                     lastErrorMessage = errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`;
+
+                    // Nếu thông báo lỗi có gợi ý model thay thế (ví dụ models/gemini-3.8-flash), tự động ưu tiên model đó ngay!
+                    const suggestedMatch = lastErrorMessage.match(/models\/(gemini-[a-zA-Z0-9._-]+)/i);
+                    if (suggestedMatch && suggestedMatch[1] && !triedModels.has(suggestedMatch[1])) {
+                        candidateModels.unshift(suggestedMatch[1]);
+                        continue;
+                    }
+
                     const lowerErr = lastErrorMessage.toLowerCase();
-                    if (response.status === 404 || response.status === 400 || lowerErr.includes('no longer available') || lowerErr.includes('not found') || lowerErr.includes('not supported')) {
+                    if (response.status === 404 || response.status === 400 || lowerErr.includes('no longer available') || lowerErr.includes('not found') || lowerErr.includes('not supported') || lowerErr.includes('deprecated')) {
                         continue;
                     }
                     throw new Error(lastErrorMessage);
                 } catch (err) {
                     if (err.name === 'AbortError') {
-                        lastErrorMessage = `Kết nối tới ${modelName} quá hạn (30 giây). Đang thử model dự phòng...`;
+                        lastErrorMessage = `Kết nối tới ${modelName} quá hạn (35 giây). Đang thử model dự phòng...`;
                         addLog(lastErrorMessage, 'warning');
                         continue;
                     }
