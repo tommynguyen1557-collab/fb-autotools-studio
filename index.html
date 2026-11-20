@@ -1254,9 +1254,10 @@
                 } catch (_) {}
             }
 
-            // Dự phòng nếu chưa bật Robot: mở trực tiếp trên trình duyệt hiện tại
+            // Nếu chưa bật Robot: mở tab tài khoản nguồn và tự động dò kết nối Robot liên tục
             window.open(fullUrl, '_blank', 'noopener,noreferrer');
-            showToast('Đang mở link tài khoản nguồn trên trình duyệt của bạn (Bật Robot để kết nối tự động).', 'info');
+            addLog('Chưa thấy Robot chạy ngầm trên Windows. Hãy mở file KHOI_DONG_ROBOT.bat để chuyển từ Chế độ Web sang Tự Động Đăng!', 'warning');
+            showToast('Đang ở Chế độ Web: Hãy mở file KHOI_DONG_ROBOT.bat trong thư mục Downloads để Robot tự đăng vào nhóm!', 'warning');
         }
 
         function parseCleanGroupUrls(rawText) {
@@ -1766,26 +1767,24 @@
                 '            if not TASK_QUEUE:',
                 '                time.sleep(1); continue',
                 '            kind, payload = TASK_QUEUE.pop(0)',
-                '            if kind == "connect_source":',
-                '                try:',
-                '                    connect_to_source_account(page, payload.get("sourceUrl", ""))',
-                '                except Exception as e:',
-                '                    print(f"[ROBOT LOI KET NOI NICK] {e}")',
-                '            elif kind == "post":',
-                '                try:',
-                '                    connect_to_source_account(page, payload.get("sourceUrl", ""))',
-                '                except Exception: pass',
-                '                media_paths = [m for m in payload.get("mediaPaths", []) if os.path.exists(m)]',
-                '                for g_url in payload.get("groupUrls", []):',
-                '                    try:',
-                '                        print(f"[ROBOT] Dang mo nhom & dang bai ({len(media_paths)} tep): {g_url}")',
+                        '                        print(f"[ROBOT] Dang mo nhom & dang bai ({len(media_paths)} tep): {g_url}")',
                 '                        page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
                 '                        human_sleep(3, 5)',
-                '                        for txt in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai..."]:',
-                '                            loc = page.get_by_text(txt, exact=False).first',
-                '                            if loc.is_visible(timeout=2500): loc.click(); break',
+                '                        opened_composer = False',
+                '                        for txt in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai...", "Bạn đang nghĩ gì?"]:',
+                '                            try:',
+                '                                loc = page.get_by_text(txt, exact=False).first',
+                '                                if loc.is_visible(timeout=2500):',
+                '                                    loc.click()',
+                '                                    opened_composer = True',
+                '                                    break',
+                '                            except Exception: pass',
+                '                        if not opened_composer:',
+                '                            try:',
+                '                                page.locator(\'div[role="button"]:has-text("Bạn viết gì đi"), div[role="button"]:has-text("Write something")\').first.click()',
+                '                            except Exception: pass',
                 '                        human_sleep(2, 3)',
-                '                        dlg = page.locator(\'div[role="dialog"]\')',
+                '                        dlg = page.locator(\'div[role="dialog"]\').last',
                 '                        box = dlg.locator(\'div[role="textbox"]\').first',
                 '                        box.click()',
                 '                        for ch in payload.get("postContent", ""):',
@@ -1798,8 +1797,10 @@
                 '                            has_video = any(m.lower().endswith((".mp4", ".mov", ".webm", ".avi")) for m in media_paths)',
                 '                            human_sleep(10, 15) if has_video else human_sleep(4, 6)',
                 '                        for btn_txt in ["Đăng", "Post"]:',
-                '                            btn = dlg.locator(f\'div[aria-label="{btn_txt}"][role="button"]\').first',
-                '                            if btn.is_visible(timeout=4000): btn.click(); break',
+                '                            try:',
+                '                                btn = dlg.locator(f\'div[aria-label="{btn_txt}"][role="button"]\').first',
+                '                                if btn.is_visible(timeout=4000): btn.click(); break',
+                '                            except Exception: pass',
                 '                        print("[ROBOT] Da bam Dang bai thanh cong!")',
                 '                        human_sleep(7, 10)',
                 '                        page.goto(g_url, wait_until="domcontentloaded")',
@@ -2373,6 +2374,9 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
 
         window.addEventListener('DOMContentLoaded', () => {
             checkDesktopRobotBridge(false);
+            setInterval(() => {
+                if (!state.robotConnected) checkDesktopRobotBridge(false);
+            }, 4000);
             const activeSession = JSON.parse(localStorage.getItem(PERSISTENT_SESSION_KEY) || 'null');
             const vault = getCoreVault();
 
