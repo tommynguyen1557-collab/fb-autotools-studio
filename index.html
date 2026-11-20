@@ -359,10 +359,10 @@
                             <input type="url" id="sourceAccountUrlInput" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/profile.php?id=..."
                                 class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                             <button type="button" onclick="openSourceAccountUrl()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
-                                🔗 Kết Nối Nick
+                                🔗 Mở Nick Nguồn
                             </button>
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-1">Bấm <b>Kết Nối Nick</b> để Robot mở thẳng tài khoản/Fanpage nguồn này và dùng chính phiên đó để đăng bài.</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Mở thẳng tài khoản/Fanpage nguồn ngay trên trình duyệt chính đang đăng nhập sẵn (0% lỗi 2FA).</p>
                     </div>
 
                     <div>
@@ -371,26 +371,43 @@
                             class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
                     </div>
 
-                    <!-- Cầu nối Robot Tự Động Chuột/Bàn Phím chạy ngầm trên Windows -->
-                    <div class="p-3.5 rounded-2xl bg-slate-900 text-slate-200 space-y-2.5 border border-slate-700">
+                    <!-- Bảng Chế Độ Siêu Tốc 1-Click (Mặc định) & Ngăn phụ Robot -->
+                    <div class="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 space-y-2.5">
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center space-x-2">
-                                <span id="robotStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                                <span class="text-xs font-bold text-white">Robot Tự Động Chuột/Phím (Chrome Chuẩn)</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="text-xs font-extrabold text-emerald-950">Chế Độ Siêu Tốc 1-Click (Khuyên Dùng)</span>
                             </div>
-                            <span id="robotStatusText" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">Chế độ Web</span>
+                            <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 cursor-pointer select-none">
+                                <input type="checkbox" id="soundAlertToggle" checked onchange="saveUserConfigToVault()" class="rounded text-emerald-600 focus:ring-emerald-500">
+                                <span>🔔 Chuông nhắc giờ</span>
+                            </label>
                         </div>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Mở trình duyệt Chrome chuẩn sạch dấu vết tự động hóa, đăng nhập trang chủ Facebook mượt mà & tự động đăng 4 ảnh + video 1 phút:
+                        <p class="text-[11px] text-emerald-900/80 leading-relaxed">
+                            Chạy trực tiếp trên trình duyệt chính bạn đang đăng nhập Facebook: tự động tạo bài mới & 5 comment mồi câu theo chu kỳ, kèm nút bấm <b>1-Click tự copy & mở thẳng từng nhóm</b>.
                         </p>
-                        <div class="flex flex-wrap gap-2">
-                            <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] transition">
-                                ⬇ Tải Robot 1-Click (.bat)
-                            </button>
-                            <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] border border-slate-600 transition">
-                                Kiểm tra kết nối Robot
-                            </button>
-                        </div>
+
+                        <!-- Ngăn phụ thu gọn cho Robot Desktop (tùy chọn nâng cao) -->
+                        <details class="pt-1 border-t border-emerald-200/80">
+                            <summary class="text-[11px] font-bold text-slate-600 hover:text-slate-900 cursor-pointer select-none flex items-center justify-between">
+                                <span>⚙️ Tùy chọn nâng cao: Cầu nối Robot Desktop (.bat)</span>
+                                <span id="robotStatusText" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200">Đang tắt</span>
+                            </summary>
+                            <div class="mt-2.5 p-3 rounded-xl bg-slate-900 text-slate-200 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <span id="robotStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <span class="text-[11px] font-semibold">Chỉ dùng khi muốn chạy ngầm bằng Python/Playwright:</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] transition">
+                                        ⬇ Tải Robot (.bat)
+                                    </button>
+                                    <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] border border-slate-600 transition">
+                                        Kiểm tra kết nối
+                                    </button>
+                                </div>
+                            </div>
+                        </details>
                     </div>
 
                     <!-- Tùy chỉnh chu kỳ thời gian đăng bài & bình luận -->
@@ -578,7 +595,7 @@
                     </div>
 
                     <div id="groupQuickLinksContainer" class="flex flex-wrap gap-2 pt-1"></div>
-                    <p class="text-[11px] text-slate-400 italic">💡 Mẹo: Khi bật Robot, hệ thống tự động đăng đủ tối đa 4 ảnh + video 1 phút lên từng nhóm. Ở Chế độ Web, bấm <b>Mở Nhóm</b> để copy sẵn bài viết và nhấn <b>Ctrl + V</b>.</p>
+                    <p class="text-[11px] text-slate-400 italic">💡 Mẹo Siêu Tốc 1-Click: Bấm <b>🚀 Đăng Nhanh Nhóm #...</b> bên trên để hệ thống tự copy sẵn nội dung bài viết và mở thẳng trang Group trên trình duyệt chính — bạn chỉ việc nhấn <b>Ctrl + V</b> và thả ảnh/video là xong!</p>
                 </div>
 
                 <!-- Khung 5 Bình Luận Seeding Gây Tò Mò -->
@@ -1476,10 +1493,10 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                     : 'w-2.5 h-2.5 rounded-full bg-amber-400';
             }
             if (txt) {
-                txt.textContent = connected ? 'Đã kết nối Robot' : 'Chế độ Web';
+                txt.textContent = connected ? 'Đã kết nối Robot' : 'Đang tắt';
                 txt.className = connected
-                    ? 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300';
+                    ? 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200';
             }
         }
 
@@ -1524,7 +1541,7 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 } catch (_) {}
             }
 
-            showToast('Robot chưa bật: Đang mở link nguồn trên tab trình duyệt hiện tại (Hãy bật KHOI_DONG_ROBOT.bat để tự động hóa).', 'info');
+            showToast('Đang mở link tài khoản nguồn trên trình duyệt chính của bạn...', 'success');
             window.open(fullUrl, '_blank', 'noopener,noreferrer');
         }
 
@@ -1779,10 +1796,17 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 '            executable_path=exe_path,',
                 '            headless=False,',
                 '            ignore_default_args=["--enable-automation", "--no-sandbox"],',
-                '            args=["--disable-blink-features=AutomationControlled", "--start-maximized"],',
+                '            args=["--start-maximized"],',
                 '            no_viewport=True',
                 '        )',
                 '        page = ctx.pages[0] if ctx.pages else ctx.new_page()',
+                '        def _auto_bypass_2fa_blank(frame):',
+                '            try:',
+                '                if frame == page.main_frame and "two_step_verification" in (frame.url or ""):',
+                '                    page.goto("https://mbasic.facebook.com", wait_until="domcontentloaded")',
+                '            except Exception:',
+                '                pass',
+                '        page.on("framenavigated", _auto_bypass_2fa_blank)',
                 '        start_url = INITIAL_SOURCE_URL if INITIAL_SOURCE_URL else "https://www.facebook.com"',
                 '        page.goto(start_url, wait_until="domcontentloaded")',
                 '        if INITIAL_SOURCE_URL:',
@@ -1895,26 +1919,52 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 `::PY_B64:${b64Payload}`
             ];
 
-            const blob = new Blob([batLines.join('\r\n')], { type: 'application/bat' });
+            const blob = new Blob([batLines.join('\r\n')], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'KHOI_DONG_ROBOT.bat';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast('Đã tải xuống file KHOI_DONG_ROBOT.bat! Hãy mở file trong thư mục Downloads.', 'success');
+            showToast('Đã tải xuống KHOI_DONG_ROBOT.bat! Vào thư mục Downloads để chạy.', 'success');
         }
 
         // =========================================================================
-        // 5. ĐIỀU PHỐI CHIẾN DỊCH, THEO DÕI TRẠNG THÁI DUYỆT BÀI & SEEDING
+        // 5. ĐIỀU PHỐI CHIẾN DỊCH 1-CLICK, THEO DÕI DUYỆT BÀI & SEEDING MỒI CÂU
         // =========================================================================
         function parseGroupUrls() {
-            const raw = document.getElementById('groupUrlsInput')?.value || '';
+            const raw = (document.getElementById('groupUrlsInput')?.value || '').trim();
+            if (!raw) return [];
             return raw
-                .split(/\r?\n/)
-                .map(line => line.trim())
+                .split(/[\n,;]+/)
+                .map(u => u.trim())
                 .filter(Boolean)
                 .map(u => (u.startsWith('http') ? u : 'https://' + u));
+        }
+
+        function playGentleNotificationChime() {
+            try {
+                const toggle = document.getElementById('soundAlertToggle');
+                if (toggle && !toggle.checked) return;
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const now = ctx.currentTime;
+                [587.33, 880].forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+                    gain.gain.setValueAtTime(0.08, now + idx * 0.14);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.14 + 0.35);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.14);
+                    osc.stop(now + idx * 0.14 + 0.36);
+                });
+            } catch (_) {}
         }
 
         function renderGroupQuickLinks(groupUrls) {
@@ -1924,14 +1974,21 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             groupUrls.forEach((url, idx) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 text-xs font-bold transition';
-                btn.textContent = `Mở Nhóm #${idx + 1} ↗`;
+                btn.className = 'px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-xs text-xs font-extrabold transition flex items-center gap-1.5';
+                btn.textContent = `🚀 Đăng Nhanh Nhóm #${idx + 1} (Copy + Mở)`;
                 btn.onclick = () => {
-                    copyTextFromElement('generatedPostOutput', `Đã copy bài viết! Dán (Ctrl + V) vào Nhóm #${idx + 1}.`);
+                    copyTextFromElement('generatedPostOutput', `Đã copy bài viết! Dán (Ctrl + V) vào ô đăng bài Nhóm #${idx + 1}.`);
+                    state.groupPostStatuses[url] = {
+                        status: 'pending',
+                        postUrl: '',
+                        updatedAt: new Date().toLocaleTimeString('vi-VN', { hour12: false })
+                    };
+                    renderPostTrackingUI();
                     window.open(url, '_blank', 'noopener,noreferrer');
                 };
                 container.appendChild(btn);
             });
+            renderPostTrackingUI();
         }
 
         function renderPostTrackingUI() {
@@ -1952,19 +2009,15 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 const info = state.groupPostStatuses[gUrl] || { status: 'draft', postUrl: '', updatedAt: '' };
                 const cleanGroupBase = gUrl.split('?')[0].replace(/\/$/, '');
                 const pendingReviewUrl = `${cleanGroupBase}/my_pending_content`;
+                const postedContentUrl = `${cleanGroupBase}/my_posted_content`;
 
-                let badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">Chế độ Web (Sẵn sàng dán)</span>';
-                let actionHtml = `<a href="${cleanGroupBase}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-white hover:bg-blue-50 text-blue-700 border border-slate-200 text-[11px] font-bold">Mở Nhóm ↗</a>`;
-
+                let badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">✨ Sẵn sàng đăng 1-Click</span>';
                 if (info.status === 'published') {
                     badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">✅ Đã đăng lên nhóm</span>';
-                    const targetLink = info.postUrl || cleanGroupBase;
-                    actionHtml = `<a href="${targetLink}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs">🔗 Xem bài trực tiếp</a>`;
                 } else if (info.status === 'pending') {
-                    badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">⏳ Đang chờ Admin duyệt</span>';
-                    actionHtml = `<a href="${pendingReviewUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-[11px] font-bold">Mở mục Chờ duyệt ↗</a>`;
+                    badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">⏳ Đã mở đăng / Chờ duyệt</span>';
                 } else if (info.status === 'queued') {
-                    badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">🤖 Robot đang thao tác...</span>';
+                    badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 text-indigo-800">🤖 Robot đang xử lý</span>';
                 }
 
                 const row = document.createElement('div');
@@ -1974,34 +2027,36 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                         <div class="font-bold text-slate-800 truncate">Nhóm #${idx + 1}: ${cleanGroupBase.replace('https://www.facebook.com/groups/', '')}</div>
                         <div class="flex items-center gap-2 mt-1">${badgeHtml} ${info.updatedAt ? `<span class="text-[10px] text-slate-400">(${info.updatedAt})</span>` : ''}</div>
                     </div>
-                    <div class="shrink-0">${actionHtml}</div>
+                    <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+                        <a href="${pendingReviewUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold">⏳ Xem Chờ Duyệt</a>
+                        <a href="${info.postUrl || postedContentUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs">🔗 Bài Đã Đăng</a>
+                    </div>
                 `;
                 listEl.appendChild(row);
             });
         }
 
         async function refreshPostTrackingStatus(notify = false) {
-            if (!state.activeGroupUrls.length) return;
-            if (state.robotConnected) {
+            if (state.robotConnected && state.activeGroupUrls.length) {
                 try {
                     const postText = (document.getElementById('generatedPostOutput')?.value || '').trim();
-                    const firstLine = (postText.split('\n')[0] || '').slice(0, 40);
+                    const snippet = (postText.split('\n')[0] || '').slice(0, 40);
                     await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/check-post-status`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ groupUrls: state.activeGroupUrls, snippet: firstLine })
+                        body: JSON.stringify({ groupUrls: state.activeGroupUrls, snippet })
                     }, 3000);
                     const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/post-statuses`, { method: 'GET' }, 3000);
                     if (res.ok) {
-                        const map = await res.json();
-                        Object.keys(map).forEach(k => {
-                            state.groupPostStatuses[k] = map[k];
+                        const statusMap = await res.json();
+                        Object.keys(statusMap || {}).forEach(gUrl => {
+                            state.groupPostStatuses[gUrl] = statusMap[gUrl];
                         });
                     }
                 } catch (_) {}
             }
             renderPostTrackingUI();
-            if (notify) showToast('Đã cập nhật trạng thái duyệt bài trên các nhóm!', 'info');
+            if (notify) showToast('Đã cập nhật trạng thái kiểm tra bài đăng trên các nhóm!', 'info');
         }
 
         function renderCommentsQueueUI() {
@@ -2025,9 +2080,20 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                         </div>
                         <p class="text-slate-700 leading-relaxed">${item.text}</p>
                     </div>
-                    <button type="button" class="copy-cmt-btn px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 font-bold text-[11px] shrink-0">Copy</button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" class="copy-cmt-btn px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 font-bold text-[11px]">Copy</button>
+                        <button type="button" class="open-cmt-btn px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px]">💬 Dán Comment</button>
+                    </div>
                 `;
                 row.querySelector('.copy-cmt-btn').onclick = () => copyRawText(item.text, `Đã copy bình luận #${idx + 1}!`);
+                row.querySelector('.open-cmt-btn').onclick = () => {
+                    copyRawText(item.text, `Đã copy bình luận #${idx + 1}! Mở bài đã đăng để dán.`);
+                    if (state.activeGroupUrls.length) {
+                        const firstGroup = state.activeGroupUrls[0].split('?')[0].replace(/\/$/, '');
+                        const targetUrl = (state.groupPostStatuses[state.activeGroupUrls[0]] || {}).postUrl || `${firstGroup}/my_posted_content`;
+                        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                    }
+                };
                 listEl.appendChild(row);
             });
         }
@@ -2042,9 +2108,11 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             state.commentCount = state.curiousCommentsQueue.filter(c => c.released).length;
             document.getElementById('commentCountDisplay').textContent = `${state.commentCount} / 5`;
             renderCommentsQueueUI();
+            playGentleNotificationChime();
+            copyRawText(nextItem.text, `🔔 Đến giờ Comment #${state.commentCount}/5! Đã tự động copy sẵn nội dung.`);
 
             const sent = await dispatchCommentToRobot(state.activeGroupUrls, nextItem.text);
-            addLog(`Kích hoạt bình luận seeding #${state.commentCount}/5${sent ? ' (Robot đã nhận lệnh comment tự động)' : ''}: "${nextItem.text}"`, 'success');
+            addLog(`Kích hoạt bình luận seeding #${state.commentCount}/5${sent ? ' (Robot đã nhận lệnh)' : ' (Đã copy sẵn vào bộ nhớ tạm)'}: "${nextItem.text}"`, 'success');
         }
 
         async function executePostGenerationCycle() {
@@ -2096,9 +2164,9 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                         updatedAt: new Date().toLocaleTimeString('vi-VN', { hour12: false })
                     };
                 });
-                renderPostTrackingUI();
-
-                addLog(`Hoàn tất chu kỳ #${state.postCycleCount}: Đã tạo bài viết mới & ${state.curiousCommentsQueue.length} bình luận gây tò mò.${sentToRobot ? ' Robot đang tự động đăng lên các nhóm!' : ''}`, 'success');
+                addLog(`Hoàn tất chu kỳ #${state.postCycleCount}: Đã tạo bài viết mới & ${state.curiousCommentsQueue.length} bình luận gây tò mò.${sentToRobot ? ' Robot đang tự động đăng lên các nhóm!' : ' Bấm nút 🚀 Đăng Nhanh Nhóm để copy & mở nhóm ngay!'}`, 'success');
+                playGentleNotificationChime();
+                showToast(`✨ Đã tạo xong Bài Đăng #${state.postCycleCount} & 5 bình luận mồi câu!`, 'success');
                 if (sentToRobot) {
                     setTimeout(() => refreshPostTrackingStatus(false), 14000);
                 }
