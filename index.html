@@ -1778,7 +1778,7 @@
                 '                media_paths = payload.get("mediaPaths", [])',
                 '                for g_url in payload.get("groupUrls", []):',
                 '                    try:',
-                '                        print(f"[ROBOT] Dang mo nhom & dang bai ({len(media_paths)} tep): {g_url}")',
+                '                        print(f"[ROBOT] Dang mo nhom va dang bai ({len(media_paths)} tep): {g_url}")',
                 '                        page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
                 '                        human_sleep(3, 5)',
                 '                        opened_composer = False',
