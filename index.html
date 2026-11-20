@@ -1582,8 +1582,6 @@
         }
 
         function downloadDesktopRobotAgent() {
-            // Mã nguồn Python Robot tối ưu tuyệt đối: Tự động nhân bản hồ sơ Chrome/Edge ĐÃ ĐĂNG NHẬP SẴN FACEBOOK trên máy bạn!
-            // -> Vừa mở lên là vào thẳng trang chủ Facebook của nick bạn, bỏ qua 100% đăng nhập & 2FA!
             const pythonCode = [
                 'import os, sys, time, json, random, shutil, socket, threading, subprocess, traceback',
                 'from email import message_from_bytes',
@@ -1621,7 +1619,6 @@
                 '    return None, None',
                 '',
                 'def clone_existing_fb_cookies(source_user_data, target_profile):',
-                '    # Neu chua co ho so nhan ban, tu dong chep Cookie & Phien dang nhap tu trinh duyet chinh cua ban sang!',
                 '    target_default = os.path.join(target_profile, "Default")',
                 '    if os.path.exists(os.path.join(target_default, "Network", "Cookies")) or os.path.exists(os.path.join(target_default, "Cookies")):',
                 '        return',
@@ -1839,7 +1836,6 @@
 
             const b64Payload = utf8ToBase64(pythonCode);
 
-            // Dùng %~f0 để đọc chính xác file .bat bất kể tên file, tự động tắt tiến trình cũ bị kẹt ngầm
             const batLines = [
                 '@echo off',
                 'title ROBOT TU DONG FACEBOOK GROUP STUDIO (CHROME CHUAN)',
@@ -1880,7 +1876,7 @@
         }
 
         // =========================================================================
-        // 4. GOOGLE GEMINI VISION AI (PHÂN TÍCH ĐỒNG THỜI TỐI ĐA 4 ẢNH)
+        // 4. GOOGLE GEMINI VISION AI (TỰ ĐỘNG CHỌN MODEL MỚI NHẤT & PHÂN TÍCH 4 ẢNH)
         // =========================================================================
         function safeParseAIJson(rawText) {
             let cleaned = (rawText || '').trim();
@@ -1894,6 +1890,32 @@
             }
             cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
             return JSON.parse(cleaned);
+        }
+
+        async function resolveAvailableGeminiModels(apiKey) {
+            const fallbackOrder = [
+                'gemini-3.8-flash',
+                'gemini-3.5-flash',
+                'gemini-3-flash',
+                'gemini-2.5-flash',
+                'gemini-2.5-pro'
+            ];
+            try {
+                const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`;
+                const res = await fetchWithTimeout(listUrl, { method: 'GET' }, 8000);
+                if (!res.ok) return fallbackOrder;
+                const data = await res.json();
+                const available = (data.models || [])
+                    .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+                    .map(m => (m.name || '').replace(/^models\//, ''))
+                    .filter(name => name.includes('flash') && !name.includes('lite') && !name.includes('8b') && !name.includes('2.0'));
+                if (available.length > 0) {
+                    // Ưu tiên phiên bản mới nhất lên đầu
+                    available.sort((a, b) => b.localeCompare(a));
+                    return [...new Set([...available, ...fallbackOrder])];
+                }
+            } catch (_) {}
+            return fallbackOrder;
         }
 
         async function callGeminiMarketingAI(cycleNumber) {
@@ -1951,7 +1973,7 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                 });
             });
 
-            const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+            const candidateModels = await resolveAvailableGeminiModels(apiKey);
             let lastErrorMessage = '';
 
             for (const modelName of candidateModels) {
@@ -1967,22 +1989,25 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                                 responseMimeType: 'application/json'
                             }
                         })
-                    }, 25000);
+                    }, 30000);
 
                     if (response.ok) {
                         const data = await response.json();
                         const rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        addLog(`AI (${modelName}) đã phân tích xong dữ liệu hình ảnh & nội dung!`, 'info');
                         return safeParseAIJson(rawResponseText);
                     }
 
                     const errData = await response.json().catch(() => ({}));
                     lastErrorMessage = errData?.error?.message || `Lỗi kết nối Gemini API (HTTP ${response.status})`;
-                    if (response.status !== 404 && !lastErrorMessage.toLowerCase().includes('no longer available')) {
-                        throw new Error(lastErrorMessage);
+                    const lowerErr = lastErrorMessage.toLowerCase();
+                    if (response.status === 404 || response.status === 400 || lowerErr.includes('no longer available') || lowerErr.includes('not found') || lowerErr.includes('not supported')) {
+                        continue;
                     }
+                    throw new Error(lastErrorMessage);
                 } catch (err) {
                     if (err.name === 'AbortError') {
-                        lastErrorMessage = `Kết nối tới ${modelName} quá hạn (25 giây). Đang thử model dự phòng...`;
+                        lastErrorMessage = `Kết nối tới ${modelName} quá hạn (30 giây). Đang thử model dự phòng...`;
                         addLog(lastErrorMessage, 'warning');
                         continue;
                     }
