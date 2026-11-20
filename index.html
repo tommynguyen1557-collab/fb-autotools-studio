@@ -384,30 +384,30 @@
                             </label>
                         </div>
                         <p class="text-[11px] text-emerald-900/80 leading-relaxed">
-                            Chạy trực tiếp trên trình duyệt chính bạn đang đăng nhập Facebook: tự động tạo bài mới & 5 comment mồi câu theo chu kỳ, kèm nút bấm <b>1-Click tự copy & mở thẳng từng nhóm</b>.
-                        </p>
-
-                        <!-- Ngăn phụ thu gọn cho Robot Desktop (tùy chọn nâng cao) -->
-                        <details class="pt-1 border-t border-emerald-200/80">
-                            <summary class="text-[11px] font-bold text-slate-600 hover:text-slate-900 cursor-pointer select-none flex items-center justify-between">
-                                <span>⚙️ Tùy chọn nâng cao: Cầu nối Robot Desktop (.bat)</span>
-                                <span id="robotStatusText" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200">Đang tắt</span>
-                            </summary>
-                            <div class="mt-2.5 p-3 rounded-xl bg-slate-900 text-slate-200 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <span id="robotStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-                                    <span class="text-[11px] font-semibold">Chỉ dùng khi muốn chạy ngầm bằng Python/Playwright:</span>
-                                </div>
-                                <div class="flex flex-wrap gap-2">
-                                    <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] transition">
-                                        ⬇ Tải Robot (.bat)
-                                    </button>
-                                    <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] border border-slate-600 transition">
-                                        Kiểm tra kết nối
-                                    </button>
-                                </div>
+                    <!-- Bảng Chế Độ Tự Động Hóa Toàn Phần 100% (Auto-Pilot) -->
+                    <div class="p-4 rounded-2xl bg-slate-900 text-slate-100 border border-slate-700 space-y-3 shadow-inner">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span id="robotStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                <span class="text-xs font-extrabold text-white">Auto-Pilot Tự Động 100% (Đăng & Seeding)</span>
                             </div>
-                        </details>
+                            <span id="robotStatusText" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">Chưa bật Auto-Pilot</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                            Để Tool <b>tự động đăng bài lên các nhóm, tự cập nhật content mới theo lịch & tự động thả 5 comment seeding</b> hoàn toàn rảnh tay, bạn chỉ cần mở file Auto-Pilot 1 lần duy nhất:
+                        </p>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-xs shadow-sm transition">
+                                ⬇ Tải Auto-Pilot 1-Click (.bat)
+                            </button>
+                            <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-600 transition">
+                                Kiểm tra kết nối
+                            </button>
+                            <label class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-300 cursor-pointer select-none">
+                                <input type="checkbox" id="soundAlertToggle" checked onchange="saveUserConfigToVault()" class="rounded text-amber-500 focus:ring-amber-500">
+                                <span>🔔 Chuông</span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Tùy chỉnh chu kỳ thời gian đăng bài & bình luận -->
@@ -595,7 +595,7 @@
                     </div>
 
                     <div id="groupQuickLinksContainer" class="flex flex-wrap gap-2 pt-1"></div>
-                    <p class="text-[11px] text-slate-400 italic">💡 Mẹo Siêu Tốc 1-Click: Bấm <b>🚀 Đăng Nhanh Nhóm #...</b> bên trên để hệ thống tự copy sẵn nội dung bài viết và mở thẳng trang Group trên trình duyệt chính — bạn chỉ việc nhấn <b>Ctrl + V</b> và thả ảnh/video là xong!</p>
+                    <p class="text-[11px] text-slate-400 italic">🤖 <b>Chế độ Tự Động Toàn Phần:</b> Khi đèn <b>Auto-Pilot</b> báo xanh, bạn chỉ cần bấm <b>Chạy Chiến Dịch Tự Động</b> — hệ thống sẽ tự động xoay vòng viết bài mới theo lịch, tự đăng đủ 4 ảnh + video vào từng nhóm, tự cập nhật trạng thái duyệt bài và tự thả 5 bình luận mồi câu mà không cần thao tác tay!</p>
                 </div>
 
                 <!-- Khung 5 Bình Luận Seeding Gây Tò Mò -->
@@ -1489,14 +1489,14 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             const txt = document.getElementById('robotStatusText');
             if (dot) {
                 dot.className = connected
-                    ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse'
+                    ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping'
                     : 'w-2.5 h-2.5 rounded-full bg-amber-400';
             }
             if (txt) {
-                txt.textContent = connected ? 'Đã kết nối Robot' : 'Đang tắt';
+                txt.textContent = connected ? 'Đã kết nối Auto-Pilot' : 'Chưa bật Auto-Pilot';
                 txt.className = connected
-                    ? 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300'
-                    : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200';
+                    ? 'text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50'
+                    : 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40';
             }
         }
 
@@ -2219,6 +2219,12 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             const postMins = Math.max(1, parseInt(document.getElementById('postIntervalInput')?.value || '5', 10));
             const cmtMins = Math.max(1, parseInt(document.getElementById('commentIntervalInput')?.value || '5', 10));
 
+            const isAutoPilotReady = await checkDesktopRobotBridge(false);
+            if (!isAutoPilotReady) {
+                showToast('⚠️ Bạn chưa bật Auto-Pilot! Hãy mở file KHOI_DONG_ROBOT.bat để Tool tự động đăng bài & seeding 100% rảnh tay.', 'warning');
+                addLog('Cảnh báo: Chưa kết nối Auto-Pilot. Tool vẫn tạo bài AI theo lịch, nhưng cần mở KHOI_DONG_ROBOT.bat để tự động đăng & comment vào nhóm.', 'warning');
+            }
+
             state.isRunning = true;
             state.postSecondsRemaining = postMins * 60;
             state.commentSecondsRemaining = cmtMins * 60;
@@ -2227,7 +2233,6 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             document.getElementById('stopCampaignBtn').classList.remove('hidden');
             updateCampaignStatusBadge(true);
 
-            await checkDesktopRobotBridge(false);
             await executePostGenerationCycle();
 
             if (!state.isRunning) return;
