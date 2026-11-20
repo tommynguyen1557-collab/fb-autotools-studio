@@ -2128,7 +2128,16 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             const hotPosts = (document.getElementById('hotPostsInput')?.value || '').trim();
 
             if (!apiKey) {
-                showToast('Vui lòng nhập Google Gemini API Key!', 'error');
+                const msg = 'Thiếu Google Gemini API Key! Vui lòng dán API Key (AIzaSy...) vào ô Mục 1 trước khi chạy.';
+                addLog(msg, 'error');
+                showToast(msg, 'error');
+                if (state.isRunning) stopCampaign();
+                return;
+            }
+            if (!productInfo && state.images.length === 0) {
+                const msg = 'Thiếu nội dung sản phẩm! Vui lòng nhập mô tả hoặc chọn ít nhất 1 ảnh.';
+                addLog(msg, 'error');
+                showToast(msg, 'error');
                 if (state.isRunning) stopCampaign();
                 return;
             }
@@ -2177,8 +2186,8 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                     setTimeout(() => refreshPostTrackingStatus(false), 14000);
                 }
             } catch (err) {
-                addLog(`Lỗi AI: ${err.message}`, 'error');
-                showToast(err.message, 'error');
+                addLog(`Lỗi gọi Gemini AI: ${err.message}`, 'error');
+                showToast(`Lỗi AI: ${err.message}`, 'error');
                 if (state.isRunning) stopCampaign();
             } finally {
                 state.isProcessingCycle = false;
