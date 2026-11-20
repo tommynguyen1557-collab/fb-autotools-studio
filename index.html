@@ -1902,6 +1902,7 @@
                 'gemini-3-flash-preview',
                 'gemini-3-flash',
                 'gemini-2.5-flash',
+                'gemini-2.5-flash-lite',
                 'gemini-2.5-pro'
             ];
             if (!apiKey) return fallbackOrder;
@@ -1910,12 +1911,27 @@
                 const res = await fetchWithTimeout(listUrl, { method: 'GET' }, 8000);
                 if (!res.ok) return fallbackOrder;
                 const data = await res.json();
+                const excludedKeywords = [
+                    'image', 'imagen', 'veo', 'tts', 'audio', 'embedding',
+                    'aqa', 'bisect', 'robotics', 'computer-use', 'deep-research',
+                    '2.0', '1.5', '1.0', 'exp'
+                ];
                 const available = (data.models || [])
                     .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
                     .map(m => (m.name || '').replace(/^models\//, ''))
-                    .filter(name => (name.includes('flash') || name.includes('pro')) && !name.includes('lite') && !name.includes('8b') && !name.includes('2.0') && !name.includes('1.5'));
+                    .filter(name => {
+                        const lower = name.toLowerCase();
+                        return (lower.includes('flash') || lower.includes('pro')) &&
+                            !excludedKeywords.some(kw => lower.includes(kw));
+                    });
                 if (available.length > 0) {
-                    available.sort((a, b) => b.localeCompare(a));
+                    // Ưu tiên các dòng Flash trước vì gói Free Tier có hạn mức cao nhất
+                    available.sort((a, b) => {
+                        const aFlash = a.includes('flash') ? 1 : 0;
+                        const bFlash = b.includes('flash') ? 1 : 0;
+                        if (aFlash !== bFlash) return bFlash - aFlash;
+                        return b.localeCompare(a);
+                    });
                     return [...new Set([...available, ...fallbackOrder])];
                 }
             } catch (_) {}
@@ -2015,7 +2031,18 @@ Trả về duy nhất 1 đối tượng JSON chuẩn xác theo cấu trúc:
                     }
 
                     const lowerErr = lastErrorMessage.toLowerCase();
-                    if (response.status === 404 || response.status === 400 || lowerErr.includes('no longer available') || lowerErr.includes('not found') || lowerErr.includes('not supported') || lowerErr.includes('deprecated')) {
+                    if (
+                        response.status === 404 ||
+                        response.status === 400 ||
+                        response.status === 429 ||
+                        lowerErr.includes('quota') ||
+                        lowerErr.includes('rate-limit') ||
+                        lowerErr.includes('no longer available') ||
+                        lowerErr.includes('not found') ||
+                        lowerErr.includes('not supported') ||
+                        lowerErr.includes('deprecated')
+                    ) {
+                        addLog(`Model ${modelName} không khả dụng hoặc hết hạn mức, tự động chuyển sang model kế tiếp...`, 'warning');
                         continue;
                     }
                     throw new Error(lastErrorMessage);
