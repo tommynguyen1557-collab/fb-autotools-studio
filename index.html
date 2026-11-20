@@ -1465,6 +1465,9 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
         // =========================================================================
         // 4. CẦU NỐI ROBOT TỰ ĐỘNG CHUỘT/BÀN PHÍM (CHROME NGUYÊN BẢN + 2FA BYPASS)
         // =========================================================================
+        const ROBOT_BRIDGE_ENDPOINTS = ['http://127.0.0.1:8765', 'http://localhost:8765'];
+        let activeRobotBridgeUrl = ROBOT_BRIDGE_ENDPOINTS[0];
+
         function fetchWithTimeout(url, options = {}, timeoutMs = 3000) {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -1489,17 +1492,20 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
         }
 
         async function checkDesktopRobotBridge(notifyUser = false) {
-            try {
-                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/ping`, { method: 'GET' }, 2000);
-                if (res.ok) {
-                    setRobotBadgeUI(true);
-                    if (notifyUser) showToast('Đã kết nối thành công với Robot Chrome trên máy tính!', 'success');
-                    return true;
-                }
-            } catch (_) {}
+            for (const baseUrl of ROBOT_BRIDGE_ENDPOINTS) {
+                try {
+                    const res = await fetchWithTimeout(`${baseUrl}/ping`, { method: 'GET' }, 2000);
+                    if (res.ok) {
+                        activeRobotBridgeUrl = baseUrl;
+                        setRobotBadgeUI(true);
+                        if (notifyUser) showToast('Đã kết nối thành công với Auto-Pilot trên máy tính!', 'success');
+                        return true;
+                    }
+                } catch (_) {}
+            }
             setRobotBadgeUI(false);
             if (notifyUser) {
-                showToast('Chưa thấy Robot chạy ngầm. Hãy mở file KHOI_DONG_ROBOT.bat trong thư mục Downloads!', 'warning');
+                showToast('Chưa thấy Auto-Pilot chạy ngầm. Hãy tải bản mới & mở KHOI_DONG_ROBOT.bat!', 'warning');
             }
             return false;
         }
@@ -1516,7 +1522,7 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
             const connected = await checkDesktopRobotBridge(false);
             if (connected) {
                 try {
-                    const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/connect-source`, {
+                    const res = await fetchWithTimeout(`${activeRobotBridgeUrl}/connect-source`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ sourceUrl: fullUrl })
@@ -1562,7 +1568,7 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                     formData.append('video_0', state.videoFile, state.videoFile.name || 'product_video.mp4');
                 }
 
-                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/auto-post-media`, {
+                const res = await fetchWithTimeout(`${activeRobotBridgeUrl}/auto-post-media`, {
                     method: 'POST',
                     body: formData
                 }, 15000);
@@ -1580,7 +1586,7 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 if (!connected) return false;
             }
             try {
-                const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/auto-comment`, {
+                const res = await fetchWithTimeout(`${activeRobotBridgeUrl}/auto-comment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1788,98 +1794,113 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 '        "--start-maximized",',
                 '        start_url',
                 '    ])',
-                '    time.sleep(3.5)',
-                '    with sync_playwright() as p:',
-                '        browser = p.chromium.connect_over_cdp("http://127.0.0.1:9222")',
-                '        ctx = browser.contexts[0]',
-                '        page = ctx.pages[0] if ctx.pages else ctx.new_page()',
-                '        if INITIAL_SOURCE_URL:',
-                '            try: connect_to_source_account(page, INITIAL_SOURCE_URL)',
-                '            except Exception: pass',
-                '        print("============================================================")',
-                '        print(" DA SAN SANG KET NOI TRUC TIEP LINK TAI KHOAN NGUON!")',
-                '        print("============================================================")',
+                '    time.sleep(4.5)',
+                '    try:',
+                '        with sync_playwright() as p:',
+                '            browser = None',
+                '            for _ in range(10):',
+                '                try:',
+                '                    browser = p.chromium.connect_over_cdp("http://127.0.0.1:9222")',
+                '                    break',
+                '                except Exception:',
+                '                    time.sleep(1.5)',
+                '            if not browser:',
+                '                print("[CANH BAO] Chua noi duoc CDP, hay dong het cua so Chrome Robot cu va chay lai!")',
+                '                while True: time.sleep(5)',
+                '            ctx = browser.contexts[0]',
+                '            page = ctx.pages[0] if ctx.pages else ctx.new_page()',
+                '            if INITIAL_SOURCE_URL:',
+                '                try: connect_to_source_account(page, INITIAL_SOURCE_URL)',
+                '                except Exception: pass',
+                '            print("============================================================")',
+                '            print(" DA SAN SANG KET NOI TRUC TIEP LINK TAI KHOAN NGUON!")',
+                '            print("============================================================")',
+                '            while True:',
+                '                if not TASK_QUEUE:',
+                '                    time.sleep(1)',
+                '                    continue',
+                '                kind, payload = TASK_QUEUE.pop(0)',
+                '                if kind == "connect_source":',
+                '                    try: connect_to_source_account(page, payload.get("sourceUrl", ""))',
+                '                    except Exception as e: print(f"[LOI KET NOI NICK] {e}")',
+                '                elif kind == "check_status":',
+                '                    for g_url in payload.get("groupUrls", []):',
+                '                        inspect_group_post_visibility(page, g_url, payload.get("snippet", ""))',
+                '                elif kind == "post":',
+                '                    if payload.get("sourceUrl"):',
+                '                        try: connect_to_source_account(page, payload.get("sourceUrl"))',
+                '                        except Exception: pass',
+                '                    media_paths = payload.get("mediaPaths", [])',
+                '                    first_line = (payload.get("postContent", "").strip().split("\\n")[0])[:40]',
+                '                    for g_url in payload.get("groupUrls", []):',
+                '                        POST_STATUS_MAP[g_url] = {"status": "queued", "postUrl": "", "updatedAt": time.strftime("%H:%M:%S")}',
+                '                        try:',
+                '                            print(f"[ROBOT] Dang mo nhom & dang bai ({len(media_paths)} tep): {g_url}")',
+                '                            page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
+                '                            human_sleep(3, 5)',
+                '                            opened = False',
+                '                            for trig in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai...", "Create a public post..."]:',
+                '                                loc = page.get_by_text(trig, exact=False).first',
+                '                                if loc.is_visible(timeout=2500):',
+                '                                    loc.click()',
+                '                                    opened = True',
+                '                                    break',
+                '                            if not opened:',
+                '                                print(f"[ROBOT CANH BAO] Khong thay o dang bai tai {g_url} (Hay kiem tra da tham gia nhom chua).")',
+                '                                continue',
+                '                            human_sleep(2, 4)',
+                '                            dlg = page.locator(\'div[role="dialog"]\').first',
+                '                            tbox = dlg.locator(\'div[role="textbox"]\').first',
+                '                            tbox.click()',
+                '                            human_sleep(1, 2)',
+                '                            for line in payload.get("postContent", "").split("\\n"):',
+                '                                page.keyboard.insert_text(line)',
+                '                                page.keyboard.press("Enter")',
+                '                            human_sleep(1.5, 2.5)',
+                '                            if media_paths:',
+                '                                f_inp = dlg.locator(\'input[type="file"]\').first',
+                '                                f_inp.set_input_files(media_paths)',
+                '                                human_sleep(5, 9)',
+                '                            for p_btn in ["Đăng", "Post"]:',
+                '                                b = dlg.locator(f\'div[aria-label="{p_btn}"][role="button"]\').first',
+                '                                if b.is_visible(timeout=3000):',
+                '                                    b.click()',
+                '                                    break',
+                '                            print("[ROBOT] Da bam Dang bai thanh cong!")',
+                '                            human_sleep(7, 10)',
+                '                            inspect_group_post_visibility(page, g_url, first_line)',
+                '                        except Exception as e:',
+                '                            print(f"[ROBOT LOI DANG BAI] {e}")',
+                '                elif kind == "comment":',
+                '                    cmt = payload.get("commentText", "")',
+                '                    for g_url in payload.get("groupUrls", []):',
+                '                        target = (POST_STATUS_MAP.get(g_url) or {}).get("postUrl") or g_url',
+                '                        try:',
+                '                            page.goto(target, wait_until="domcontentloaded", timeout=60000)',
+                '                            human_sleep(3, 5)',
+                '                            cbox = None',
+                '                            for sel in [\'div[aria-label="Viết bình luận..."]\', \'div[aria-label="Write a comment..."]\', \'div[aria-label="Viết bình luận công khai..."]\']:',
+                '                                loc = page.locator(sel).first',
+                '                                if loc.is_visible(timeout=2500):',
+                '                                    cbox = loc',
+                '                                    break',
+                '                            if cbox:',
+                '                                cbox.click()',
+                '                                human_sleep(1, 2)',
+                '                                page.keyboard.insert_text(cmt)',
+                '                                human_sleep(1, 2)',
+                '                                page.keyboard.press("Enter")',
+                '                                print(f"[ROBOT SEEDING] Da binh luan thanh cong tai {target}")',
+                '                        except Exception as e:',
+                '                            print(f"[ROBOT LOI COMMENT] {e}")',
+                '    except Exception as outer_err:',
+                '        print(f"[CANH BAO KET NOI CHROME] {outer_err}")',
                 '        while True:',
-                '            if not TASK_QUEUE:',
-                '                time.sleep(1)',
-                '                continue',
-                '            kind, payload = TASK_QUEUE.pop(0)',
-                '            if kind == "connect_source":',
-                '                try: connect_to_source_account(page, payload.get("sourceUrl", ""))',
-                '                except Exception as e: print(f"[LOI KET NOI NICK] {e}")',
-                '            elif kind == "check_status":',
-                '                for g_url in payload.get("groupUrls", []):',
-                '                    inspect_group_post_visibility(page, g_url, payload.get("snippet", ""))',
-                '            elif kind == "post":',
-                '                if payload.get("sourceUrl"):',
-                '                    try: connect_to_source_account(page, payload.get("sourceUrl"))',
-                '                    except Exception: pass',
-                '                media_paths = payload.get("mediaPaths", [])',
-                '                first_line = (payload.get("postContent", "").strip().split("\\n")[0])[:40]',
-                '                for g_url in payload.get("groupUrls", []):',
-                '                    POST_STATUS_MAP[g_url] = {"status": "queued", "postUrl": "", "updatedAt": time.strftime("%H:%M:%S")}',
-                '                    try:',
-                '                        print(f"[ROBOT] Dang mo nhom & dang bai ({len(media_paths)} tep): {g_url}")',
-                '                        page.goto(g_url, wait_until="domcontentloaded", timeout=60000)',
-                '                        human_sleep(3, 5)',
-                '                        opened = False',
-                '                        for trig in ["Bạn viết gì đi...", "Write something...", "Tạo bài viết công khai...", "Create a public post..."]:',
-                '                            loc = page.get_by_text(trig, exact=False).first',
-                '                            if loc.is_visible(timeout=2500):',
-                '                                loc.click()',
-                '                                opened = True',
-                '                                break',
-                '                        if not opened:',
-                '                            print(f"[ROBOT CANH BAO] Khong thay o dang bai tai {g_url} (Hay kiem tra da tham gia nhom chua).")',
-                '                            continue',
-                '                        human_sleep(2, 4)',
-                '                        dlg = page.locator(\'div[role="dialog"]\').first',
-                '                        tbox = dlg.locator(\'div[role="textbox"]\').first',
-                '                        tbox.click()',
-                '                        human_sleep(1, 2)',
-                '                        for line in payload.get("postContent", "").split("\\n"):',
-                '                            page.keyboard.insert_text(line)',
-                '                            page.keyboard.press("Enter")',
-                '                        human_sleep(1.5, 2.5)',
-                '                        if media_paths:',
-                '                            f_inp = dlg.locator(\'input[type="file"]\').first',
-                '                            f_inp.set_input_files(media_paths)',
-                '                            human_sleep(5, 9)',
-                '                        for p_btn in ["Đăng", "Post"]:',
-                '                            b = dlg.locator(f\'div[aria-label="{p_btn}"][role="button"]\').first',
-                '                            if b.is_visible(timeout=3000):',
-                '                                b.click()',
-                '                                break',
-                '                        print("[ROBOT] Da bam Dang bai thanh cong!")',
-                '                        human_sleep(7, 10)',
-                '                        inspect_group_post_visibility(page, g_url, first_line)',
-                '                    except Exception as e:',
-                '                        print(f"[ROBOT LOI DANG BAI] {e}")',
-                '            elif kind == "comment":',
-                '                cmt = payload.get("commentText", "")',
-                '                for g_url in payload.get("groupUrls", []):',
-                '                    target = (POST_STATUS_MAP.get(g_url) or {}).get("postUrl") or g_url',
-                '                    try:',
-                '                        page.goto(target, wait_until="domcontentloaded", timeout=60000)',
-                '                        human_sleep(3, 5)',
-                '                        cbox = None',
-                '                        for sel in [\'div[aria-label="Viết bình luận..."]\', \'div[aria-label="Write a comment..."]\', \'div[aria-label="Viết bình luận công khai..."]\']:',
-                '                            loc = page.locator(sel).first',
-                '                            if loc.is_visible(timeout=2500):',
-                '                                cbox = loc',
-                '                                break',
-                '                        if cbox:',
-                '                            cbox.click()',
-                '                            human_sleep(1, 2)',
-                '                            page.keyboard.insert_text(cmt)',
-                '                            human_sleep(1, 2)',
-                '                            page.keyboard.press("Enter")',
-                '                            print(f"[ROBOT SEEDING] Da binh luan thanh cong tai {target}")',
-                '                    except Exception as e:',
-                '                        print(f"[ROBOT LOI COMMENT] {e}")',
+                '            time.sleep(5)',
                 '',
                 'if __name__ == "__main__":',
-                '    srv = HTTPServer(("127.0.0.1", 8765), BridgeHandler)',
+                '    HTTPServer.allow_reuse_address = True',
+                '    srv = HTTPServer(("0.0.0.0", 8765), BridgeHandler)',
                 '    import threading',
                 '    threading.Thread(target=srv.serve_forever, daemon=True).start()',
                 '    print("[2/3] Cau noi tu dong san sang tai http://127.0.0.1:8765")',
@@ -1895,6 +1916,7 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 'echo ============================================================',
                 'echo  DANG DON SACH TIEN TRINH CU VA MO TRINH DUYET FACEBOOK',
                 'echo ============================================================',
+                'taskkill /F /IM python.exe /T >nul 2>&1',
                 'set "PY_FILE=%~dp0fb_desktop_agent.py"',
                 'powershell -NoProfile -Command "$lines = Get-Content -LiteralPath \'%~f0\'; $line = ($lines | Where-Object { $_ -like \'::PY_B64:*\' } | Select-Object -First 1); $b64 = $line.Substring(9); [IO.File]::WriteAllBytes(\'%PY_FILE%\', [Convert]::FromBase64String($b64))"',
                 'python "%PY_FILE%"',
@@ -2025,12 +2047,12 @@ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU (không bọc markdown):
                 try {
                     const postText = (document.getElementById('generatedPostOutput')?.value || '').trim();
                     const snippet = (postText.split('\n')[0] || '').slice(0, 40);
-                    await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/check-post-status`, {
+                    await fetchWithTimeout(`${activeRobotBridgeUrl}/check-post-status`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ groupUrls: state.activeGroupUrls, snippet })
                     }, 3000);
-                    const res = await fetchWithTimeout(`${ROBOT_BRIDGE_URL}/post-statuses`, { method: 'GET' }, 3000);
+                    const res = await fetchWithTimeout(`${activeRobotBridgeUrl}/post-statuses`, { method: 'GET' }, 3000);
                     if (res.ok) {
                         const statusMap = await res.json();
                         Object.keys(statusMap || {}).forEach(gUrl => {
