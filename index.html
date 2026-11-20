@@ -333,85 +333,76 @@
         </div>
     </header>
 
-    <!-- NỘI DUNG CHÍNH -->
+    <!-- NỘI DUNG CHÍNH: BỐ CỤC CHUẨN SAAS 5 CỘT TRÁI - 7 CỘT PHẢI -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- CỘT TRÁI: CẤU HÌNH & NẠP DỮ LIỆU ĐẦU VÀO (5 CỘT) -->
-            <div class="lg:col-span-5 space-y-6">
-
-    <!-- NỘI DUNG CHÍNH: BỐ CỤC CÂN ĐỐI NGANG - DỌC 50/50 -->
-    <main class="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- CỘT TRÁI: CẤU HÌNH ĐẦU VÀO & ĐIỀU KHIỂN CHIẾN DỊCH (6 CỘT = 50%) -->
-            <div class="lg:col-span-6 space-y-5">
+            <!-- CỘT TRÁI: THIẾT LẬP ĐẦU VÀO & ĐIỀU KHIỂN (5 CỘT) -->
+            <div class="lg:col-span-5 space-y-5 min-w-0">
 
                 <!-- Thẻ 1: Kết nối AI, Tài khoản nguồn & Chu kỳ thời gian -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <h2 class="text-xs font-extrabold uppercase tracking-wider text-blue-700 flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-md bg-blue-600 text-white inline-flex items-center justify-center text-[11px]">1</span>
+                            <span class="w-5 h-5 rounded-md bg-blue-600 text-white inline-flex items-center justify-center text-[11px] shrink-0">1</span>
                             <span>Kết Nối AI, Tài Khoản & Lịch Chạy</span>
                         </h2>
-                        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:underline font-semibold">Lấy API Key →</a>
+                        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:underline font-semibold shrink-0">Lấy API Key →</a>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Google Gemini API Key <span class="text-rose-500">*</span></label>
-                            <input type="password" id="geminiApiKeyInput" oninput="saveUserConfigToVault()" placeholder="AIzaSy..."
-                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
-                        </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Google Gemini API Key <span class="text-rose-500">*</span></label>
+                        <input type="password" id="geminiApiKeyInput" oninput="saveUserConfigToVault()" placeholder="AIzaSy..."
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                    </div>
 
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Chu kỳ bài (Phút)</label>
-                                <input type="number" id="postIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI()"
-                                    class="w-full px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50/60 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-center">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Chu kỳ cmt (Phút)</label>
-                                <input type="number" id="commentIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI()"
-                                    class="w-full px-3 py-2 text-sm font-bold text-indigo-700 bg-indigo-50/60 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-center">
-                            </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Chu kỳ đăng bài (Phút)</label>
+                            <input type="number" id="postIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI()"
+                                class="w-full px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50/60 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-center">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Chu kỳ comment (Phút)</label>
+                            <input type="number" id="commentIntervalInput" min="1" max="1440" value="5" oninput="syncCustomTimersUI()"
+                                class="w-full px-3 py-2 text-sm font-bold text-indigo-700 bg-indigo-50/60 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-center">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Link Tài Khoản Đăng Nhập Nguồn (Facebook / Fanpage)</label>
-                        <div class="flex gap-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Link Tài Khoản Đăng Nhập Nguồn (Facebook / Fanpage)</label>
+                        <div class="flex items-center gap-2">
                             <input type="url" id="sourceAccountUrlInput" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/profile.php?id=..."
-                                class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
-                            <button type="button" onclick="openSourceAccountUrl()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                                class="flex-1 min-w-0 px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <button type="button" onclick="openSourceAccountUrl()" class="px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 whitespace-nowrap">
                                 🔗 Kết Nối Nick
                             </button>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Danh sách Link Group Mục Tiêu (Mỗi dòng 1 link)</label>
-                        <textarea id="groupUrlsInput" rows="2" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/groups/ten_nhom_1&#10;https://www.facebook.com/groups/ten_nhom_2"
-                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Danh sách Link Group Mục Tiêu (Mỗi dòng 1 link)</label>
+                        <textarea id="groupUrlsInput" rows="3" oninput="saveUserConfigToVault()" placeholder="https://www.facebook.com/groups/ten_nhom_1&#10;https://www.facebook.com/groups/ten_nhom_2"
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
                     </div>
 
                     <!-- Bảng Chế Độ Tự Động Hóa Toàn Phần 100% (Auto-Pilot) -->
-                    <div class="p-3.5 rounded-2xl bg-slate-900 text-slate-100 border border-slate-700 space-y-2.5 shadow-inner">
-                        <div class="flex items-center justify-between gap-2">
+                    <div class="p-4 rounded-2xl bg-slate-900 text-slate-100 border border-slate-700 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
                             <div class="flex items-center space-x-2">
-                                <span id="robotStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                                <span class="text-xs font-extrabold text-white">Auto-Pilot Tự Động 100% (Đăng & Seeding)</span>
+                                <span id="robotStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+                                <span class="text-xs font-extrabold text-white">Auto-Pilot Tự Động 100%</span>
                             </div>
                             <span id="robotStatusText" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">Chưa bật Auto-Pilot</span>
                         </div>
                         <p class="text-[11px] text-slate-300 leading-relaxed">
                             Mở file Auto-Pilot 1 lần duy nhất để Tool <b>tự động đăng bài lên các nhóm, tự cập nhật content mới theo lịch & tự thả 5 comment mồi câu</b> rảnh tay:
                         </p>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-xs shadow-sm transition">
-                                ⬇ Tải Auto-Pilot 1-Click (.bat)
+                        <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                            <button type="button" onclick="downloadDesktopRobotAgent()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-xs shadow-sm transition">
+                                ⬇ Tải Auto-Pilot (.bat)
                             </button>
-                            <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-600 transition">
+                            <button type="button" onclick="checkDesktopRobotBridge(true)" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-600 transition">
                                 Kiểm tra kết nối
                             </button>
                             <label class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-300 cursor-pointer select-none">
@@ -424,23 +415,22 @@
 
                 <!-- Thẻ 2: Đa Phương Tiện (4 Ảnh + Video) & Mô tả Sản Phẩm -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <h2 class="text-xs font-extrabold uppercase tracking-wider text-blue-700 flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-md bg-blue-600 text-white inline-flex items-center justify-center text-[11px]">2</span>
+                            <span class="w-5 h-5 rounded-md bg-blue-600 text-white inline-flex items-center justify-center text-[11px] shrink-0">2</span>
                             <span>Đa Phương Tiện & Nội Dung Gốc</span>
                         </h2>
-                        <span id="mediaCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">0/4 Ảnh • 0 Video</span>
+                        <span id="mediaCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100 shrink-0">0/4 Ảnh • 0 Video</span>
                     </div>
 
-                    <!-- Bố cục ngang 2 cột cho Tải Ảnh và Tải Video -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <!-- Cột chọn tối đa 4 ảnh -->
-                        <div class="space-y-2">
+                        <div class="space-y-1.5">
                             <div class="flex items-center justify-between">
                                 <label class="text-xs font-semibold text-slate-700">Ảnh sản phẩm (Max 4)</label>
                                 <button type="button" id="clearAllImagesBtn" onclick="clearAllProductImages()" class="hidden text-[11px] font-semibold text-rose-600 hover:underline">Xóa hết</button>
                             </div>
-                            <label for="productImagesInput" class="flex flex-col items-center justify-center w-full h-24 px-3 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-blue-50/50 hover:border-blue-400 transition text-center">
+                            <label for="productImagesInput" class="flex flex-col items-center justify-center w-full h-24 px-2 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-blue-50/50 hover:border-blue-400 transition text-center">
                                 <svg class="w-5 h-5 mb-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
@@ -451,12 +441,12 @@
                         </div>
 
                         <!-- Cột chọn Video ≤ 1 phút (< 300MB) -->
-                        <div class="space-y-2">
+                        <div class="space-y-1.5">
                             <div class="flex items-center justify-between">
                                 <label class="text-xs font-semibold text-slate-700">Video ngắn (≤ 60s)</label>
                                 <button type="button" id="removeVideoBtn" onclick="clearProductVideo()" class="hidden text-[11px] font-semibold text-rose-600 hover:underline">Gỡ video</button>
                             </div>
-                            <label id="videoUploadLabel" for="productVideoInput" class="flex flex-col items-center justify-center w-full h-24 px-3 border-2 border-dashed border-indigo-200 rounded-2xl cursor-pointer bg-indigo-50/40 hover:bg-indigo-50 hover:border-indigo-400 transition text-center">
+                            <label id="videoUploadLabel" for="productVideoInput" class="flex flex-col items-center justify-center w-full h-24 px-2 border-2 border-dashed border-indigo-200 rounded-2xl cursor-pointer bg-indigo-50/40 hover:bg-indigo-50 hover:border-indigo-400 transition text-center">
                                 <svg class="w-5 h-5 mb-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
@@ -471,158 +461,156 @@
                     <div id="multiImagePreviewGrid" class="hidden grid grid-cols-4 gap-2"></div>
 
                     <!-- Khung xem trước Video -->
-                    <div id="videoPreviewBox" class="hidden rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 p-2 space-y-1.5">
-                        <video id="productVideoPreview" controls class="w-full max-h-36 rounded-xl bg-black"></video>
+                    <div id="videoPreviewBox" class="hidden rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 p-2.5 space-y-1.5">
+                        <video id="productVideoPreview" controls class="w-full max-h-40 rounded-xl bg-black"></video>
                         <div class="flex items-center justify-between px-1 text-[11px] text-slate-300">
                             <span id="videoMetaName" class="truncate font-medium max-w-[65%]">video.mp4</span>
                             <span id="videoMetaSpec" class="text-emerald-400 font-bold shrink-0">0s • 0 MB</span>
                         </div>
                     </div>
 
-                    <!-- Bố cục ngang 2 cột cho Mô tả sản phẩm & Ngữ cảnh bài hot -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Mô tả sản phẩm gốc <span class="text-rose-500">*</span></label>
-                            <textarea id="productInfoInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Ví dụ: Nhẫn bạc S925 đính đá cao cấp, sáng bóng bền màu, ưu đãi hôm nay..."
-                                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mô tả sản phẩm / Dịch vụ gốc <span class="text-rose-500">*</span></label>
+                        <textarea id="productInfoInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Ví dụ: Nhẫn bạc S925 đính đá cao cấp, sáng bóng bền màu, ưu đãi hôm nay..."
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-700">Ngữ cảnh bài hot trong Group</label>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold">Tối ưu văn phong</span>
                         </div>
-                        <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-semibold text-slate-700">Ngữ cảnh bài hot Group</label>
-                                <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-semibold">Văn phong</span>
-                            </div>
-                            <textarea id="hotPostsInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Dán 2-3 đoạn nội dung đang hot trong nhóm để AI học văn phong..."
-                                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
-                        </div>
+                        <textarea id="hotPostsInput" rows="3" oninput="saveUserConfigToVault()" placeholder="Dán 2-3 đoạn nội dung đang hot trong nhóm để AI học văn phong tự nhiên..."
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"></textarea>
                     </div>
                 </div>
 
-                <!-- Thanh nút điều khiển chính (Cố định dễ bấm) -->
-                <div class="sticky bottom-3 z-20 bg-white/90 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200 shadow-lg flex gap-3">
-                    <button type="button" id="startCampaignBtn" onclick="startCampaign()" class="flex-1 py-3 px-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-sm rounded-xl shadow-md shadow-blue-500/25 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Nút Điều Khiển Chiến Dịch Chính -->
+                <div class="flex gap-3">
+                    <button type="button" id="startCampaignBtn" onclick="startCampaign()" class="flex-1 py-3.5 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span>Chạy Chiến Dịch Tự Động</span>
                     </button>
 
-                    <button type="button" id="stopCampaignBtn" onclick="stopCampaign()" class="hidden py-3 px-6 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm rounded-xl shadow-md shadow-rose-500/25 flex items-center justify-center space-x-2 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" id="stopCampaignBtn" onclick="stopCampaign()" class="hidden flex-1 py-3.5 px-6 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center space-x-2 transition">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
                         </svg>
-                        <span>Dừng</span>
+                        <span>Dừng Chiến Dịch</span>
                     </button>
                 </div>
 
             </div>
 
-            <!-- CỘT PHẢI: BẢNG ĐIỀU HÀNH THỜI GIAN THỰC & KẾT QUẢ AI (6 CỘT = 50%) -->
-            <div class="lg:col-span-6 space-y-5">
+            <!-- CỘT PHẢI: BẢNG ĐIỀU HÀNH THỜI GIAN THỰC & KẾT QUẢ AI (7 CỘT) -->
+            <div class="lg:col-span-7 space-y-5 min-w-0">
 
-                <!-- Bộ đếm thời gian kép (Ngang hàng cân đối với Thẻ 1) -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
-                        <div>
-                            <span id="postIntervalBadge" class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">Chu kỳ 5 phút</span>
-                            <p class="text-[11px] text-slate-500 mt-1.5">Làm mới bài tiếp theo</p>
-                            <div class="flex items-baseline space-x-1.5 mt-0.5">
-                                <span id="postTimerDisplay" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">05:00</span>
-                                <span class="text-[11px] text-slate-400">phút</span>
+                <!-- Bộ đếm thời gian kép -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <span id="postIntervalBadge" class="inline-block text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">Chu kỳ 5 phút</span>
+                            <p class="text-xs text-slate-500 mt-2">Làm mới bài đăng tiếp theo</p>
+                            <div class="flex items-baseline space-x-1.5 mt-1">
+                                <span id="postTimerDisplay" class="text-3xl font-extrabold text-slate-900 tracking-tight">05:00</span>
+                                <span class="text-xs text-slate-400">phút</span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[11px] text-slate-400 block">Đã tạo bài</span>
+                        <div class="text-right shrink-0">
+                            <span class="text-xs text-slate-400 block">Đã tạo bài</span>
                             <span id="postCycleCountDisplay" class="text-2xl font-extrabold text-blue-600">#0</span>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
-                        <div>
-                            <span id="commentIntervalBadge" class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">Mỗi 5 phút (Max 5)</span>
-                            <p class="text-[11px] text-slate-500 mt-1.5">Comment seeding tiếp</p>
-                            <div class="flex items-baseline space-x-1.5 mt-0.5">
-                                <span id="commentTimerDisplay" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">05:00</span>
-                                <span class="text-[11px] text-slate-400">phút</span>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <span id="commentIntervalBadge" class="inline-block text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">Mỗi 5 phút (Max 5)</span>
+                            <p class="text-xs text-slate-500 mt-2">Bình luận seeding tiếp theo</p>
+                            <div class="flex items-baseline space-x-1.5 mt-1">
+                                <span id="commentTimerDisplay" class="text-3xl font-extrabold text-slate-900 tracking-tight">05:00</span>
+                                <span class="text-xs text-slate-400">phút</span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[11px] text-slate-400 block">Seeding</span>
+                        <div class="text-right shrink-0">
+                            <span class="text-xs text-slate-400 block">Tiến độ Seeding</span>
                             <span id="commentCountDisplay" class="text-2xl font-extrabold text-indigo-600">0 / 5</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Khung kết quả Bài Đăng AI vừa tối ưu -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3.5">
-                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                         <div>
-                            <h3 class="text-sm font-extrabold text-slate-900">Nội Dung Bài Đăng Mới Nhất</h3>
-                            <p class="text-[11px] text-slate-500">AI tự động xoay vòng văn phong theo ngữ cảnh nhóm</p>
+                            <h3 class="text-base font-extrabold text-slate-900">Nội Dung Bài Đăng Mới Nhất</h3>
+                            <p class="text-xs text-slate-500">AI tự động xoay vòng văn phong theo ngữ cảnh nhóm</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button type="button" onclick="executePostGenerationCycle()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <button type="button" onclick="executePostGenerationCycle()" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
                                 Viết lại ngay
                             </button>
-                            <button type="button" onclick="copyTextFromElement('generatedPostOutput', 'Đã sao chép nội dung bài đăng!')" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs flex items-center space-x-1.5 transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="button" onclick="copyTextFromElement('generatedPostOutput', 'Đã sao chép nội dung bài đăng!')" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs flex items-center space-x-1.5 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
                                 </svg>
-                                <span>Copy Bài</span>
+                                <span>Copy Bài Viết</span>
                             </button>
                         </div>
                     </div>
 
-                    <div id="aiExpertAnalysisBox" class="hidden p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900 space-y-1">
+                    <div id="aiExpertAnalysisBox" class="hidden p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900 space-y-1">
                         <span class="font-bold flex items-center space-x-1">
                             <span>💡 Góc nhìn Chuyên gia Marketing:</span>
                         </span>
                         <p id="aiExpertAnalysisText" class="leading-relaxed text-amber-800"></p>
                     </div>
 
-                    <textarea id="generatedPostOutput" rows="5" placeholder="Nội dung bài viết do AI biên soạn sẽ xuất hiện tại đây sau khi bạn bấm Chạy Chiến Dịch..."
-                        class="w-full p-3.5 text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"></textarea>
+                    <textarea id="generatedPostOutput" rows="6" placeholder="Nội dung bài viết do AI biên soạn sẽ xuất hiện tại đây sau khi bạn bấm Chạy Chiến Dịch..."
+                        class="w-full p-4 text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"></textarea>
 
                     <!-- Bảng theo dõi trạng thái bài đăng: Đã lên nhóm hay Chờ duyệt -->
-                    <div id="postTrackingSection" class="hidden p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                        <div class="flex items-center justify-between gap-2">
+                    <div id="postTrackingSection" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
                             <span class="text-xs font-extrabold text-slate-800">📡 Trạng Thái Bài Đăng Trên Các Nhóm</span>
-                            <button type="button" onclick="refreshPostTrackingStatus(true)" class="px-2.5 py-1 rounded-lg bg-white hover:bg-blue-50 text-blue-700 border border-slate-200 text-[11px] font-bold transition">
+                            <button type="button" onclick="refreshPostTrackingStatus(true)" class="px-3 py-1.5 rounded-lg bg-white hover:bg-blue-50 text-blue-700 border border-slate-200 text-[11px] font-bold transition shrink-0">
                                 🔄 Kiểm tra duyệt bài
                             </button>
                         </div>
-                        <div id="postTrackingList" class="space-y-1.5"></div>
+                        <div id="postTrackingList" class="space-y-2"></div>
                     </div>
 
                     <div id="groupQuickLinksContainer" class="flex flex-wrap gap-2"></div>
                 </div>
 
                 <!-- Khung 5 Bình Luận Seeding Gây Tò Mò -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                         <div>
-                            <h3 class="text-sm font-extrabold text-slate-900">Kịch Bản 5 Bình Luận Gây Tò Mò (Chủ Bài Tung Mồi Câu)</h3>
-                            <p class="text-[11px] text-slate-500">Tự động thả bổ sung theo chu kỳ để kích thích người đọc hỏi ngay</p>
+                            <h3 class="text-base font-extrabold text-slate-900">Kịch Bản 5 Bình Luận Gây Tò Mò (Chủ Bài Tung Mồi Câu)</h3>
+                            <p class="text-xs text-slate-500">Chính bạn tự bình luận bổ sung theo chu kỳ để kích thích người đọc tò mò</p>
                         </div>
-                        <button type="button" onclick="releaseNextCuriousComment()" class="px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition shrink-0">
-                            + Thả cmt tiếp
+                        <button type="button" onclick="releaseNextCuriousComment()" class="px-3.5 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition shrink-0">
+                            + Mở comment tiếp
                         </button>
                     </div>
 
-                    <div id="commentsQueueList" class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-                        <p class="text-xs text-slate-400 italic text-center py-5">Chưa có bình luận nào. Bấm chạy chiến dịch để AI tạo 5 bình luận seeding.</p>
+                    <div id="commentsQueueList" class="space-y-2.5 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                        <p class="text-xs text-slate-400 italic text-center py-6">Chưa có bình luận nào. Bấm chạy chiến dịch để AI tạo 5 bình luận seeding.</p>
                     </div>
                 </div>
 
                 <!-- Nhật ký hoạt động thời gian thực -->
                 <div class="bg-slate-900 rounded-2xl shadow-sm p-4 text-slate-300 space-y-2">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Nhật ký hệ thống (Live Console)</span>
-                        <button type="button" onclick="document.getElementById('liveLogContainer').innerHTML=''" class="text-[11px] text-slate-500 hover:text-slate-300">Xóa log</button>
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nhật ký hệ thống (Live Console)</span>
+                        <button type="button" onclick="document.getElementById('liveLogContainer').innerHTML=''" class="text-xs text-slate-500 hover:text-slate-300">Xóa log</button>
                     </div>
-                    <div id="liveLogContainer" class="h-28 overflow-y-auto custom-scrollbar space-y-1 pr-1">
-                        <div class="text-[11px] font-mono text-emerald-400">[Hệ thống v3.8 Pro] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio (Hỗ trợ 4 Ảnh + Video 1 phút &lt; 300MB).</div>
+                    <div id="liveLogContainer" class="h-32 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
+                        <div class="text-xs font-mono text-emerald-400">[Hệ thống v3.8 Pro] Sẵn sàng khởi chạy chiến dịch AI Facebook Group Studio (Hỗ trợ 4 Ảnh + Video 1 phút &lt; 300MB).</div>
                     </div>
                 </div>
 
